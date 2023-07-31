@@ -5,7 +5,7 @@ const CHARACTER_CLASS_MAX: usize = 64;
 
 #[derive(SaveBin)]
 pub struct Character {
-    level: u32,
+    pub(crate) level: u32,
     exp: u32,
     bonus_exp: u32,
 
@@ -25,5 +25,5 @@ pub struct CharacterClass {
     #[loc(0x8)]
     gems: [u8; 3],
     arts: [u16; 8],
-    skills: [u16; 7]
+    skills: [u16; 7],
 }

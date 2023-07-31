@@ -80,7 +80,9 @@ where
         }
 
         // https://github.com/rust-lang/rust/issues/61956
-        Ok(unsafe { std::mem::transmute_copy::<_, [T; N]>(&data) })
+        let ptr = &data as *const _ as *const [T; N];
+        std::mem::forget(data);
+        Ok(unsafe { ptr.read() })
     }
 
     fn size() -> usize {

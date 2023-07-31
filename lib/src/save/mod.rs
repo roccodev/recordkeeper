@@ -12,7 +12,7 @@ const SAVE_VERSION: u8 = 10;
 
 #[derive(SaveBin)]
 pub struct SaveData {
-    #[assert(0xb378fa6a)]
+    #[assert(0xb368fa6a)]
     _magic: u32,
     #[assert(SAVE_VERSION)]
     save_version: u8,
@@ -21,7 +21,7 @@ pub struct SaveData {
     play_time: PlayTime,
     #[loc(0x18)]
     timestamp: SaveTimestamp,
-    gold: u32,
+    pub gold: u32,
 
     /// Saved event flow ID for end-of-chapter saves
     #[loc(0x684)]
@@ -40,7 +40,7 @@ pub struct SaveData {
     flags: AllFlags,
 
     #[loc(0xe3a0)]
-    characters: [Character; CHARACTER_MAX],
+    pub characters: [Character; CHARACTER_MAX],
 
     #[loc(0x183000)]
     enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
