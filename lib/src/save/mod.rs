@@ -1,4 +1,4 @@
-use crate::save::character::{Character, CHARACTER_MAX};
+use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX};
 use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
 use crate::save::flags::AllFlags;
 use recordkeeper_macros::SaveBin;
@@ -32,18 +32,19 @@ pub struct SaveData {
     map_time: MapTime,
 
     #[loc(0x6a0)]
-    player_pos: Pos,
+    pub player_pos: Pos,
     #[loc(0x6a8)]
-    ship_pos: Pos,
+    pub ship_pos: Pos,
 
     #[loc(0x710)]
     flags: AllFlags,
 
     #[loc(0xe3a0)]
     pub characters: [Character; CHARACTER_MAX],
+    pub ouroboros: [Ouroboros; OUROBOROS_MAX],
 
     #[loc(0x183000)]
-    enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
+    pub enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
 }
 
 #[derive(SaveBin, Debug)]
@@ -59,9 +60,9 @@ pub struct SaveTimestamp {
 
 #[derive(SaveBin, Debug)]
 pub struct Pos {
-    x: f32,
-    y: f32,
-    z: f32,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
 #[derive(SaveBin, Debug)]

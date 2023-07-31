@@ -1,6 +1,7 @@
 use recordkeeper_macros::SaveBin;
 
 pub const CHARACTER_MAX: usize = 64;
+pub const OUROBOROS_MAX: usize = 6;
 const CHARACTER_CLASS_MAX: usize = 64;
 
 #[derive(SaveBin, Debug)]
@@ -24,6 +25,17 @@ pub struct Character {
 }
 
 #[derive(SaveBin, Debug)]
+pub struct Ouroboros {
+    pub art_ids: [u16; 5],
+    pub exp: u16, // ???
+    pub sp: u32,
+    pub linked_skills: [u16; 2],
+
+    #[loc(0x34)]
+    pub skill_tree: OuroborosTree,
+}
+
+#[derive(SaveBin, Debug)]
 #[size(68)]
 pub struct CharacterClass {
     cp: u32,
@@ -32,8 +44,8 @@ pub struct CharacterClass {
 
     #[loc(0x8)]
     gems: [u8; 10], // ? (-1 for locked slot probably)
-    skills: [u16; 7],
-    arts: [u16; 8],
+    arts: [u16; 7],
+    skills: [u16; 8],
 
     accessories: [ClassAccessory; 3],
 }
@@ -43,4 +55,9 @@ pub struct ClassAccessory {
     bdat_id: u16,
     slot_index: u16,
     item_type: u16,
+}
+
+#[derive(SaveBin, Debug)]
+pub struct OuroborosTree {
+    raw: u64,
 }

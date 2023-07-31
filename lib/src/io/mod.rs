@@ -14,6 +14,14 @@ pub trait SaveBin<'src>: Sized {
     }
 }
 
+impl<'src> SaveBin<'src> for u64 {
+    type Error = std::io::Error;
+
+    fn read(mut bytes: Cursor<&'src [u8]>) -> Result<Self, Self::Error> {
+        bytes.read_u64::<LittleEndian>()
+    }
+}
+
 impl<'src> SaveBin<'src> for f32 {
     type Error = std::io::Error;
 
