@@ -1,7 +1,7 @@
 use recordkeeper_macros::SaveBin;
 use std::marker::PhantomData;
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 #[size(16)]
 pub struct ItemSlot {
     item_id: u16,

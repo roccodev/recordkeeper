@@ -10,7 +10,7 @@ const FLAG_8_BIT_COUNT: usize = 8192;
 const FLAG_16_BIT_COUNT: usize = 3072;
 const FLAG_32_BIT_COUNT: usize = 2372;
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 pub struct AllFlags {
     // workaround for https://github.com/rust-lang/rust/issues/76560
     // words = flag count / 32 / bits
@@ -22,13 +22,13 @@ pub struct AllFlags {
     flags_32b: ByteFlags<u32, FLAG_32_BIT_COUNT>,
 }
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 struct BitFlags<const BITS: usize, const WORDS: usize> {
     words: [u32; WORDS],
     _bits: [PhantomData<()>; BITS],
 }
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 struct ByteFlags<B: for<'a> SaveBin<'a>, const N: usize>
 where
     StructError: for<'a> From<<B as SaveBin<'a>>::Error>,

@@ -10,7 +10,7 @@ mod item;
 
 const SAVE_VERSION: u8 = 10;
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 pub struct SaveData {
     #[assert(0xb368fa6a)]
     _magic: u32,
@@ -46,25 +46,25 @@ pub struct SaveData {
     enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
 }
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 pub struct PlayTime {
     raw: u32,
 }
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 pub struct SaveTimestamp {
     time: u32,
     date: u32,
 }
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 pub struct Pos {
     x: f32,
     y: f32,
     z: f32,
 }
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 pub struct MapTime {
     hour: u16,
     minute: u16,

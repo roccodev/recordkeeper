@@ -3,7 +3,7 @@ use recordkeeper_macros::SaveBin;
 pub const CHARACTER_MAX: usize = 64;
 const CHARACTER_CLASS_MAX: usize = 64;
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 #[size(4444)]
 pub struct Character {
     pub level: u32,
@@ -23,11 +23,11 @@ pub struct Character {
     pub attachment: u8, // unsure
 }
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 #[size(68)]
 pub struct CharacterClass {
     cp: u32,
-    attachments: u16, // unsure
+    unlock_points: u16,
     level: u8,
 
     #[loc(0x8)]
@@ -38,7 +38,7 @@ pub struct CharacterClass {
     accessories: [ClassAccessory; 3],
 }
 
-#[derive(SaveBin)]
+#[derive(SaveBin, Debug)]
 pub struct ClassAccessory {
     bdat_id: u16,
     slot_index: u16,
