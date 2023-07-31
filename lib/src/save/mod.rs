@@ -1,3 +1,4 @@
+use crate::item::Inventory;
 use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX};
 use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
 use crate::save::flags::AllFlags;
@@ -42,6 +43,9 @@ pub struct SaveData {
     #[loc(0xe3a0)]
     pub characters: [Character; CHARACTER_MAX],
     pub ouroboros: [Ouroboros; OUROBOROS_MAX],
+
+    #[loc(0x53c78)]
+    pub inventory: Inventory,
 
     #[loc(0x183000)]
     pub enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
