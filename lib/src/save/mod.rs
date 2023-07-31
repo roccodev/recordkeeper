@@ -3,10 +3,10 @@ use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
 use crate::save::flags::AllFlags;
 use recordkeeper_macros::SaveBin;
 
-mod character;
-mod enemy;
-mod flags;
-mod item;
+pub mod character;
+pub mod enemy;
+pub mod flags;
+pub mod item;
 
 const SAVE_VERSION: u8 = 10;
 
@@ -37,7 +37,7 @@ pub struct SaveData {
     pub ship_pos: Pos,
 
     #[loc(0x710)]
-    flags: AllFlags,
+    pub flags: AllFlags,
 
     #[loc(0xe3a0)]
     pub characters: [Character; CHARACTER_MAX],
