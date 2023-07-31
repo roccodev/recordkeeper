@@ -63,7 +63,7 @@ impl<'ast> FieldVisitor<'ast> {
     }
 }
 
-#[proc_macro_derive(SaveBin, attributes(loc, assert))]
+#[proc_macro_derive(SaveBin, attributes(loc, assert, size))]
 pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let item = parse_macro_input!(item as DeriveInput);
 
@@ -80,6 +80,15 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
         Data::Struct(str) => str,
         _ => panic!("SaveBin can only be derived on structs"),
     };
+
+    let expected_size = item
+        .attrs
+        .iter()
+        .find(|a| a.path().is_ident("size"))
+        .map(|a| match &a.meta {
+            Meta::List(l) => l.tokens.clone(),
+            _ => panic!("syntax: #[size(N)]"),
+        });
 
     let field_visitors = item_struct
         .fields
@@ -124,6 +133,16 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
         .flat_map(|v| v.size_calc_tokens())
         .collect::<TokenStream>();
 
+    let extra_size = expected_size.map(|size| {
+        quote! {
+            if size > #size {
+                panic!("Struct {} too large, can't add padding. Expected max {} bytes, found {}.",
+                    stringify!(#name), #size, size);
+            }
+            size = #size;
+        }
+    });
+
     let out = quote! {
         impl #impl_generics crate::io::SaveBin<'__SRC> for #name #ty_generics #where_clause {
             type Error = crate::error::StructError;
@@ -145,6 +164,7 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
                 let mut size: usize = 0;
 
                 #size_calc
+                #extra_size
 
                 size
             }
