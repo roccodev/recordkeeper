@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 recordkeeper-macros = { path = "../macros" }
 byteorder = "1.4.3"
+thiserror = "1.0.44"

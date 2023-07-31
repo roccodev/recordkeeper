@@ -1,3 +1,5 @@
+use crate::error::StructError;
+use crate::io::SaveBin;
 use recordkeeper_macros::SaveBin;
 use std::marker::PhantomData;
 
@@ -27,6 +29,9 @@ struct BitFlags<const BITS: usize, const WORDS: usize> {
 }
 
 #[derive(SaveBin)]
-struct ByteFlags<B, const N: usize> {
+struct ByteFlags<B: for<'a> SaveBin<'a>, const N: usize>
+where
+    StructError: for<'a> From<<B as SaveBin<'a>>::Error>,
+{
     flags: [B; N],
 }

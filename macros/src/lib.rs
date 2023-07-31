@@ -1,7 +1,7 @@
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 
 use quote::{quote, ToTokens};
-use syn::{parse_macro_input, Attribute, Data, DeriveInput, Expr, Field, Ident, Meta};
+use syn::{parse_macro_input, parse_quote, Attribute, Data, DeriveInput, Expr, Field, Ident, Meta};
 
 struct FieldVisitor<'ast> {
     field: &'ast Field,
@@ -30,8 +30,10 @@ impl<'ast> FieldVisitor<'ast> {
             #loc_code
             let #var_name = <#type_ident as crate::io::SaveBin>::read(__IN_BYTES.clone())?;
             #assert_code
-            __IN_BYTES.set_position(__IN_BYTES.position()
-                + <#type_ident as crate::io::SaveBin>::size().try_into().expect("size too large"));
+            let __SIZE: u64 = <#type_ident as crate::io::SaveBin>::size()
+                .try_into()
+                .expect("size too large");
+            __IN_BYTES.set_position(__IN_BYTES.position() + __SIZE);
         };
         out.into()
     }
@@ -41,6 +43,24 @@ impl<'ast> FieldVisitor<'ast> {
         let out = quote! { #name, };
         out.into()
     }
+
+    fn size_calc_tokens(&self) -> TokenStream {
+        let type_ident = &self.field.ty;
+
+        let out = match &self.location {
+            Some(loc) => quote! {
+                let _size = <#type_ident as crate::io::SaveBin>::size();
+                size += _size + #loc - current_loc;
+                current_loc = #loc + _size;
+            },
+            None => quote! {
+                let _size = <#type_ident as crate::io::SaveBin>::size();
+                size += _size;
+                current_loc += _size;
+            },
+        };
+        out.into()
+    }
 }
 
 #[proc_macro_derive(SaveBin, attributes(loc, assert))]
@@ -48,7 +68,13 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
     let item = parse_macro_input!(item as DeriveInput);
 
     let name = &item.ident;
-    let (impl_generics, ty_generics, where_clause) = item.generics.split_for_impl();
+
+    let mut generics = item.generics.clone();
+    // add lifetime param for SaveBin, but only to impl generics
+    generics.params.insert(0, parse_quote!('__SRC));
+    let (impl_generics, _, _) = generics.split_for_impl();
+
+    let (_, ty_generics, where_clause) = item.generics.split_for_impl();
 
     let item_struct = match item.data {
         Data::Struct(str) => str,
@@ -93,13 +119,18 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
         .flat_map(|v| v.initializer_tokens())
         .collect::<TokenStream>();
 
+    let size_calc = field_visitors
+        .iter()
+        .flat_map(|v| v.size_calc_tokens())
+        .collect::<TokenStream>();
+
     let out = quote! {
-        impl<'__SRC> #impl_generics crate::io::SaveBin<'__SRC> for #name #ty_generics #where_clause {
+        impl #impl_generics crate::io::SaveBin<'__SRC> for #name #ty_generics #where_clause {
             type Error = crate::error::StructError;
 
             fn read(mut __IN_BYTES: std::io::Cursor<&'__SRC [u8]>) -> Result<Self, Self::Error> {
                 // Set up relative positions for start of struct
-                let __POS = usize::from(__IN_BYTES.position());
+                let __POS = usize::try_from(__IN_BYTES.position()).expect("position too large");
                 __IN_BYTES = std::io::Cursor::new(&__IN_BYTES.into_inner()[__POS..]);
 
                 #parsers
@@ -107,6 +138,15 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
                 Ok(Self {
                     #initializers
                 })
+            }
+
+            fn size() -> usize {
+                let mut current_loc: usize = 0;
+                let mut size: usize = 0;
+
+                #size_calc
+
+                size
             }
         }
     };
