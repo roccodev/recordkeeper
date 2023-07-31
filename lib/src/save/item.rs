@@ -1,5 +1,5 @@
-use std::marker::PhantomData;
 use recordkeeper_macros::SaveBin;
+use std::marker::PhantomData;
 
 #[derive(SaveBin)]
 pub struct ItemSlot {
@@ -7,6 +7,5 @@ pub struct ItemSlot {
     amount: u16,
 
     #[loc(0xf)]
-    #[no_getter]
-    _padding: PhantomData<()>
+    _padding: PhantomData<()>,
 }

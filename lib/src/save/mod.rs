@@ -1,18 +1,17 @@
-use recordkeeper_macros::SaveBin;
 use crate::save::character::{Character, CHARACTER_MAX};
-use crate::save::enemy::{ENEMY_TOMBSTONE_MAX, EnemyTombstone};
+use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
 use crate::save::flags::AllFlags;
+use recordkeeper_macros::SaveBin;
 
 mod character;
-mod item;
-mod flags;
 mod enemy;
+mod flags;
+mod item;
 
 const SAVE_VERSION: u8 = 10;
 
 #[derive(SaveBin)]
 pub struct SaveData {
-    #[no_getter]
     #[assert(0xb378fa6a)]
     _magic: u32,
     #[assert(SAVE_VERSION)]
@@ -49,24 +48,24 @@ pub struct SaveData {
 
 #[derive(SaveBin)]
 pub struct PlayTime {
-    raw: u32
+    raw: u32,
 }
 
 #[derive(SaveBin)]
 pub struct SaveTimestamp {
     time: u32,
-    date: u32
+    date: u32,
 }
 
 #[derive(SaveBin)]
 pub struct Pos {
     x: f32,
     y: f32,
-    z: f32
+    z: f32,
 }
 
 #[derive(SaveBin)]
 pub struct MapTime {
     hour: u16,
-    minute: u16
+    minute: u16,
 }
