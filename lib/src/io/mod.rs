@@ -14,43 +14,35 @@ pub trait SaveBin<'src>: Sized {
     }
 }
 
-impl<'src> SaveBin<'src> for u64 {
-    type Error = std::io::Error;
+macro_rules! byteorder_impl {
+    ($($types:tt ) *) => {
+        $(
+            impl<'src> SaveBin<'src> for $types {
+                type Error = std::io::Error;
 
-    fn read(mut bytes: Cursor<&'src [u8]>) -> Result<Self, Self::Error> {
-        bytes.read_u64::<LittleEndian>()
-    }
+                fn read(mut bytes: std::io::Cursor<&'src [u8]>) -> Result<Self, Self::Error> {
+                    paste::paste! { bytes.[<read_ $types >]::<LittleEndian>() }
+                }
+            }
+        )*
+    };
 }
 
-impl<'src> SaveBin<'src> for f32 {
-    type Error = std::io::Error;
-
-    fn read(mut bytes: Cursor<&'src [u8]>) -> Result<Self, Self::Error> {
-        bytes.read_f32::<LittleEndian>()
-    }
-}
-
-impl<'src> SaveBin<'src> for u32 {
-    type Error = std::io::Error;
-
-    fn read(mut bytes: Cursor<&'src [u8]>) -> Result<Self, Self::Error> {
-        bytes.read_u32::<LittleEndian>()
-    }
-}
-
-impl<'src> SaveBin<'src> for u16 {
-    type Error = std::io::Error;
-
-    fn read(mut bytes: Cursor<&'src [u8]>) -> Result<Self, Self::Error> {
-        bytes.read_u16::<LittleEndian>()
-    }
-}
+byteorder_impl!(u64 i64 f64 u32 i32 f32 u16 i16);
 
 impl<'src> SaveBin<'src> for u8 {
     type Error = std::io::Error;
 
     fn read(mut bytes: Cursor<&'src [u8]>) -> Result<Self, Self::Error> {
         bytes.read_u8()
+    }
+}
+
+impl<'src> SaveBin<'src> for i8 {
+    type Error = std::io::Error;
+
+    fn read(mut bytes: Cursor<&'src [u8]>) -> Result<Self, Self::Error> {
+        bytes.read_i8()
     }
 }
 

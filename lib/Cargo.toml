@@ -7,3 +7,4 @@ edition = "2021"
 recordkeeper-macros = { path = "../macros" }
 byteorder = "1.4.3"
 thiserror = "1.0.44"
+paste = "1.0.14"
