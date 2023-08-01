@@ -1,3 +1,5 @@
+use crate::character::{PARTY_GUEST_MAX, PARTY_MAX};
+use crate::flags::{BitFlags, UnknownFlags};
 use crate::item::Inventory;
 use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX};
 use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
@@ -24,6 +26,10 @@ pub struct SaveData {
     timestamp: SaveTimestamp,
     pub gold: u32,
 
+    /// Updated by the game on load.
+    #[loc(0x4c)]
+    pub seen_colonies: u32,
+
     /// Saved event flow ID for end-of-chapter saves
     #[loc(0x684)]
     saved_event_flow: u32,
@@ -40,12 +46,23 @@ pub struct SaveData {
     #[loc(0x710)]
     pub flags: AllFlags,
 
+    #[loc(0xe330)]
+    pub party_character_ids: [u16; PARTY_MAX],
+    pub party_character_count: u64,
+
+    #[loc(0xe358)]
+    pub party_guest_ids: [u16; PARTY_GUEST_MAX], // unsure
+    pub party_guest_count: u64,
+
     #[loc(0xe3a0)]
     pub characters: [Character; CHARACTER_MAX],
     pub ouroboros: [Ouroboros; OUROBOROS_MAX],
 
     #[loc(0x53c78)]
     pub inventory: Inventory,
+
+    #[loc(0x181c80)]
+    pub unknown_flags: UnknownFlags,
 
     #[loc(0x183000)]
     pub enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],

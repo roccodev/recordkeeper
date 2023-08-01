@@ -10,6 +10,9 @@ const FLAG_8_BIT_COUNT: usize = 8192;
 const FLAG_16_BIT_COUNT: usize = 3072;
 const FLAG_32_BIT_COUNT: usize = 2372;
 
+const FLAG_1_BIT_COUNT_UNK: usize = 80000;
+const FLAG_2_BIT_COUNT_UNK: usize = 31936;
+
 pub enum FlagType {
     Bit,
     TwoBits,
@@ -32,8 +35,14 @@ pub struct AllFlags {
 }
 
 #[derive(SaveBin, Debug)]
+pub struct UnknownFlags {
+    flags_1b: BitFlags<1, { FLAG_1_BIT_COUNT_UNK / 32 }>,
+    flags_2b: BitFlags<2, { FLAG_2_BIT_COUNT_UNK / 32 * 2 }>,
+}
+
+#[derive(SaveBin, Debug)]
 #[size(WORDS * 4)]
-struct BitFlags<const BITS: usize, const WORDS: usize> {
+pub struct BitFlags<const BITS: usize, const WORDS: usize> {
     words: [u32; WORDS],
     _bits: [PhantomData<()>; BITS],
 }

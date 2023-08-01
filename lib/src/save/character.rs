@@ -1,5 +1,7 @@
 use recordkeeper_macros::SaveBin;
 
+pub const PARTY_MAX: usize = 16;
+pub const PARTY_GUEST_MAX: usize = 8;
 pub const CHARACTER_MAX: usize = 64;
 pub const OUROBOROS_MAX: usize = 6;
 const CHARACTER_CLASS_MAX: usize = 64;
