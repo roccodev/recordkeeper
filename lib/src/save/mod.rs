@@ -1,9 +1,11 @@
 use crate::character::{PARTY_GUEST_MAX, PARTY_MAX};
+use crate::error::SaveError;
 use crate::flags::{BitFlags, UnknownFlags};
 use crate::item::Inventory;
 use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX};
 use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
 use crate::save::flags::AllFlags;
+
 use recordkeeper_macros::SaveBin;
 
 pub mod character;
@@ -11,13 +13,13 @@ pub mod enemy;
 pub mod flags;
 pub mod item;
 
-const SAVE_VERSION: u8 = 10;
+pub(crate) const SAVE_VERSION: u8 = 10;
 
 #[derive(SaveBin, Debug)]
 pub struct SaveData {
     #[assert(0xb368fa6a)]
     _magic: u32,
-    #[assert(SAVE_VERSION)]
+    #[assert(SAVE_VERSION, SaveError::UnsupportedVersion(ACTUAL))]
     save_version: u8,
 
     #[loc(0x10)]
