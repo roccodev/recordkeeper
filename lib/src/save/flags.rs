@@ -50,7 +50,8 @@ pub struct BitFlags<const BITS: usize, const WORDS: usize> {
 #[derive(SaveBin, Debug)]
 struct ByteFlags<B: for<'a> SaveBin<'a>, const N: usize>
 where
-    SaveError: for<'a> From<<B as SaveBin<'a>>::Error>,
+    SaveError: for<'a> From<<B as SaveBin<'a>>::ReadError>,
+    SaveError: for<'a> From<<B as SaveBin<'a>>::WriteError>,
 {
     flags: [B; N],
 }
@@ -81,7 +82,8 @@ impl<const BITS: usize, const WORDS: usize> BitFlags<BITS, WORDS> {
 
 impl<B: for<'a> SaveBin<'a>, const N: usize> ByteFlags<B, N>
 where
-    SaveError: for<'a> From<<B as SaveBin<'a>>::Error>,
+    SaveError: for<'a> From<<B as SaveBin<'a>>::ReadError>,
+    SaveError: for<'a> From<<B as SaveBin<'a>>::WriteError>,
     B: Copy,
 {
     pub fn get(&self, index: usize) -> Option<B> {

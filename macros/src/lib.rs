@@ -55,6 +55,25 @@ impl<'ast> FieldVisitor<'ast> {
         out.into()
     }
 
+    fn writer_tokens(&self) -> TokenStream {
+        let name = &self.field.ident;
+        let field_type = self.field.ty.to_token_stream();
+
+        let loc_code = self.location.as_ref().map(|loc| {
+            quote! {
+                __POS = #loc;
+            }
+        });
+
+        let out = quote! {
+            #loc_code
+            let __TMP_BYTES = &mut __OUT_BYTES[__POS..];
+            self. #name .write(__TMP_BYTES)?;
+            __POS += <#field_type as crate::io::SaveBin>::size();
+        };
+        out.into()
+    }
+
     fn initializer_tokens(&self) -> TokenStream {
         let name = &self.field.ident;
         let out = quote! { #name, };
@@ -148,6 +167,11 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
         .flat_map(|v| v.parser_tokens())
         .collect::<TokenStream>();
 
+    let writers = field_visitors
+        .iter()
+        .flat_map(|v| v.writer_tokens())
+        .collect::<TokenStream>();
+
     let initializers = field_visitors
         .iter()
         .flat_map(|v| v.initializer_tokens())
@@ -170,9 +194,10 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
 
     let out = quote! {
         impl #impl_generics crate::io::SaveBin<'__SRC> for #name #ty_generics #where_clause {
-            type Error = crate::error::SaveError;
+            type ReadError = crate::error::SaveError;
+            type WriteError = crate::error::SaveError;
 
-            fn read(mut __IN_BYTES: std::io::Cursor<&'__SRC [u8]>) -> Result<Self, Self::Error> {
+            fn read(mut __IN_BYTES: std::io::Cursor<&'__SRC [u8]>) -> Result<Self, Self::ReadError> {
                 // Set up relative positions for start of struct
                 let __POS = usize::try_from(__IN_BYTES.position()).expect("position too large");
                 __IN_BYTES = std::io::Cursor::new(&__IN_BYTES.into_inner()[__POS..]);
@@ -182,6 +207,12 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
                 Ok(Self {
                     #initializers
                 })
+            }
+
+            fn write(&self, mut __OUT_BYTES: &mut [u8]) -> Result<(), Self::WriteError> {
+                let mut __POS = 0;
+                #writers
+                Ok(())
             }
 
             fn size() -> usize {

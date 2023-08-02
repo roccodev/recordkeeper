@@ -16,4 +16,6 @@ pub enum SaveError {
     Io(#[from] std::io::Error),
     #[error("unreachable")]
     Infallible(#[from] Infallible),
+    #[error("Unexpected EOF while writing byte")]
+    UnexpectedEof,
 }
