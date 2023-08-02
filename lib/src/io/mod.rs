@@ -5,6 +5,65 @@ use std::io::Cursor;
 use std::marker::PhantomData;
 use std::mem::MaybeUninit;
 
+/// Provides support for reading structs from save files, and writing to portions of them.
+///
+/// ## Derive macro
+/// The recommended way to implement this trait for a struct is to use the `#[derive(SaveBin)]`
+/// attribute.
+///
+/// The example below also showcases the optional `loc`, `assert`, and `size` attributes.
+/// ```ignore
+/// use recordkeeper::SaveBin;
+///
+/// #[derive(SaveBin)]
+/// // We can provide a size hint manually. If the actual size is bigger,
+/// // reads will panic. If it is smaller, extra space will be accounted
+/// // for when reading or writing.
+/// #[size(32)]
+/// struct Position {
+///     // fields must be of types that implement SaveBin
+///     x: f32,
+///     y: f32,
+///     z: f32,
+///
+///     // We don't know what the other fields are, but
+///     // we can skip them by forcing an offset. The
+///     // offset is relative to the start of the struct.
+///     #[loc(0x10)]
+///     yaw: f32,
+///     pitch: f32,
+///     
+///     // We observed that this field is always 0, so we can
+///     // add an assertion in case this ever changes
+///     #[assert(0)]
+///     _unknown: u32,
+/// }
+/// ```
+///
+/// Failed assertions on struct fields will not panic, they will instead cause reads to throw
+/// an [`AssertionError`].  
+/// It is also possible to throw a custom error, like in this example:
+/// ```ignore
+/// use recordkeeper::SaveBin;
+///
+/// struct UnsupportedVersion;
+///
+/// #[derive(SaveBin)]
+/// struct Version {
+///     // version, must be 1.
+///     #[assert(1, UnsupportedVersion)]
+///     version: u32,
+/// }
+/// ```
+///
+/// To construct errors with custom values, the `ACTUAL` keyword may be used in place of the
+/// encountered value, e.g.
+/// ```ignore
+/// #[assert(1, CustomErrorWithValue(ACTUAL))]
+/// ```
+///
+/// [`AssertionError`]: crate::error::SaveError::AssertionError
+#[doc(inline)]
 pub trait SaveBin<'src>: Sized {
     type ReadError;
     type WriteError;
