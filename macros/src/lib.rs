@@ -36,23 +36,26 @@ impl<'ast> FieldVisitor<'ast> {
             let field_type = self.field.ty.to_token_stream();
             quote! {
                 let EXPECTED: #field_type = #assert_value;
-                if EXPECTED != #var_name {
-                    let ACTUAL = #var_name;
+                // __OUT_PTR points to valid memory if the read succeeded
+                if EXPECTED != std::ptr::read(__OUT_PTR) {
+                    let ACTUAL = std::ptr::read(__OUT_PTR);
                     return Err(#assert_error)
                 }
             }
         });
 
-        let out = quote! {
+        quote! {
             #loc_code
-            let #var_name = <#type_ident as crate::io::SaveBin>::read(__IN_BYTES.clone())?;
-            #assert_code
+            {
+                let __OUT_PTR = addr_of_mut!((*__BUILDING). #var_name);
+                <#type_ident as crate::io::SaveBin>::read_into(__IN_BYTES.clone(), __OUT_PTR)?;
+                #assert_code
+            }
             let __SIZE: u64 = <#type_ident as crate::io::SaveBin>::size()
                 .try_into()
                 .expect("size too large");
             __IN_BYTES.set_position(__IN_BYTES.position() + __SIZE);
-        };
-        out.into()
+        }
     }
 
     fn writer_tokens(&self) -> TokenStream {
@@ -65,25 +68,23 @@ impl<'ast> FieldVisitor<'ast> {
             }
         });
 
-        let out = quote! {
+        quote! {
             #loc_code
             let __TMP_BYTES = &mut __OUT_BYTES[__POS..];
             self. #name .write(__TMP_BYTES)?;
             __POS += <#field_type as crate::io::SaveBin>::size();
-        };
-        out.into()
+        }
     }
 
     fn initializer_tokens(&self) -> TokenStream {
         let name = &self.field.ident;
-        let out = quote! { #name, };
-        out.into()
+        quote! { #name, }
     }
 
     fn size_calc_tokens(&self) -> TokenStream {
         let type_ident = &self.field.ty;
 
-        let out = match &self.location {
+        match &self.location {
             Some(loc) => quote! {
                 let _size = <#type_ident as crate::io::SaveBin>::size();
                 size += _size + #loc - current_loc;
@@ -94,8 +95,7 @@ impl<'ast> FieldVisitor<'ast> {
                 size += _size;
                 current_loc += _size;
             },
-        };
-        out.into()
+        }
     }
 }
 
@@ -197,16 +197,16 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
             type ReadError = crate::error::SaveError;
             type WriteError = crate::error::SaveError;
 
-            fn read(mut __IN_BYTES: std::io::Cursor<&'__SRC [u8]>) -> Result<Self, Self::ReadError> {
+            unsafe fn read_into(mut __IN_BYTES: std::io::Cursor<&'__SRC [u8]>, __BUILDING: *mut Self) -> Result<(), Self::ReadError> {
+                use std::ptr::addr_of_mut;
+
                 // Set up relative positions for start of struct
                 let __POS = usize::try_from(__IN_BYTES.position()).expect("position too large");
                 __IN_BYTES = std::io::Cursor::new(&__IN_BYTES.into_inner()[__POS..]);
 
                 #parsers
 
-                Ok(Self {
-                    #initializers
-                })
+                Ok(())
             }
 
             fn write(&self, mut __OUT_BYTES: &mut [u8]) -> Result<(), Self::WriteError> {

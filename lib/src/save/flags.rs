@@ -26,7 +26,7 @@ pub enum FlagType {
 pub struct AllFlags {
     // workaround for https://github.com/rust-lang/rust/issues/76560
     // words = flag count / 32 * bits
-    flags_1b: BitFlags<1, { FLAG_1_BIT_COUNT / 32 * 1 }>,
+    flags_1b: BitFlags<1, { FLAG_1_BIT_COUNT / 32 }>,
     flags_2b: BitFlags<2, { FLAG_2_BIT_COUNT / 32 * 2 }>,
     flags_4b: BitFlags<4, { FLAG_4_BIT_COUNT / 32 * 4 }>,
     flags_8b: ByteFlags<u8, FLAG_8_BIT_COUNT>,

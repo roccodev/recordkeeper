@@ -1,5 +1,4 @@
 use recordkeeper_macros::SaveBin;
-use std::marker::PhantomData;
 
 #[derive(SaveBin, Debug)]
 pub struct Inventory {

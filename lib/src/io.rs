@@ -1,5 +1,5 @@
 use crate::error::SaveError;
-use byteorder::{ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
+use byteorder::{ByteOrder, LittleEndian, ReadBytesExt};
 use std::convert::Infallible;
 use std::io::Cursor;
 use std::marker::PhantomData;
@@ -63,18 +63,49 @@ use std::mem::MaybeUninit;
 /// ```
 ///
 /// [`AssertionError`]: crate::error::SaveError::AssertionError
-#[doc(inline)]
 pub trait SaveBin<'src>: Sized {
     type ReadError;
     type WriteError;
 
-    fn read(bytes: Cursor<&'src [u8]>) -> Result<Self, Self::ReadError>;
+    /// Reads the type from a byte buffer, into the given memory buffer.
+    ///
+    /// The cursor's internal marker will be modified after the call,
+    /// even if the read fails.
+    ///
+    /// ## Safety
+    /// This function is safe to call provided that `out` points to valid memory. It's not required
+    /// for that memory to be initialized, therefore implementations **must not read or drop
+    /// any part of the output memory**, and `out` **must point to initialized memory if the read
+    /// succeeds**.
+    ///
+    /// If the read fails, the state of the output memory is undefined.
+    ///
+    /// ## Alternatives
+    /// If the type also implements `Default` and `Copy`, the [`read`] function from the
+    /// [`OwnedSaveBin`] trait may be used instead.
+    ///
+    /// [`read`]: OwnedSaveBin::read
+    unsafe fn read_into(bytes: Cursor<&'src [u8]>, out: *mut Self) -> Result<(), Self::ReadError>;
 
+    /// Writes the type to a byte buffer.
+    ///
+    /// ## Panics
+    /// This function may panic if there isn't enough space to write the data.
+    /// When writing save files, the old save file data should be used as the base.
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError>;
 
+    /// Returns the total size of this type *when serialized into the save binary format*.
     fn size() -> usize {
         std::mem::size_of::<Self>()
     }
+}
+
+pub trait OwnedSaveBin<'src>: SaveBin<'src> {
+    /// Reads the type from a byte buffer.
+    ///
+    /// The cursor's internal marker will be modified after the call,
+    /// even if the read fails.
+    fn read(bytes: Cursor<&'src [u8]>) -> Result<Self, Self::ReadError>;
 }
 
 macro_rules! byteorder_impl {
@@ -84,8 +115,10 @@ macro_rules! byteorder_impl {
                 type ReadError = std::io::Error;
                 type WriteError = std::convert::Infallible;
 
-                fn read(mut bytes: std::io::Cursor<&'src [u8]>) -> Result<Self, Self::ReadError> {
-                    paste::paste! { bytes.[<read_ $types >]::<LittleEndian>() }
+                unsafe fn read_into(mut bytes: Cursor<&'src [u8]>, out: *mut Self) -> Result<(), Self::ReadError> {
+                    // Integer types don't implement Drop, so no need for ptr::write
+                    *out = paste::paste! { bytes.[<read_ $types >]::<LittleEndian>()? };
+                    Ok(())
                 }
 
                 fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
@@ -103,8 +136,13 @@ impl<'src> SaveBin<'src> for u8 {
     type ReadError = std::io::Error;
     type WriteError = SaveError;
 
-    fn read(mut bytes: Cursor<&'src [u8]>) -> Result<Self, Self::ReadError> {
-        bytes.read_u8()
+    unsafe fn read_into(
+        mut bytes: Cursor<&'src [u8]>,
+        out: *mut Self,
+    ) -> Result<(), Self::ReadError> {
+        // Integer types don't implement Drop, so no need for ptr::write
+        *out = bytes.read_u8()?;
+        Ok(())
     }
 
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
@@ -118,8 +156,12 @@ impl<'src> SaveBin<'src> for i8 {
     type ReadError = std::io::Error;
     type WriteError = SaveError;
 
-    fn read(mut bytes: Cursor<&'src [u8]>) -> Result<Self, Self::ReadError> {
-        bytes.read_i8()
+    unsafe fn read_into(
+        mut bytes: Cursor<&'src [u8]>,
+        out: *mut Self,
+    ) -> Result<(), Self::ReadError> {
+        *out = bytes.read_i8()?;
+        Ok(())
     }
 
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
@@ -131,8 +173,9 @@ impl<'src> SaveBin<'src> for bool {
     type ReadError = std::io::Error;
     type WriteError = SaveError;
 
-    fn read(bytes: Cursor<&'src [u8]>) -> Result<Self, Self::ReadError> {
-        Ok(u8::read(bytes)? != 0)
+    unsafe fn read_into(bytes: Cursor<&'src [u8]>, out: *mut Self) -> Result<(), Self::ReadError> {
+        *out = <u8 as OwnedSaveBin>::read(bytes)? != 0;
+        Ok(())
     }
 
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
@@ -144,11 +187,11 @@ impl<'src, T> SaveBin<'src> for PhantomData<T> {
     type ReadError = Infallible;
     type WriteError = Infallible;
 
-    fn read(_: Cursor<&'src [u8]>) -> Result<Self, Self::ReadError> {
-        Ok(PhantomData)
+    unsafe fn read_into(_: Cursor<&'src [u8]>, _: *mut Self) -> Result<(), Self::ReadError> {
+        Ok(())
     }
 
-    fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
+    fn write(&self, _: &mut [u8]) -> Result<(), Self::WriteError> {
         Ok(())
     }
 }
@@ -160,13 +203,16 @@ where
     type ReadError = T::ReadError;
     type WriteError = T::WriteError;
 
-    fn read(mut bytes: Cursor<&'src [u8]>) -> Result<Self, Self::ReadError> {
+    unsafe fn read_into(
+        mut bytes: Cursor<&'src [u8]>,
+        out: *mut Self,
+    ) -> Result<(), Self::ReadError> {
+        // SAFETY: inner `MaybeUninit`s are already initialized
         let mut data: [MaybeUninit<T>; N] = unsafe { MaybeUninit::uninit().assume_init() };
 
         // Loop is drop-safe, see MaybeUninit docs
         for elem in &mut data[..] {
-            let item = T::read(bytes.clone())?;
-            elem.write(item);
+            T::read_into(bytes.clone(), elem.as_mut_ptr())?;
             let size: u64 = T::size().try_into().expect("size too large");
             bytes.set_position(bytes.position() + size);
         }
@@ -174,10 +220,14 @@ where
         // https://github.com/rust-lang/rust/issues/61956
         let ptr = &data as *const _ as *const [T; N];
         std::mem::forget(data);
-        Ok(unsafe { ptr.read() })
+        // SAFETY: memory is initialized if the read succeeds
+        unsafe {
+            out.copy_from(ptr, 1);
+        }
+        Ok(())
     }
 
-    fn write(&self, mut bytes: &mut [u8]) -> Result<(), Self::WriteError> {
+    fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
         let mut pos = 0;
         let item_size = T::size();
 
@@ -192,5 +242,19 @@ where
 
     fn size() -> usize {
         T::size() * N
+    }
+}
+
+impl<'src, T> OwnedSaveBin<'src> for T
+where
+    T: SaveBin<'src> + Default + Copy,
+{
+    fn read(bytes: Cursor<&'src [u8]>) -> Result<Self, Self::ReadError> {
+        let mut out = Self::default();
+        // SAFETY: the previous value is perfectly valid, and does not implement Drop
+        unsafe {
+            Self::read_into(bytes, &mut out as *mut _)?;
+        }
+        Ok(out)
     }
 }

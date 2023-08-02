@@ -1,6 +1,6 @@
 use crate::character::{PARTY_GUEST_MAX, PARTY_MAX};
 use crate::error::SaveError;
-use crate::flags::{BitFlags, UnknownFlags};
+use crate::flags::UnknownFlags;
 use crate::item::Inventory;
 use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX};
 use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
@@ -15,6 +15,13 @@ pub mod item;
 
 pub(crate) const SAVE_VERSION: u8 = 10;
 
+/// Defines the save file binary structure.
+///
+/// This struct should not be created manually, as it's quite big and requires substantial stack
+/// space. Instead, it is recommended to use [`SaveFile::from_bytes`] to get a heap-allocated
+/// save file.
+///
+/// [`SaveFile::from_bytes`]: crate::SaveFile::from_bytes
 #[derive(SaveBin, Debug)]
 pub struct SaveData {
     #[assert(0xb368fa6a)]
