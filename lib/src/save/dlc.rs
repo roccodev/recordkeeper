@@ -1,5 +1,4 @@
-use crate::item::DlcExtraInventory;
-
+use crate::character::ClassAccessory;
 use recordkeeper_macros::SaveBin;
 
 pub const DLC4_ENEMYPEDIA_MAX_EACH: usize = 200;
@@ -16,4 +15,11 @@ pub struct Dlc4 {
     // lol
     #[loc(0x80c8)]
     enemypedia_200_399: [u8; DLC4_ENEMYPEDIA_MAX_EACH],
+}
+
+#[derive(SaveBin, Debug)]
+#[size(512)]
+pub struct DlcExtraInventory {
+    /// Likely indexed by class ID
+    battle_manual: [ClassAccessory; 64],
 }

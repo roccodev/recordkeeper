@@ -43,12 +43,6 @@ enum SlotFlags {
 }
 
 #[derive(SaveBin, Debug)]
-#[size(512)]
-pub struct DlcExtraInventory {
-    battle_manuals: [DlcManualSlot; 64],
-}
-
-#[derive(SaveBin, Debug)]
 pub struct DlcManualSlot {
     item_id: u16,
     inventory_slot_index: u16,

@@ -1,4 +1,3 @@
-use crate::item::{DlcExtraInventory, DlcManualSlot};
 use recordkeeper_macros::SaveBin;
 
 pub const ENEMY_TOMBSTONE_MAX: usize = 200;
