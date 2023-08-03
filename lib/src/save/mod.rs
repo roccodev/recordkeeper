@@ -8,6 +8,7 @@ use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX}
 use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
 use crate::save::flags::AllFlags;
 
+use crate::dlc::ChallengeBattle;
 use dlc::Dlc4;
 use recordkeeper_macros::SaveBin;
 
@@ -77,6 +78,9 @@ pub struct SaveData {
 
     #[loc(0x183000)]
     pub enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
+
+    #[loc(0x193ed8)]
+    pub challenge_battle: ChallengeBattle,
 
     #[loc(0x19afc0)]
     pub party_formations: [PartyFormation; PARTY_FORMATION_MAX],
