@@ -21,7 +21,15 @@ impl<'ast> FieldVisitor<'ast> {
 
         let loc_code = self.location.as_ref().map(|loc| {
             quote! {
-                __IN_BYTES.set_position(#loc.try_into().expect("new #[loc] too large"));
+                {
+                    let loc: u64 = #loc.try_into().expect("new #[loc] too large");
+                    let current = __IN_BYTES.position();
+                    if loc < current {
+                        panic!("New location 0x{:x} is lower than current location 0x{:x} for field {}",
+                            loc, current, stringify!(#var_name));
+                    }
+                    __IN_BYTES.set_position(loc);
+                }
             }
         });
 
@@ -83,9 +91,14 @@ impl<'ast> FieldVisitor<'ast> {
 
     fn size_calc_tokens(&self) -> TokenStream {
         let type_ident = &self.field.ty;
+        let field_name = self.field.ident.to_token_stream();
 
         match &self.location {
             Some(loc) => quote! {
+                if #loc < current_loc {
+                    panic!("New location 0x{:x} is lower than current location 0x{:x} for field {}",
+                        #loc, current_loc, stringify!(#field_name));
+                }
                 let _size = <#type_ident as crate::io::SaveBin>::size();
                 size += _size + #loc - current_loc;
                 current_loc = #loc + _size;

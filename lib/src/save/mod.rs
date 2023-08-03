@@ -1,4 +1,6 @@
-use crate::character::{PARTY_GUEST_MAX, PARTY_MAX};
+use crate::character::{
+    CharacterParty, PartyFormation, PARTY_FORMATION_MAX, PARTY_GUEST_MAX, PARTY_MAX,
+};
 use crate::error::SaveError;
 use crate::flags::UnknownFlags;
 use crate::item::Inventory;
@@ -51,20 +53,17 @@ pub struct SaveData {
 
     #[loc(0x6a0)]
     pub player_pos: Pos,
-    #[loc(0x6a8)]
+    #[loc(0x6c0)]
     pub ship_pos: Pos,
 
     #[loc(0x710)]
     pub flags: AllFlags,
 
     #[loc(0xe330)]
-    pub party_character_ids: [u16; PARTY_MAX],
-    pub party_character_count: u64,
-
+    pub party_characters: CharacterParty<PARTY_MAX>,
     /// Guest IDs from FLD_NpcList
     #[loc(0xe358)]
-    pub party_guest_ids: [u16; PARTY_GUEST_MAX],
-    pub party_guest_count: u64,
+    pub party_guests: CharacterParty<PARTY_GUEST_MAX>,
 
     #[loc(0xe3a0)]
     pub characters: [Character; CHARACTER_MAX],
@@ -78,6 +77,9 @@ pub struct SaveData {
 
     #[loc(0x183000)]
     pub enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
+
+    #[loc(0x19afc0)]
+    pub party_formations: [PartyFormation; PARTY_FORMATION_MAX],
 
     #[loc(0x1bec5c)]
     pub dlc4: Dlc4,

@@ -4,7 +4,16 @@ pub const PARTY_MAX: usize = 16;
 pub const PARTY_GUEST_MAX: usize = 8;
 pub const CHARACTER_MAX: usize = 64;
 pub const OUROBOROS_MAX: usize = 6;
+pub const PARTY_FORMATION_MAX: usize = 15;
+
 const CHARACTER_CLASS_MAX: usize = 64;
+
+/// Character IDs currently in the party
+#[derive(SaveBin, Debug)]
+pub struct CharacterParty<const MAX: usize> {
+    ids: [u16; MAX],
+    count: u64,
+}
 
 #[derive(SaveBin, Debug)]
 #[size(4444)]
@@ -20,7 +29,8 @@ pub struct Character {
     pub class_inventory: [CharacterClass; CHARACTER_CLASS_MAX],
 
     pub costume_id: u16,
-    /// The level the character joined the party at. Seems to be the ending party's level for NG+
+    /// The level the character joined the party at. Seems to be the character's
+    /// ending level for NG+.
     pub arrival_level: u8,
     pub dirty_level: u8,
     pub attachment: u8, // unsure
@@ -62,4 +72,32 @@ pub struct ClassAccessory {
 #[derive(SaveBin, Debug)]
 pub struct OuroborosTree {
     raw: u64,
+}
+
+#[derive(SaveBin, Debug)]
+#[size(9360)]
+pub struct PartyFormation {
+    name_id: u64, // unsure
+    party: CharacterParty<PARTY_MAX>,
+    /// Indexed by character ID
+    characters: [CharacterFormation; CHARACTER_MAX],
+    ouroboros: [OuroborosFormation; OUROBOROS_MAX],
+}
+
+#[derive(SaveBin, Debug)]
+#[size(144)]
+struct CharacterFormation {
+    #[loc(0x4)]
+    class: CharacterClass,
+    current_class: u16,
+    character_id: u16, // unsure
+    costume_id: u16,
+    attachment: u16, // unsure
+}
+
+#[derive(SaveBin, Debug)]
+struct OuroborosFormation {
+    pub ouroboros_id: u16,
+    pub art_ids: [u16; 5],
+    pub linked_skills: [u16; 2],
 }

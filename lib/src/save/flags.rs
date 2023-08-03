@@ -10,8 +10,8 @@ const FLAG_8_BIT_COUNT: usize = 8192;
 const FLAG_16_BIT_COUNT: usize = 3072;
 const FLAG_32_BIT_COUNT: usize = 2372;
 
-const FLAG_1_BIT_COUNT_UNK: usize = 80000;
-const FLAG_2_BIT_COUNT_UNK: usize = 31936;
+const FLAG_1_BIT_COUNT_UNK: usize = 20000;
+const FLAG_2_BIT_COUNT_UNK: usize = 7984;
 
 pub enum FlagType {
     Bit,
