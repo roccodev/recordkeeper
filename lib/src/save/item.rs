@@ -41,3 +41,16 @@ enum SlotFlags {
     /// The small circle icon for "unchecked" items
     New = 1 << 3,
 }
+
+#[derive(SaveBin, Debug)]
+#[size(512)]
+pub struct DlcExtraInventory {
+    battle_manuals: [DlcManualSlot; 64],
+}
+
+#[derive(SaveBin, Debug)]
+pub struct DlcManualSlot {
+    item_id: u16,
+    inventory_slot_index: u16,
+    item_type: u16,
+}

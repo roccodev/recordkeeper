@@ -6,9 +6,11 @@ use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX}
 use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
 use crate::save::flags::AllFlags;
 
+use dlc::Dlc4;
 use recordkeeper_macros::SaveBin;
 
 pub mod character;
+pub mod dlc;
 pub mod enemy;
 pub mod flags;
 pub mod item;
@@ -59,8 +61,9 @@ pub struct SaveData {
     pub party_character_ids: [u16; PARTY_MAX],
     pub party_character_count: u64,
 
+    /// Guest IDs from FLD_NpcList
     #[loc(0xe358)]
-    pub party_guest_ids: [u16; PARTY_GUEST_MAX], // unsure
+    pub party_guest_ids: [u16; PARTY_GUEST_MAX],
     pub party_guest_count: u64,
 
     #[loc(0xe3a0)]
@@ -75,6 +78,9 @@ pub struct SaveData {
 
     #[loc(0x183000)]
     pub enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
+
+    #[loc(0x1bec5c)]
+    pub dlc4: Dlc4,
 }
 
 #[derive(SaveBin, Debug)]
