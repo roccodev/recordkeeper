@@ -4,7 +4,12 @@ use recordkeeper_macros::SaveBin;
 pub const DLC4_ENEMYPEDIA_MAX_EACH: usize = 200;
 const CHALLENGE_BATTLE_NUM_CHALLENGES: usize = 18;
 const CHALLENGE_BATTLE_NUM_GAUNTLET: usize = 4;
+const CHALLENGE_BATTLE_NUM_GAUNTLET_STATES: usize = 1; // best guess
 const CHALLENGE_BATTLE_DIFFICULTY_MAX: usize = 3;
+const EMBLEM_MAX: usize = 300; // best guess
+
+const GAUNTLET_STATE_CHARACTER_MAX: usize = 7;
+const GAUNTLET_STATE_EMBLEM_MAX: usize = 60;
 
 #[derive(SaveBin, Debug)]
 pub struct Dlc4 {
@@ -12,7 +17,7 @@ pub struct Dlc4 {
     enemypedia_0_199: [u8; DLC4_ENEMYPEDIA_MAX_EACH],
 
     /// Extra inventory, indexed by character ID
-    extra_inventory: [DlcExtraInventory; 64],
+    extra_inventory: [Dlc4ExtraInventory; 64],
 
     /// Number of victories for Enemypedia entries 200-399
     // lol
@@ -29,8 +34,20 @@ pub struct ChallengeBattle {
 
     gauntlet: [Gauntlet; CHALLENGE_BATTLE_NUM_GAUNTLET],
 
+    #[loc(0x368)]
+    gauntlet_states: [GauntletState; CHALLENGE_BATTLE_NUM_GAUNTLET_STATES],
+
     #[loc(0x6320)]
     challenges_19: [Challenge; 1], // easier to work with
+
+    /// Actual size: number of rows in `BTL_ChSU_Emblem`
+    #[loc(0x658c)]
+    emblem_shop: [EmblemItem; EMBLEM_MAX],
+
+    #[loc(0x70cc)]
+    nopon_stone_red: u32,
+    nopon_stone_blue: u32,
+    // Two flags here for whether the current challenge has a bonus, not relevant for saves
 }
 
 #[derive(SaveBin, Debug)]
@@ -56,12 +73,79 @@ pub struct Gauntlet {
     _unk3: bool, // could be whether rewards for ranks A/B have been received
     _unk4: bool,
     #[loc(0x44)]
-    _unk5: u32, // clear count?
+    clear_count: u32,
+}
+
+/// Archsage's Gauntlet save state
+#[derive(SaveBin, Debug)]
+#[size(584)]
+pub struct GauntletState {
+    timestamp: DateTime,
+    /// Actually randomly generated
+    random: u64,
+    active: bool,
+
+    #[loc(0x18)]
+    gauntlet_id: u32, // unsure
+
+    /// Character IDs currently in the party
+    #[loc(0x38)]
+    party_characters: [u32; GAUNTLET_STATE_CHARACTER_MAX],
+    _unk_array_1: [u32; GAUNTLET_STATE_CHARACTER_MAX],
+
+    /// Emblems currently active
+    emblems: [u32; GAUNTLET_STATE_EMBLEM_MAX],
+
+    _unk_array_2: [u32; 11],
+    _unk_array_3: [u8; 32],
+
+    #[loc(0x1b0)]
+    _unk: u32, // map id?
+    last_stage: u32,
+    current_score: u32,
+    /// 0-3
+    shuffle_tickets: u32,
+    /// 100: one charge, 200: two charges, 300: three charges
+    launch_charge: f32,
+    /// 0-100
+    nopwatch_gauge: f32,
+    /// 0-6
+    no_ko_streak: u32,
+
+    /// Number of nopwatch refill purchases
+    #[loc(0x1d4)]
+    nopwatch_buy_count: u32,
+
+    /// 0-900
+    #[loc(0x1ec)]
+    chain_gauge: f32,
+
+    // End screen stats
+    /// Score spent in the shop
+    #[loc(0x23c)]
+    score_spent: u32,
+    emblems_bought: u32,
+}
+
+#[derive(SaveBin, Debug)]
+#[size(8)]
+pub struct EmblemItem {
+    unlocked: bool,
 }
 
 #[derive(SaveBin, Debug)]
 #[size(512)]
-pub struct DlcExtraInventory {
+pub struct Dlc4ExtraInventory {
     /// Likely indexed by class ID
     battle_manual: [ClassAccessory; 64],
+}
+
+#[derive(SaveBin, Debug)]
+#[size(8)]
+pub struct DateTime {
+    year: u16,
+    month: u8,
+    day: u8,
+    hour: u8,
+    minute: u8,
 }
