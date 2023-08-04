@@ -1,10 +1,10 @@
-use crate::character::ClassAccessory;
+use crate::character::{ClassAccessory, CHARACTER_MAX};
 use recordkeeper_macros::SaveBin;
 
 pub const DLC4_ENEMYPEDIA_MAX_EACH: usize = 200;
 const CHALLENGE_BATTLE_NUM_CHALLENGES: usize = 18;
 const CHALLENGE_BATTLE_NUM_GAUNTLET: usize = 4;
-const CHALLENGE_BATTLE_NUM_GAUNTLET_STATES: usize = 1; // best guess
+const CHALLENGE_BATTLE_NUM_GAUNTLET_STATES: usize = 1; // likely a 1-item array in the game
 const CHALLENGE_BATTLE_DIFFICULTY_MAX: usize = 3;
 const EMBLEM_MAX: usize = 300; // best guess
 
@@ -17,7 +17,7 @@ pub struct Dlc4 {
     enemypedia_0_199: [u8; DLC4_ENEMYPEDIA_MAX_EACH],
 
     /// Extra inventory, indexed by character ID
-    extra_inventory: [Dlc4ExtraInventory; 64],
+    extra_inventory: [Dlc4ExtraInventory; CHARACTER_MAX],
 
     /// Number of victories for Enemypedia entries 200-399
     // lol
@@ -86,7 +86,13 @@ pub struct GauntletState {
     active: bool,
 
     #[loc(0x18)]
-    gauntlet_id: u32, // unsure
+    gauntlet_id: u32,
+    lead_character_id: u32, // unsure
+    difficulty: u32,
+
+    /// ID for `RSC_WeatherSet`
+    #[loc(0x24)]
+    weather: u32,
 
     /// Character IDs currently in the party
     #[loc(0x38)]
@@ -99,8 +105,10 @@ pub struct GauntletState {
     _unk_array_2: [u32; 11],
     _unk_array_3: [u8; 32],
 
-    #[loc(0x1b0)]
-    _unk: u32, // map id?
+    /// Current map ID. (Actual map ID = value + 75, ID for `SYS_MapList`)
+    map_id: u32,
+    /// Set if a map jump needs to happen. ID for `BTL_ChSU_MapBattleLock`.
+    next_map_pos_id: u32,
     last_stage: u32,
     current_score: u32,
     /// 0-3
@@ -112,12 +120,23 @@ pub struct GauntletState {
     /// 0-6
     no_ko_streak: u32,
 
+    /// Number of noponstones gained so far. Unclear why it is here, as it can be calculated
+    /// from the stage number.
+    nopon_stone_reward: u32,
+
+    /// Number of purchased heroes
+    hero_buy_count: u32,
     /// Number of nopwatch refill purchases
-    #[loc(0x1d4)]
     nopwatch_buy_count: u32,
 
+    #[loc(0x1e4)]
+    /// ID for `BTL_ChSU_SettingGate`. It's likely that setting both of these will
+    /// open the whimsy screen when the save is loaded.
+    // needs testing
+    whimsy_negative: u32,
+    /// ID for `BTL_ChSU_SettingGate`
+    whimsy_positive: u32,
     /// 0-900
-    #[loc(0x1ec)]
     chain_gauge: f32,
 
     // End screen stats
