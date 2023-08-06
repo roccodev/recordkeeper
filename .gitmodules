@@ -1,0 +1,3 @@
+[submodule "webapp/assets/bulma"]
+	path = webapp/assets/bulma
+	url = https://github.com/jgthms/bulma
