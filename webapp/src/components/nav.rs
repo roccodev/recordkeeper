@@ -1,6 +1,6 @@
-use ybc::{Button, Icon, NavbarDropdown, NavbarFixed, NavbarItem, Size};
+use ybc::{Icon, NavbarDropdown, NavbarFixed, NavbarItem, Size};
 use yew::prelude::*;
-use yew_feather::{CornerUpLeft, CornerUpRight, FilePlus, Github, Info, Key, Save};
+use yew_feather::{Github, Info, Key};
 
 use crate::BRAND_DISPLAY;
 
@@ -9,11 +9,6 @@ pub fn Navbar() -> Html {
     html! {
         <ybc::Navbar fixed={NavbarFixed::Top}
             navend={html!(<Brand />)}
-            navstart={html!{
-                <>
-                {edit_operations().collect::<Html>()}
-                </>
-            }}
         />
     }
 }
@@ -40,21 +35,4 @@ fn Brand() -> Html {
             </NavbarDropdown>
         </NavbarItem>
     }
-}
-
-fn edit_operations() -> impl Iterator<Item = Html> {
-    let ops = [
-        ("Open", html!(<FilePlus />)),
-        ("Save", html!(<Save />)),
-        ("Undo", html!(<CornerUpLeft />)),
-        ("Redo", html!(<CornerUpRight />)),
-    ];
-
-    ops.into_iter().map(|(name, icon)| {
-        html! {
-            <Button>
-                <Icon>{icon}</Icon>
-            </Button>
-        }
-    })
 }
