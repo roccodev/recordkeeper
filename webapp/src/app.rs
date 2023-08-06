@@ -1,14 +1,19 @@
 use crate::components::nav::Navbar;
 use crate::components::sidebar::Sidebar;
+use crate::lang::{Lang, LangManager};
+
 use yew::prelude::*;
 
 #[function_component]
 fn App() -> Html {
+    let lang = LangManager::DEFAULT_LANG;
+    let lang = use_memo(|lang| LangManager::load(lang.clone()), lang);
+
     html! {
-        <>
-          <Sidebar />
-          <Navbar />
-        </>
+        <ContextProvider<Lang> context={lang}>
+            <Sidebar />
+            <Navbar />
+        </ContextProvider<Lang>>
     }
 }
 

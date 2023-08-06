@@ -2,7 +2,7 @@ use ybc::{Icon, NavbarDropdown, NavbarFixed, NavbarItem, Size};
 use yew::prelude::*;
 use yew_feather::{Github, Info, Key};
 
-use crate::BRAND_DISPLAY;
+use crate::{lang::Text, BRAND_DISPLAY};
 
 #[function_component]
 pub fn Navbar() -> Html {
@@ -16,9 +16,9 @@ pub fn Navbar() -> Html {
 #[function_component]
 fn Brand() -> Html {
     let items = [
-        ("About", html!(<Info />)),
-        ("Source", html!(<Github />)),
-        ("License", html!(<Key />)),
+        (html!(<Text path="nav_about" />), html!(<Info />)),
+        (html!(<Text path="nav_source" />), html!(<Github />)),
+        (html!(<Text path="nav_license" />), html!(<Key />)),
     ];
 
     html! {

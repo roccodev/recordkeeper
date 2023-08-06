@@ -2,6 +2,8 @@ use ybc::{Button, Icon};
 use yew::prelude::*;
 use yew_feather::{CornerUpLeft, CornerUpRight, FilePlus, Save};
 
+use crate::lang::Text;
+
 struct Category(String);
 
 #[function_component]
@@ -19,17 +21,17 @@ pub fn Sidebar() -> Html {
 
 fn edit_operations() -> impl Iterator<Item = Html> {
     let ops = [
-        ("Open", html!(<FilePlus />)),
-        ("Save", html!(<Save />)),
-        ("", html!(<CornerUpLeft />)),  // Undo
-        ("", html!(<CornerUpRight />)), // Redo
+        (Some(html!(<Text path="open" />)), html!(<FilePlus />)),
+        (Some(html!(<Text path="save" />)), html!(<Save />)),
+        (None, html!(<CornerUpLeft />)),  // Undo
+        (None, html!(<CornerUpRight />)), // Redo
     ];
 
     ops.into_iter().map(|(name, icon)| {
         html! {
             <Button>
                 <Icon>{icon}</Icon>
-                {if !name.is_empty() { html!(<span>{name}</span>) } else { html!() }}
+                {if let Some(name) = name { html!(<span>{name}</span>) } else { html!() }}
             </Button>
         }
     })
