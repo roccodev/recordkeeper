@@ -28,11 +28,20 @@ menu_category_dlc4 = Future Redeemed Data
 menu_category_meta = Metadata
 
 menu_base_characters = Characters
-menu_base_characters_ouroboros = Ouroboros
+menu_base_ouroboros = Ouroboros
 menu_base_items = Items
 menu_base_flags = Flags
+menu_base_field = Field
 menu_base_ums = Unique Monsters
 menu_base_formations = Party Formations
+
+menu_dlc_challenge = Challenge Battle
+menu_dlc_gauntlet = Archsage's Gauntlet
+menu_dlc_masha = Accessory Crafting
+
+menu_dlc4_enemypedia = Enemypedia
+
+menu_meta_meta = Metadata
 
 
 ## Character translations

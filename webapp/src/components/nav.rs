@@ -7,7 +7,7 @@ use crate::{lang::Text, BRAND_DISPLAY};
 #[function_component]
 pub fn Navbar() -> Html {
     html! {
-        <ybc::Navbar fixed={NavbarFixed::Top}
+        <ybc::Navbar fixed={NavbarFixed::Top} classes={classes!("has-shadow")}
             navend={html!(<Brand />)}
         />
     }
