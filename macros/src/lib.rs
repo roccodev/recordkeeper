@@ -84,11 +84,6 @@ impl<'ast> FieldVisitor<'ast> {
         }
     }
 
-    fn initializer_tokens(&self) -> TokenStream {
-        let name = &self.field.ident;
-        quote! { #name, }
-    }
-
     fn size_calc_tokens(&self) -> TokenStream {
         let type_ident = &self.field.ty;
         let field_name = self.field.ident.to_token_stream();
@@ -156,7 +151,7 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
                 if path.is_ident("loc") {
                     loc = Some(list.tokens.clone());
                 } else if path.is_ident("assert") {
-                    let mut parts: Punctuated<Expr, Token!(,)> = list.parse_args_with(Punctuated::parse_terminated)
+                    let parts: Punctuated<Expr, Token!(,)> = list.parse_args_with(Punctuated::parse_terminated)
                     .expect(
                         "syntax: #[assert(EXPECTED_VALUE)], or #[assert(EXPECTED, custom_error)",
                     );
@@ -183,11 +178,6 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
     let writers = field_visitors
         .iter()
         .flat_map(|v| v.writer_tokens())
-        .collect::<TokenStream>();
-
-    let initializers = field_visitors
-        .iter()
-        .flat_map(|v| v.initializer_tokens())
         .collect::<TokenStream>();
 
     let size_calc = field_visitors

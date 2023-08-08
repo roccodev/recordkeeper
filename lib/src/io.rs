@@ -207,22 +207,12 @@ where
         mut bytes: Cursor<&'src [u8]>,
         out: *mut Self,
     ) -> Result<(), Self::ReadError> {
-        // SAFETY: inner `MaybeUninit`s are already initialized
-        let mut data: [MaybeUninit<T>; N] = unsafe { MaybeUninit::uninit().assume_init() };
-
-        // Loop is drop-safe, see MaybeUninit docs
-        for elem in &mut data[..] {
-            T::read_into(bytes.clone(), elem.as_mut_ptr())?;
-            let size: u64 = T::size().try_into().expect("size too large");
+        let mut out: *mut T = out.cast();
+        let size: u64 = T::size().try_into().expect("size too large");
+        for _ in 0..N {
+            T::read_into(bytes.clone(), out)?;
             bytes.set_position(bytes.position() + size);
-        }
-
-        // https://github.com/rust-lang/rust/issues/61956
-        let ptr = &data as *const _ as *const [T; N];
-        std::mem::forget(data);
-        // SAFETY: memory is initialized if the read succeeds
-        unsafe {
-            out.copy_from(ptr, 1);
+            out = out.add(1);
         }
         Ok(())
     }
