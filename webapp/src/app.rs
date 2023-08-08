@@ -1,6 +1,7 @@
 use crate::components::nav::Navbar;
 use crate::components::sidebar::Sidebar;
 use crate::lang::{Lang, LangManager};
+use crate::save::SaveProvider;
 
 use yew::prelude::*;
 
@@ -11,8 +12,10 @@ fn App() -> Html {
 
     html! {
         <ContextProvider<Lang> context={lang}>
-            <Sidebar />
-            <Navbar />
+            <SaveProvider>
+                <Sidebar />
+                <Navbar />
+            </SaveProvider>
         </ContextProvider<Lang>>
     }
 }

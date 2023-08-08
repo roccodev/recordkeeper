@@ -1,11 +1,11 @@
 use ybc::{Button, Icon, Menu, MenuList, Size};
 use yew::prelude::*;
 use yew_feather::{
-    BookOpen, Clipboard, CornerUpLeft, CornerUpRight, Crosshair, FilePlus, Flag, LifeBuoy, Map,
-    Save, Scissors, ShoppingBag, Target, Triangle, Users, Watch,
+    BookOpen, Clipboard, CornerUpLeft, CornerUpRight, Crosshair, FilePlus, Flag, HelpCircle,
+    LifeBuoy, Map, Save, Scissors, ShoppingBag, Target, Triangle, Users, Watch,
 };
 
-use crate::lang::Text;
+use crate::{components::upload::UploadButton, lang::Text};
 
 struct Category(&'static str);
 
@@ -24,8 +24,8 @@ pub fn Sidebar() -> Html {
             Tab("base_characters", html!(<Users />)),
             Tab("base_ouroboros", html!(<Target />)),
             Tab("base_items", html!(<ShoppingBag />)),
-            Tab("base_flags", html!(<Flag />)),
             Tab("base_field", html!(<Map />)),
+            Tab("base_quests", html!(<HelpCircle />)),
             Tab("base_ums", html!(<Crosshair />)),
             Tab("base_formations", html!(<Triangle />)),
         ]),
@@ -39,6 +39,8 @@ pub fn Sidebar() -> Html {
         MenuItem::Tabs(vec![Tab("dlc4_enemypedia", html!(<BookOpen />))]),
         MenuItem::Category(Category("meta")),
         MenuItem::Tabs(vec![Tab("meta_meta", html!(<Clipboard />))]),
+        MenuItem::Category(Category("danger")),
+        MenuItem::Tabs(vec![Tab("danger_flags", html!(<Flag />))]),
     ];
 
     html! {
@@ -58,12 +60,6 @@ pub fn Sidebar() -> Html {
 fn edit_operations() -> impl Iterator<Item = Html> {
     let ops = [
         (
-            Some(html!(<Text path="open" />)),
-            html!(<FilePlus />),
-            "",
-            true,
-        ),
-        (
             Some(html!(<Text path="save" />)),
             html!(<Save />),
             "is-info",
@@ -73,14 +69,20 @@ fn edit_operations() -> impl Iterator<Item = Html> {
         (None, html!(<CornerUpRight />), "is-light", false), // Redo
     ];
 
-    ops.into_iter().map(|(name, icon, style, enabled)| {
+    std::iter::once(html! {
+        <UploadButton>
+            <Icon><FilePlus /></Icon>
+            <span><Text path="open" /></span>
+        </UploadButton>
+    })
+    .chain(ops.into_iter().map(|(name, icon, style, enabled)| {
         html! {
             <Button classes={classes!(style)} disabled={!enabled}>
                 <Icon>{icon}</Icon>
                 {if let Some(name) = name { html!(<span>{name}</span>) } else { html!() }}
             </Button>
         }
-    })
+    }))
 }
 
 impl From<Category> for Html {

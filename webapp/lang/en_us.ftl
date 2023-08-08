@@ -27,11 +27,14 @@ menu_category_dlc4 = Future Redeemed Data
 # Data related to the save file itself
 menu_category_meta = Metadata
 
+# Dangerous settings that should not be changed by the average user
+menu_category_danger = Danger Zone
+
 menu_base_characters = Characters
 menu_base_ouroboros = Ouroboros
 menu_base_items = Items
-menu_base_flags = Flags
 menu_base_field = Field
+menu_base_quests = Quests
 menu_base_ums = Unique Monsters
 menu_base_formations = Party Formations
 
@@ -42,6 +45,8 @@ menu_dlc_masha = Accessory Crafting
 menu_dlc4_enemypedia = Enemypedia
 
 menu_meta_meta = Metadata
+
+menu_danger_flags = Flags
 
 
 ## Character translations
