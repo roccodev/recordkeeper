@@ -10,6 +10,7 @@ use yew::prelude::*;
 #[derive(Default)]
 pub struct SaveManager {
     save_buffers: [Option<SaveFile>; 4],
+    // discriminant for PartialEq
     change_id: usize,
 }
 
@@ -30,7 +31,10 @@ pub struct SaveContext {
 }
 
 #[derive(Default, PartialEq)]
-struct SaveReducer(RefCell<SaveManager>);
+struct SaveReducer {
+    manager: Rc<RefCell<SaveManager>>,
+    change_id: usize,
+}
 
 #[function_component]
 pub fn SaveProvider(props: &SaveProviderProps) -> Html {
@@ -83,7 +87,7 @@ impl SaveContext {
     }
 
     pub fn get(&self) -> Ref<'_, SaveManager> {
-        self.handle.0.borrow()
+        self.handle.manager.borrow()
     }
 
     pub fn on_file_upload(&self, data: Result<Vec<u8>, FileReadError>) {
@@ -95,12 +99,15 @@ impl Reducible for SaveReducer {
     type Action = EditAction;
 
     fn reduce(self: Rc<Self>, action: Self::Action) -> Rc<Self> {
-        let mut handle = self.0.borrow_mut();
+        let mut handle = self.manager.borrow_mut();
         match action {
             EditAction::Load(bytes) => handle.load(&bytes).unwrap(),
             EditAction::Save => handle.back_up_and_save().unwrap(),
         }
-        Rc::clone(&self)
+        Rc::new(Self {
+            manager: Rc::clone(&self.manager),
+            change_id: handle.change_id,
+        })
     }
 }
 

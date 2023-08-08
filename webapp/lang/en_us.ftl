@@ -2,6 +2,7 @@ open = Open
 save = Save
 undo = Undo
 redo = Redo
+download = Download
 
 # The project's info page
 nav_about = About
@@ -44,7 +45,7 @@ menu_dlc_masha = Accessory Crafting
 
 menu_dlc4_enemypedia = Enemypedia
 
-menu_meta_meta = Metadata
+menu_meta_meta = Save Info
 
 menu_danger_flags = Flags
 

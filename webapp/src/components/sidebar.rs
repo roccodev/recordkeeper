@@ -1,11 +1,15 @@
 use ybc::{Button, Icon, Menu, MenuList, Size};
 use yew::prelude::*;
 use yew_feather::{
-    BookOpen, Clipboard, CornerUpLeft, CornerUpRight, Crosshair, FilePlus, Flag, HelpCircle,
-    LifeBuoy, Map, Save, Scissors, ShoppingBag, Target, Triangle, Users, Watch,
+    BookOpen, CornerUpLeft, CornerUpRight, Crosshair, FilePlus, Flag, HelpCircle, Info, LifeBuoy,
+    Map, Save, Scissors, ShoppingBag, Target, Triangle, Users, Watch,
 };
 
-use crate::{components::upload::UploadButton, lang::Text};
+use crate::{
+    components::upload::UploadButton,
+    lang::Text,
+    save::{SaveContext, SaveManager},
+};
 
 struct Category(&'static str);
 
@@ -19,6 +23,8 @@ enum MenuItem {
 #[function_component]
 pub fn Sidebar() -> Html {
     let menu = [
+        MenuItem::Category(Category("meta")),
+        MenuItem::Tabs(vec![Tab("meta_meta", html!(<Info />))]),
         MenuItem::Category(Category("base")),
         MenuItem::Tabs(vec![
             Tab("base_characters", html!(<Users />)),
@@ -37,17 +43,17 @@ pub fn Sidebar() -> Html {
         ]),
         MenuItem::Category(Category("dlc4")),
         MenuItem::Tabs(vec![Tab("dlc4_enemypedia", html!(<BookOpen />))]),
-        MenuItem::Category(Category("meta")),
-        MenuItem::Tabs(vec![Tab("meta_meta", html!(<Clipboard />))]),
         MenuItem::Category(Category("danger")),
         MenuItem::Tabs(vec![Tab("danger_flags", html!(<Flag />))]),
     ];
+
+    let save = use_context::<SaveContext>().unwrap();
 
     html! {
       <aside class="aside is-placed-left is-expanded">
           <div class="aside-tools">
               <div class="aside-tools-label buttons">
-                  {edit_operations().collect::<Html>()}
+                  {edit_operations(&save.get()).collect::<Html>()}
               </div>
           </div>
           <Menu>
@@ -57,13 +63,13 @@ pub fn Sidebar() -> Html {
     }
 }
 
-fn edit_operations() -> impl Iterator<Item = Html> {
+fn edit_operations(save: &SaveManager) -> impl Iterator<Item = Html> {
     let ops = [
         (
             Some(html!(<Text path="save" />)),
             html!(<Save />),
             "is-info",
-            true,
+            save.is_loaded(),
         ),
         (None, html!(<CornerUpLeft />), "is-light", false), // Undo
         (None, html!(<CornerUpRight />), "is-light", false), // Redo
