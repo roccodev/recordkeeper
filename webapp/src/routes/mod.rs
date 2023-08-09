@@ -1,6 +1,8 @@
 use yew::prelude::*;
 use yew_router::Routable;
 
+mod meta;
+
 #[derive(Routable, Clone, PartialEq, Copy)]
 pub enum Route {
     #[at("/")]
@@ -36,7 +38,7 @@ pub enum Route {
 pub fn render(route: Route) -> Html {
     match route {
         Route::Home => html!(),
-        Route::Meta => html!(),
+        Route::Meta => html!(<meta::SaveMeta />),
         Route::Characters => html!(),
         Route::Ouroboros => html!(),
         Route::Items => html!(),

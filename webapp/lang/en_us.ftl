@@ -50,6 +50,30 @@ menu_meta_meta = Save Info
 
 menu_danger_flags = Flags
 
+## Save info translations
+
+hours = Hours
+minutes = Minutes
+seconds = Seconds
+date = Date
+time = Time
+
+difficulty = Difficulty
+difficulty_easy = Easy
+difficulty_normal = Normal
+difficulty_hard = Hard
+difficulty_veryhard = Very Hard (Unreleased)
+
+scenario_flag_flag = Flag
+scenario_flag_chapter = Chapter
+scenario_flag_event = Event
+
+meta_playtime = Play Time
+# When the game was last saved
+meta_savetime = Save Time
+meta_scenario_flag = Scenario Flag
+meta_ngp = New Game Plus
+meta_settings = Settings
 
 ## Character translations
 
