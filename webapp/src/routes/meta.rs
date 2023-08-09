@@ -1,3 +1,4 @@
+use recordkeeper::flags::FlagType;
 use ybc::{Checkbox, Container, Control, Field, Select, Tile, Title};
 use yew::prelude::*;
 
@@ -32,6 +33,11 @@ pub fn SaveMeta() -> Html {
 
 #[function_component]
 fn PlayTime() -> Html {
+    let save = use_context::<SaveContext>().unwrap();
+    let save = save.get();
+    let save = save.get().save();
+    let (hours, mins, secs) = save.play_time.to_hours_mins_secs();
+
     html! {
         <Tile classes={classes!("is-child", "notification")}>
             <Title><Text path="meta_playtime" /></Title>
@@ -39,21 +45,21 @@ fn PlayTime() -> Html {
             <Field>
                 <label class="label"><Text path="hours" /></label>
                 <Control>
-                    <input class="input" type="number" min="0" max="9999" />
+                    <input class="input" type="number" min="0" max="9999" value={hours.to_string()} />
                 </Control>
             </Field>
 
             <Field>
                 <label class="label"><Text path="minutes" /></label>
                 <Control>
-                    <input class="input" type="number" min="0" max="59" />
+                    <input class="input" type="number" min="0" max="59" value={mins.to_string()} />
                 </Control>
             </Field>
 
             <Field>
                 <label class="label"><Text path="seconds" /></label>
                 <Control>
-                    <input class="input" type="number" min="0" max="59" />
+                    <input class="input" type="number" min="0" max="59" value={secs.to_string()} />
                 </Control>
             </Field>
         </Tile>
@@ -62,6 +68,12 @@ fn PlayTime() -> Html {
 
 #[function_component]
 fn Timestamps() -> Html {
+    let save = use_context::<SaveContext>().unwrap();
+    let save = save.get();
+    let save = save.get().save();
+    let date = save.timestamp.to_iso_date();
+    let time = save.timestamp.to_iso_time();
+
     html! {
         <Tile classes={classes!("is-child", "notification")}>
             <Title><Text path="meta_savetime" /></Title>
@@ -69,14 +81,14 @@ fn Timestamps() -> Html {
             <Field>
                 <label class="label"><Text path="date" /></label>
                 <Control>
-                    <input class="input" type="date" />
+                    <input class="input" type="date" value={date} />
                 </Control>
             </Field>
 
             <Field>
                 <label class="label"><Text path="time" /></label>
                 <Control>
-                    <input class="input" type="time" />
+                    <input class="input" type="time" value={time} />
                 </Control>
             </Field>
         </Tile>
@@ -85,6 +97,11 @@ fn Timestamps() -> Html {
 
 #[function_component]
 fn ScenarioFlag() -> Html {
+    let save = use_context::<SaveContext>().unwrap();
+    let save = save.get();
+    let save = save.get().save();
+    let flag = save.flags.get(FlagType::Short, 1).unwrap();
+
     html! {
         <Tile classes={classes!("is-child", "notification")}>
             <Title><Text path="meta_scenario_flag" /></Title>
@@ -92,7 +109,7 @@ fn ScenarioFlag() -> Html {
             <Field>
                 <label class="label"><Text path="scenario_flag_flag" /></label>
                 <Control>
-                    <input class="input" type="number" />
+                    <input class="input" type="number" value={flag.to_string()} />
                 </Control>
             </Field>
 
@@ -119,6 +136,13 @@ fn ScenarioFlag() -> Html {
 
 #[function_component]
 fn Settings() -> Html {
+    let save = use_context::<SaveContext>().unwrap();
+    let save = save.get();
+    let save = save.get().save();
+
+    let ngp_flag = save.flags.get(FlagType::Bit, 23894).unwrap() != 0;
+    let difficulty = save.flags.get(FlagType::TwoBits, 4554).unwrap() as usize;
+
     html! {
         <Tile classes={classes!("is-child", "notification")}>
             <Title><Text path="meta_settings" /></Title>
@@ -126,15 +150,17 @@ fn Settings() -> Html {
             <Field>
                 <label class="label"><Text path="difficulty" /></label>
                 <Control>
-                    <Select name="difficulty" value="normal" update={Callback::from(move |_| ())}>
-                        <option value="normal">{"Normal"}</option>
+                    <Select name="difficulty" value={difficulty.to_string()} update={Callback::from(move |_| ())}>
+                        {for ["normal", "easy", "hard", "veryhard"].into_iter().enumerate().map(|(i, key)| html! {
+                            <option value={i.to_string()} selected={i == difficulty}><Text path={format!("difficulty_{key}")}/></option>
+                        })}
                     </Select>
                 </Control>
             </Field>
 
             <Field>
                 <Control>
-                    <Checkbox name="ngp" checked={false} update={Callback::from(move |_| ())}>
+                    <Checkbox name="ngp" checked={ngp_flag} update={Callback::from(move |_| ())}>
                         {" "}<Text path="meta_ngp" />
                     </Checkbox>
                 </Control>
