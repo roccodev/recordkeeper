@@ -2,6 +2,7 @@ mod app;
 pub mod components;
 pub mod dialog;
 pub mod lang;
+pub mod routes;
 pub mod save;
 
 pub const BRAND_NAME: &str = "Recordkeeper";

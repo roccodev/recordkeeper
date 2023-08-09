@@ -4,16 +4,18 @@ use yew_feather::{
     BookOpen, CornerUpLeft, CornerUpRight, Crosshair, FilePlus, Flag, HelpCircle, Info, LifeBuoy,
     Map, Save, Scissors, ShoppingBag, Target, Triangle, Users, Watch,
 };
+use yew_router::prelude::{use_route, Link};
 
 use crate::{
     components::upload::UploadButton,
     lang::Text,
+    routes::Route,
     save::{SaveContext, SaveManager},
 };
 
 struct Category(&'static str);
 
-struct Tab(&'static str, Html);
+struct Tab(&'static str, Html, Route);
 
 enum MenuItem {
     Category(Category),
@@ -24,30 +26,35 @@ enum MenuItem {
 pub fn Sidebar() -> Html {
     let menu = [
         MenuItem::Category(Category("meta")),
-        MenuItem::Tabs(vec![Tab("meta_meta", html!(<Info />))]),
+        MenuItem::Tabs(vec![Tab("meta_meta", html!(<Info />), Route::Meta)]),
         MenuItem::Category(Category("base")),
         MenuItem::Tabs(vec![
-            Tab("base_characters", html!(<Users />)),
-            Tab("base_ouroboros", html!(<Target />)),
-            Tab("base_items", html!(<ShoppingBag />)),
-            Tab("base_field", html!(<Map />)),
-            Tab("base_quests", html!(<HelpCircle />)),
-            Tab("base_ums", html!(<Crosshair />)),
-            Tab("base_formations", html!(<Triangle />)),
+            Tab("base_characters", html!(<Users />), Route::Characters),
+            Tab("base_ouroboros", html!(<Target />), Route::Ouroboros),
+            Tab("base_items", html!(<ShoppingBag />), Route::Items),
+            Tab("base_field", html!(<Map />), Route::Field),
+            Tab("base_quests", html!(<HelpCircle />), Route::Quests),
+            Tab("base_ums", html!(<Crosshair />), Route::Uniques),
+            Tab("base_formations", html!(<Triangle />), Route::Formations),
         ]),
         MenuItem::Category(Category("dlc")),
         MenuItem::Tabs(vec![
-            Tab("dlc_challenge", html!(<Watch />)),
-            Tab("dlc_gauntlet", html!(<LifeBuoy />)),
-            Tab("dlc_masha", html!(<Scissors />)),
+            Tab("dlc_challenge", html!(<Watch />), Route::ChallengeBattle),
+            Tab("dlc_gauntlet", html!(<LifeBuoy />), Route::Gauntlet),
+            Tab("dlc_masha", html!(<Scissors />), Route::Masha),
         ]),
         MenuItem::Category(Category("dlc4")),
-        MenuItem::Tabs(vec![Tab("dlc4_enemypedia", html!(<BookOpen />))]),
+        MenuItem::Tabs(vec![Tab(
+            "dlc4_enemypedia",
+            html!(<BookOpen />),
+            Route::Dlc4Enemypedia,
+        )]),
         MenuItem::Category(Category("danger")),
-        MenuItem::Tabs(vec![Tab("danger_flags", html!(<Flag />))]),
+        MenuItem::Tabs(vec![Tab("danger_flags", html!(<Flag />), Route::Flags)]),
     ];
 
     let save = use_context::<SaveContext>().unwrap();
+    let route = use_route::<Route>();
 
     html! {
       <aside class="aside is-placed-left is-expanded">
@@ -57,7 +64,7 @@ pub fn Sidebar() -> Html {
               </div>
           </div>
           <Menu>
-            {menu.into_iter().map(Html::from).collect::<Html>()}
+            {menu.into_iter().map(|i| i.into_html(route)).collect::<Html>()}
           </Menu>
       </aside>
     }
@@ -91,40 +98,45 @@ fn edit_operations(save: &SaveManager) -> impl Iterator<Item = Html> {
     }))
 }
 
+impl Tab {
+    fn into_html(self, current_route: Option<Route>) -> Html {
+        let classes = if current_route.is_some_and(|r| r == self.2) {
+            "is-active"
+        } else {
+            ""
+        };
+        html! {
+            <li>
+                <Link<Route> to={self.2} classes={classes!(classes)}>
+                    <span class="icon-text">
+                        <Icon size={Size::Small}>{self.1}</Icon>
+                        <span><Text path={format!("menu_{}", self.0)} /></span>
+                    </span>
+                </Link<Route>>
+            </li>
+        }
+    }
+}
+
+impl MenuItem {
+    fn into_html(self, current_route: Option<Route>) -> Html {
+        match self {
+            MenuItem::Category(c) => c.into(),
+            MenuItem::Tabs(tabs) => html! {
+                <MenuList>
+                    {tabs.into_iter().map(|t| t.into_html(current_route)).collect::<Html>()}
+                </MenuList>
+            },
+        }
+    }
+}
+
 impl From<Category> for Html {
     fn from(value: Category) -> Self {
         html! {
             <p class="menu-label">
                 <Text path={format!("menu_category_{}", value.0)} />
             </p>
-        }
-    }
-}
-
-impl From<Tab> for Html {
-    fn from(value: Tab) -> Self {
-        html! {
-            <li>
-                <a>
-                <span class="icon-text">
-                    <Icon size={Size::Small}>{value.1}</Icon>
-                    <span><Text path={format!("menu_{}", value.0)} /></span>
-                </span>
-                </a>
-            </li>
-        }
-    }
-}
-
-impl From<MenuItem> for Html {
-    fn from(value: MenuItem) -> Self {
-        match value {
-            MenuItem::Category(c) => c.into(),
-            MenuItem::Tabs(tabs) => html! {
-                <MenuList>
-                    {tabs.into_iter().map(Html::from).collect::<Html>()}
-                </MenuList>
-            },
         }
     }
 }

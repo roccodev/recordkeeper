@@ -13,3 +13,4 @@ unic-langid = { version = "0.9", features = ["macros"] }
 web-sys = { version = "0.3.64", default-features = false, features = ["FileList", "File", "HtmlInputElement"] }
 js-sys = "0.3.64"
 gloo = "0.3"
+yew-router = "0.17"
