@@ -26,9 +26,9 @@ pub enum FlagType {
 pub struct AllFlags {
     // workaround for https://github.com/rust-lang/rust/issues/76560
     // words = flag count / 32 * bits
-    flags_1b: BitFlags<1, { FLAG_1_BIT_COUNT / 32 }>,
-    flags_2b: BitFlags<2, { FLAG_2_BIT_COUNT / 32 * 2 }>,
-    flags_4b: BitFlags<4, { FLAG_4_BIT_COUNT / 32 * 4 }>,
+    flags_1b: BitFlags<1, { (FLAG_1_BIT_COUNT + 31) / 32 }>,
+    flags_2b: BitFlags<2, { (FLAG_2_BIT_COUNT + 31) / 32 * 2 }>,
+    flags_4b: BitFlags<4, { (FLAG_4_BIT_COUNT + 31) / 32 * 4 }>,
     flags_8b: ByteFlags<u8, FLAG_8_BIT_COUNT>,
     flags_16b: ByteFlags<u16, FLAG_16_BIT_COUNT>,
     flags_32b: ByteFlags<u32, FLAG_32_BIT_COUNT>,
@@ -36,8 +36,8 @@ pub struct AllFlags {
 
 #[derive(SaveBin, Debug)]
 pub struct UnknownFlags {
-    flags_1b: BitFlags<1, { FLAG_1_BIT_COUNT_UNK / 32 }>,
-    flags_2b: BitFlags<2, { FLAG_2_BIT_COUNT_UNK / 32 * 2 }>,
+    flags_1b: BitFlags<1, { (FLAG_1_BIT_COUNT_UNK + 31) / 32 }>,
+    flags_2b: BitFlags<2, { (FLAG_2_BIT_COUNT_UNK + 31) / 32 * 2 }>,
 }
 
 #[derive(SaveBin, Debug)]
@@ -72,11 +72,13 @@ impl AllFlags {
 impl<const BITS: usize, const WORDS: usize> BitFlags<BITS, WORDS> {
     const MASK: u32 = (1 << BITS) - 1;
     const SLOT_LEN: usize = u32::BITS as usize / BITS;
+    const MAX_SHIFT: usize = u32::BITS as usize - BITS;
 
     pub fn get(&self, index: usize) -> Option<u32> {
+        let shift = (index * BITS) & Self::MAX_SHIFT;
         self.words
             .get(index / Self::SLOT_LEN)
-            .map(|&val| val & (Self::MASK << (index / BITS)))
+            .map(|&val| (val & (Self::MASK << shift)) >> shift)
     }
 }
 

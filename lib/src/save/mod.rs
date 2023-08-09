@@ -35,9 +35,9 @@ pub struct SaveData {
     save_version: u8,
 
     #[loc(0x10)]
-    play_time: PlayTime,
+    pub play_time: PlayTime,
     #[loc(0x18)]
-    timestamp: SaveTimestamp,
+    pub timestamp: SaveTimestamp,
     pub gold: u32,
 
     /// Updated by the game on load.
@@ -89,7 +89,7 @@ pub struct SaveData {
     pub dlc4: Dlc4,
 }
 
-#[derive(SaveBin, Debug)]
+#[derive(SaveBin, Debug, Clone, Copy)]
 pub struct PlayTime {
     raw: u32,
 }
@@ -111,4 +111,45 @@ pub struct Pos {
 pub struct MapTime {
     hour: u16,
     minute: u16,
+}
+
+impl PlayTime {
+    pub fn to_seconds(self) -> u32 {
+        self.raw
+    }
+
+    pub fn to_hours_mins_secs(self) -> (u32, u32, u32) {
+        let secs = self.to_seconds();
+        (secs / 3600, secs % 3600 / 60, secs % 3600 % 60)
+    }
+}
+
+impl SaveTimestamp {
+    pub fn year(&self) -> u32 {
+        self.date >> 0x12
+    }
+
+    pub fn month(&self) -> u8 {
+        (self.date >> 0xe & 0xf) as u8
+    }
+
+    pub fn day(&self) -> u8 {
+        (self.date & 0x1f) as u8
+    }
+
+    pub fn hour(&self) -> u8 {
+        (self.time >> 0x1a) as u8
+    }
+
+    pub fn minute(&self) -> u8 {
+        (self.time >> 0x14 & 0x3f) as u8
+    }
+
+    pub fn to_iso_date(&self) -> String {
+        format!("{:04}-{:02}-{:02}", self.year(), self.month(), self.day())
+    }
+
+    pub fn to_iso_time(&self) -> String {
+        format!("{:02}:{:02}", self.hour(), self.minute())
+    }
 }
