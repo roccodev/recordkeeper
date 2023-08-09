@@ -2,7 +2,8 @@ open = Open
 save = Save
 undo = Undo
 redo = Redo
-download = Download
+download = Save & Download
+ok = OK
 
 # The project's info page
 nav_about = About

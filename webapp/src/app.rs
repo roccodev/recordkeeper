@@ -1,5 +1,6 @@
 use crate::components::nav::Navbar;
 use crate::components::sidebar::Sidebar;
+use crate::dialog::DialogRenderer;
 use crate::lang::{Lang, LangManager};
 use crate::save::SaveProvider;
 
@@ -12,10 +13,12 @@ fn App() -> Html {
 
     html! {
         <ContextProvider<Lang> context={lang}>
-            <SaveProvider>
-                <Sidebar />
-                <Navbar />
-            </SaveProvider>
+            <DialogRenderer>
+                <SaveProvider>
+                    <Sidebar />
+                    <Navbar />
+                </SaveProvider>
+            </DialogRenderer>
         </ContextProvider<Lang>>
     }
 }

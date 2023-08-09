@@ -7,6 +7,8 @@ use gloo::file::FileReadError;
 use recordkeeper::{SaveFile, SaveResult};
 use yew::prelude::*;
 
+use crate::dialog::{Dialog, DialogLayout, DialogQueue, Severity};
+
 #[derive(Default)]
 pub struct SaveManager {
     save_buffers: [Option<SaveFile>; 4],
@@ -17,6 +19,7 @@ pub struct SaveManager {
 pub enum EditAction {
     Load(Vec<u8>),
     Save,
+    ClearError,
 }
 
 #[derive(Properties, PartialEq)]
@@ -34,11 +37,19 @@ pub struct SaveContext {
 struct SaveReducer {
     manager: Rc<RefCell<SaveManager>>,
     change_id: usize,
+    error_dialog: Option<Dialog>,
 }
 
 #[function_component]
 pub fn SaveProvider(props: &SaveProviderProps) -> Html {
     let manager = use_reducer(SaveReducer::default);
+    let dialog = use_context::<DialogQueue>().unwrap();
+
+    if let Some(error) = &manager.error_dialog {
+        manager.dispatch(EditAction::ClearError);
+        dialog.dispatch(Some(error.clone()));
+    }
+
     html! {
         <ContextProvider<SaveContext> context={SaveContext::new(manager)}>
             { for props.children.iter() }
@@ -100,13 +111,22 @@ impl Reducible for SaveReducer {
 
     fn reduce(self: Rc<Self>, action: Self::Action) -> Rc<Self> {
         let mut handle = self.manager.borrow_mut();
-        match action {
-            EditAction::Load(bytes) => handle.load(&bytes).unwrap(),
-            EditAction::Save => handle.back_up_and_save().unwrap(),
-        }
+        let res = match action {
+            EditAction::Load(bytes) => handle.load(&bytes),
+            EditAction::Save => handle.back_up_and_save(),
+            EditAction::ClearError => Ok(()),
+        };
         Rc::new(Self {
             manager: Rc::clone(&self.manager),
             change_id: handle.change_id,
+            error_dialog: res.err().map(|e| {
+                DialogLayout::Ok {
+                    title: None,
+                    message: e.to_string().into(),
+                    severity: Severity::Error,
+                }
+                .into()
+            }),
         })
     }
 }
