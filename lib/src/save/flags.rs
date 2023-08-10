@@ -56,6 +56,19 @@ where
     flags: [B; N],
 }
 
+impl FlagType {
+    pub fn is_valid(&self, value: u32) -> bool {
+        match self {
+            Self::Bit => value < 2,
+            Self::TwoBits => value < 4,
+            Self::FourBits => value < 16,
+            Self::Byte => value <= u8::MAX as u32,
+            Self::Short => value <= u16::MAX as u32,
+            Self::Int => true,
+        }
+    }
+}
+
 impl AllFlags {
     pub fn get(&self, flag_type: FlagType, index: usize) -> Option<u32> {
         match flag_type {
@@ -65,6 +78,17 @@ impl AllFlags {
             FlagType::Byte => self.flags_8b.get(index).map(u32::from),
             FlagType::Short => self.flags_16b.get(index).map(u32::from),
             FlagType::Int => self.flags_32b.get(index),
+        }
+    }
+
+    pub fn set(&mut self, flag_type: FlagType, index: usize, new_value: u32) {
+        match flag_type {
+            FlagType::Bit => self.flags_1b.set(index, new_value),
+            FlagType::TwoBits => self.flags_2b.set(index, new_value),
+            FlagType::FourBits => self.flags_4b.set(index, new_value),
+            FlagType::Byte => self.flags_8b.set(index, new_value.try_into().unwrap()),
+            FlagType::Short => self.flags_16b.set(index, new_value.try_into().unwrap()),
+            FlagType::Int => self.flags_32b.set(index, new_value),
         }
     }
 }
@@ -80,6 +104,19 @@ impl<const BITS: usize, const WORDS: usize> BitFlags<BITS, WORDS> {
             .get(index / Self::SLOT_LEN)
             .map(|&val| (val & (Self::MASK << shift)) >> shift)
     }
+
+    pub fn set(&mut self, index: usize, value: u32) {
+        assert!(
+            value <= Self::MASK,
+            "value too big for {}-bit flag, found {value}",
+            BITS
+        );
+        let shift = (index * BITS) & Self::MAX_SHIFT;
+        self.words
+            .get_mut(index / Self::SLOT_LEN)
+            .map(|slot| *slot |= (value & Self::MASK) << shift)
+            .expect("index out of bounds")
+    }
 }
 
 impl<B: for<'a> SaveBin<'a>, const N: usize> ByteFlags<B, N>
@@ -90,5 +127,48 @@ where
 {
     pub fn get(&self, index: usize) -> Option<B> {
         self.flags.get(index).copied()
+    }
+
+    pub fn set(&mut self, index: usize, value: B) {
+        self.flags
+            .get_mut(index)
+            .map(|f| *f = value)
+            .expect("index out of bounds")
+    }
+}
+
+impl<const BITS: usize, const WORDS: usize> Default for BitFlags<BITS, WORDS> {
+    fn default() -> Self {
+        Self {
+            words: [0; WORDS],
+            _bits: [PhantomData; BITS],
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::BitFlags;
+
+    #[test]
+    fn bitflag_set() {
+        let mut flags_1b = BitFlags::<1, 1>::default(); // 32 1-bit flags
+        let mut flags_4b = BitFlags::<4, 1>::default(); // 8 4-bit flags
+
+        for i in 0..32 {
+            flags_1b.set(i, i as u32 & 1);
+        }
+
+        for i in 0..32 {
+            assert_eq!(i as u32 & 1, flags_1b.get(i).unwrap());
+        }
+
+        for i in 0..8 {
+            flags_4b.set(i, i as u32);
+        }
+
+        for i in 0..8 {
+            assert_eq!(i as u32, flags_4b.get(i).unwrap());
+        }
     }
 }

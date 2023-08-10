@@ -2,7 +2,11 @@ use recordkeeper::flags::FlagType;
 use ybc::{Checkbox, Container, Control, Field, Select, Tile, Title};
 use yew::prelude::*;
 
-use crate::{lang::Text, save::SaveContext};
+use crate::{
+    components::edit::{flag_editor, NumberInput},
+    lang::Text,
+    save::SaveContext,
+};
 
 #[function_component]
 pub fn SaveMeta() -> Html {
@@ -100,7 +104,8 @@ fn ScenarioFlag() -> Html {
     let save = use_context::<SaveContext>().unwrap();
     let save = save.get();
     let save = save.get().save();
-    let flag = save.flags.get(FlagType::Short, 1).unwrap();
+
+    flag_editor!(ScenarioEditor, FlagType::Short, 1);
 
     html! {
         <Tile classes={classes!("is-child", "notification")}>
@@ -109,7 +114,7 @@ fn ScenarioFlag() -> Html {
             <Field>
                 <label class="label"><Text path="scenario_flag_flag" /></label>
                 <Control>
-                    <input class="input" type="number" value={flag.to_string()} />
+                    <NumberInput<ScenarioEditor> editor={ScenarioEditor} />
                 </Control>
             </Field>
 

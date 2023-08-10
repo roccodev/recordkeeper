@@ -1,10 +1,10 @@
 use std::{
-    cell::{Ref, RefCell},
+    cell::{Ref, RefCell, RefMut},
     rc::Rc,
 };
 
 use gloo::file::FileReadError;
-use recordkeeper::{SaveFile, SaveResult};
+use recordkeeper::{SaveData, SaveFile, SaveResult};
 use yew::prelude::*;
 
 use crate::dialog::{Dialog, DialogLayout, DialogQueue, Severity};
@@ -20,6 +20,7 @@ pub enum EditAction {
     Load(Vec<u8>),
     Save,
     ClearError,
+    Edit(Box<dyn FnOnce(&mut SaveData)>),
 }
 
 #[derive(Properties, PartialEq)]
@@ -60,6 +61,10 @@ pub fn SaveProvider(props: &SaveProviderProps) -> Html {
 impl SaveManager {
     pub fn get(&self) -> &SaveFile {
         self.save_buffers[0].as_ref().unwrap()
+    }
+
+    pub fn get_mut(&mut self) -> &mut SaveFile {
+        self.save_buffers[0].as_mut().unwrap()
     }
 
     pub fn is_loaded(&self) -> bool {
@@ -114,6 +119,10 @@ impl Reducible for SaveReducer {
         let res = match action {
             EditAction::Load(bytes) => handle.load(&bytes),
             EditAction::Save => handle.back_up_and_save(),
+            EditAction::Edit(mut callback) => {
+                callback(handle.get_mut().save_mut());
+                Ok(())
+            }
             EditAction::ClearError => Ok(()),
         };
         Rc::new(Self {
