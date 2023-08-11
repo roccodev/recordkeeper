@@ -1,6 +1,7 @@
 use yew::prelude::*;
 use yew_router::Routable;
 
+mod flags;
 mod meta;
 
 #[derive(Routable, Clone, PartialEq, Copy)]
@@ -50,6 +51,6 @@ pub fn render(route: Route) -> Html {
         Route::Gauntlet => html!(),
         Route::Masha => html!(),
         Route::Dlc4Enemypedia => html!(),
-        Route::Flags => html!(),
+        Route::Flags => html!(<flags::FlagList />),
     }
 }

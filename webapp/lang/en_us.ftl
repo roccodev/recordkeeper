@@ -96,3 +96,15 @@ character_dirt = Dirtiness
 ouroboros_sp = SP
 ouroboros_linked_skills = Linked { -skills }
 ouroboros_skill_tree = Skill Tree
+
+## Flag screen
+
+# The flag ID
+flag_index = Flag Index
+# How many bits the flag uses
+flag_bits = Flag Bits
+# The value stored in the flag
+flag_value = Value
+# Placeholder text for the flag ID input field.
+# Allows the user to jump to the page that contains the flag
+flag_jump_page = Go to flag...

@@ -3,7 +3,7 @@ use ybc::{Checkbox, Container, Control, Field, Select, Tile, Title};
 use yew::prelude::*;
 
 use crate::{
-    components::edit::{flag_editor, NumberInput},
+    components::edit::{FlagEditor, NumberInput},
     lang::Text,
     save::SaveContext,
 };
@@ -105,7 +105,10 @@ fn ScenarioFlag() -> Html {
     let save = save.get();
     let save = save.get().save();
 
-    flag_editor!(ScenarioEditor, FlagType::Short, 1);
+    let scenario_editor = FlagEditor {
+        flag_type: FlagType::Short,
+        flag_index: 1,
+    };
 
     html! {
         <Tile classes={classes!("is-child", "notification")}>
@@ -114,7 +117,7 @@ fn ScenarioFlag() -> Html {
             <Field>
                 <label class="label"><Text path="scenario_flag_flag" /></label>
                 <Control>
-                    <NumberInput<ScenarioEditor> editor={ScenarioEditor} />
+                    <NumberInput<FlagEditor> editor={scenario_editor} />
                 </Control>
             </Field>
 

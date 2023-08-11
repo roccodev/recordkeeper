@@ -13,6 +13,7 @@ const FLAG_32_BIT_COUNT: usize = 2372;
 const FLAG_1_BIT_COUNT_UNK: usize = 20000;
 const FLAG_2_BIT_COUNT_UNK: usize = 7984;
 
+#[derive(PartialEq, Clone, Copy)]
 pub enum FlagType {
     Bit,
     TwoBits,
@@ -57,7 +58,7 @@ where
 }
 
 impl FlagType {
-    pub fn is_valid(&self, value: u32) -> bool {
+    pub const fn is_valid(&self, value: u32) -> bool {
         match self {
             Self::Bit => value < 2,
             Self::TwoBits => value < 4,
@@ -65,6 +66,28 @@ impl FlagType {
             Self::Byte => value <= u8::MAX as u32,
             Self::Short => value <= u16::MAX as u32,
             Self::Int => true,
+        }
+    }
+
+    pub const fn num_bits(&self) -> u32 {
+        match self {
+            Self::Bit => 1,
+            Self::TwoBits => 2,
+            Self::FourBits => 4,
+            Self::Byte => u8::BITS,
+            Self::Short => u16::BITS,
+            Self::Int => u32::BITS,
+        }
+    }
+
+    pub const fn num_flags(&self) -> usize {
+        match self {
+            Self::Bit => FLAG_1_BIT_COUNT,
+            Self::TwoBits => FLAG_2_BIT_COUNT,
+            Self::FourBits => FLAG_4_BIT_COUNT,
+            Self::Byte => FLAG_8_BIT_COUNT,
+            Self::Short => FLAG_16_BIT_COUNT,
+            Self::Int => FLAG_32_BIT_COUNT,
         }
     }
 }
