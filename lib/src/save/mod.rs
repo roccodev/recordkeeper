@@ -12,6 +12,8 @@ use crate::dlc::ChallengeBattle;
 use dlc::Dlc4;
 use recordkeeper_macros::SaveBin;
 
+use self::dlc::{PowAugment, POW_AUGMENT_NUM};
+
 pub mod character;
 pub mod dlc;
 pub mod enemy;
@@ -78,6 +80,9 @@ pub struct SaveData {
 
     #[loc(0x183000)]
     pub enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
+
+    #[loc(0x1911f0)]
+    pub pow_augment: [PowAugment; POW_AUGMENT_NUM],
 
     #[loc(0x193ed8)]
     pub challenge_battle: ChallengeBattle,

@@ -1,4 +1,9 @@
-use crate::character::{ClassAccessory, CHARACTER_MAX};
+use std::num::NonZeroUsize;
+
+use crate::{
+    character::{ClassAccessory, CHARACTER_MAX},
+    flags::BitFlags,
+};
 use recordkeeper_macros::SaveBin;
 
 pub const DLC4_ENEMYPEDIA_MAX_EACH: usize = 200;
@@ -10,6 +15,21 @@ const EMBLEM_MAX: usize = 300; // best guess
 
 const GAUNTLET_STATE_CHARACTER_MAX: usize = 7;
 const GAUNTLET_STATE_EMBLEM_MAX: usize = 60;
+
+const POW_AUGMENT_NUM_FLAGS: usize = 64;
+pub const POW_AUGMENT_NUM: usize = 8;
+
+/// Inoswap (base game) / Affinity Growth (Future Redeemed)
+#[derive(SaveBin, Debug)]
+#[size(12)]
+pub struct PowAugment {
+    learned: BitFlags<1, { (POW_AUGMENT_NUM_FLAGS + 31) / 32 }>,
+    /// ID for `CHR_PC`
+    #[loc(0xa)]
+    pub chr_id: u8,
+    /// The number of unlocked growth tree tiers
+    pub unlocked_tiers: u8,
+}
 
 #[derive(SaveBin, Debug)]
 pub struct Dlc4 {
@@ -167,4 +187,17 @@ pub struct DateTime {
     day: u8,
     hour: u8,
     minute: u8,
+}
+
+impl PowAugment {
+    pub fn is_learned(&self, pow_id: NonZeroUsize) -> bool {
+        self.learned
+            .get(pow_id.get() - 1)
+            .map(|flag| flag != 0)
+            .unwrap_or_default()
+    }
+
+    pub fn set_learned(&mut self, pow_id: NonZeroUsize, learned: bool) {
+        self.learned.set(pow_id.get() - 1, learned as u8 as u32);
+    }
 }
