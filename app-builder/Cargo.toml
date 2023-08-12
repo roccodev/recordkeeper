@@ -1,0 +1,9 @@
+[package]
+name = "app-builder"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bdat = "0.3.0"
+game-data = { path = "../game-data" }
+anyhow = "1.0.72"

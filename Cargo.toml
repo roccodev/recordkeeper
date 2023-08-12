@@ -2,5 +2,7 @@
 members = [
     "lib",
     "macros",
-    "webapp"
+    "webapp",
+    "app-builder",
+    "game-data"
 ]

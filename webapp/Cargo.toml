@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 recordkeeper = { path = "../lib" }
+game-data = { path = "../game-data" }
 yew = { version = "0.20", features = ["csr"] }
 ybc = "0.4.0"
 yew-feather = "1.0"
