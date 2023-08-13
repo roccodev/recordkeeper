@@ -1,5 +1,6 @@
 use crate::error::SaveError;
 use crate::io::SaveBin;
+use crate::time::AmiiboTimeData;
 use recordkeeper_macros::SaveBin;
 use std::marker::PhantomData;
 
@@ -11,7 +12,7 @@ const FLAG_16_BIT_COUNT: usize = 3072;
 const FLAG_32_BIT_COUNT: usize = 2372;
 
 const FLAG_1_BIT_COUNT_UNK: usize = 20000;
-const FLAG_2_BIT_COUNT_UNK: usize = 7984;
+const FLAG_2_BIT_COUNT_UNK: usize = 4528;
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum FlagType {
@@ -28,8 +29,8 @@ pub struct AllFlags {
     // workaround for https://github.com/rust-lang/rust/issues/76560
     // words = flag count / 32 * bits
     flags_1b: BitFlags<1, { (FLAG_1_BIT_COUNT + 31) / 32 }>,
-    flags_2b: BitFlags<2, { (FLAG_2_BIT_COUNT + 31) / 32 * 2 }>,
-    flags_4b: BitFlags<4, { (FLAG_4_BIT_COUNT + 31) / 32 * 4 }>,
+    flags_2b: BitFlags<2, { (FLAG_2_BIT_COUNT + 15) / 16 }>,
+    flags_4b: BitFlags<4, { (FLAG_4_BIT_COUNT + 7) / 8 }>,
     flags_8b: ByteFlags<u8, FLAG_8_BIT_COUNT>,
     flags_16b: ByteFlags<u16, FLAG_16_BIT_COUNT>,
     flags_32b: ByteFlags<u32, FLAG_32_BIT_COUNT>,
@@ -38,7 +39,9 @@ pub struct AllFlags {
 #[derive(SaveBin, Debug)]
 pub struct UnknownFlags {
     flags_1b: BitFlags<1, { (FLAG_1_BIT_COUNT_UNK + 31) / 32 }>,
-    flags_2b: BitFlags<2, { (FLAG_2_BIT_COUNT_UNK + 31) / 32 * 2 }>,
+    flags_2b: BitFlags<2, { (FLAG_2_BIT_COUNT_UNK + 15) / 16 }>,
+    #[loc(0xe30)]
+    amiibo_time_data: AmiiboTimeData,
 }
 
 #[derive(SaveBin, Debug)]

@@ -19,6 +19,7 @@ pub mod dlc;
 pub mod enemy;
 pub mod flags;
 pub mod item;
+pub mod time;
 
 pub(crate) const SAVE_VERSION: u8 = 10;
 
