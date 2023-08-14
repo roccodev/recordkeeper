@@ -1,6 +1,7 @@
 mod error;
 pub mod io;
 mod save;
+pub mod util;
 
 use crate::error::SaveError;
 use std::any::{Any, TypeId};

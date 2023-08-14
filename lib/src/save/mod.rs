@@ -2,13 +2,14 @@ use crate::character::{
     CharacterParty, PartyFormation, PARTY_FORMATION_MAX, PARTY_GUEST_MAX, PARTY_MAX,
 };
 use crate::error::SaveError;
-use crate::flags::UnknownFlags;
 use crate::item::Inventory;
 use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX};
 use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
 use crate::save::flags::AllFlags;
+use menu::MenuFlags;
 
 use crate::dlc::ChallengeBattle;
+use crate::menu::MenuData;
 use dlc::Dlc4;
 use recordkeeper_macros::SaveBin;
 
@@ -19,6 +20,7 @@ pub mod dlc;
 pub mod enemy;
 pub mod flags;
 pub mod item;
+pub mod menu;
 pub mod time;
 
 pub(crate) const SAVE_VERSION: u8 = 10;
@@ -77,7 +79,7 @@ pub struct SaveData {
     pub inventory: Inventory,
 
     #[loc(0x181c80)]
-    pub unknown_flags: UnknownFlags,
+    pub menu_data: MenuData,
 
     #[loc(0x183000)]
     pub enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],

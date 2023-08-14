@@ -1,3 +1,4 @@
+use crate::util::FixStr;
 use recordkeeper_macros::SaveBin;
 
 /// aka `nn::time::PeriodicBenefitClaimContext`
@@ -5,8 +6,9 @@ use recordkeeper_macros::SaveBin;
 #[size(772)]
 pub struct AmiiboTimeData {
     _unk: u32, // 2 if active? <- XC3 field, not part of the sdk
+    /// Clock snapshot when the last time check was requested.
     #[loc(0x10)]
-    snapshot_1: ClockSnapshot,
+    last_request: ClockSnapshot,
     /// Clock snapshot when the amiibo bonus was last received.
     ///
     /// Valid if `last_benefit_received.initial_type != 0`.
@@ -24,8 +26,8 @@ struct ClockSnapshot {
     system_time_context: TimeContext,
     network_time_context: TimeContext,
 
-    system_time_posix: u64,
-    network_time_posix: u64,
+    system_time_posix: i64,
+    network_time_posix: i64,
 
     system_time_calendar: CalendarTime,
     network_time_calendar: CalendarTime,
@@ -43,21 +45,15 @@ struct ClockSnapshot {
     // 2 u8/bools
 }
 
-/// Nul-terminated string with fixed storage and maximum length.
-///
-/// Extra bytes are not guaranteed to be nulls.
-#[derive(SaveBin, Debug)]
-struct FixStr<const MAX: usize> {
-    buf: [u8; MAX],
-}
-
+// https://switchbrew.org/wiki/Glue_services#SystemClockContext
 #[derive(SaveBin, Debug)]
 #[size(32)]
 struct TimeContext {
+    system_clock_epoch: i64,
     steady_time: SteadyClockTime,
-    // + 1 unknown u64
 }
 
+// https://switchbrew.org/wiki/Glue_services#SteadyClockTimePoint
 #[derive(SaveBin, Debug)]
 #[size(24)]
 struct SteadyClockTime {
@@ -81,10 +77,13 @@ struct CalendarTime {
 
 #[derive(SaveBin, Debug)]
 struct CalendarAdditionalInfo {
-    #[loc(0x4)]
-    _unk: u32,
+    /// 0-based day of week
+    day_of_week: u32,
+    /// 0-based day of year
+    day_of_year: u32,
     timezone_short_id: FixStr<8>,
-    _unk_2: bool, // DST?
+    /// Whether daylight savings are currently in effect
+    is_dst: bool,
     #[loc(0x14)]
     utc_offset_seconds: i32,
 }

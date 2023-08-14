@@ -11,9 +11,6 @@ const FLAG_8_BIT_COUNT: usize = 8192;
 const FLAG_16_BIT_COUNT: usize = 3072;
 const FLAG_32_BIT_COUNT: usize = 2372;
 
-const FLAG_1_BIT_COUNT_UNK: usize = 20000;
-const FLAG_2_BIT_COUNT_UNK: usize = 4528;
-
 #[derive(PartialEq, Clone, Copy)]
 pub enum FlagType {
     Bit,
@@ -34,14 +31,6 @@ pub struct AllFlags {
     flags_8b: ByteFlags<u8, FLAG_8_BIT_COUNT>,
     flags_16b: ByteFlags<u16, FLAG_16_BIT_COUNT>,
     flags_32b: ByteFlags<u32, FLAG_32_BIT_COUNT>,
-}
-
-#[derive(SaveBin, Debug)]
-pub struct UnknownFlags {
-    flags_1b: BitFlags<1, { (FLAG_1_BIT_COUNT_UNK + 31) / 32 }>,
-    flags_2b: BitFlags<2, { (FLAG_2_BIT_COUNT_UNK + 15) / 16 }>,
-    #[loc(0xe30)]
-    amiibo_time_data: AmiiboTimeData,
 }
 
 #[derive(SaveBin, Debug)]
