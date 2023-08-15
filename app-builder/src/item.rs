@@ -1,11 +1,13 @@
 use std::num::NonZeroUsize;
 
 use bdat::{Label, RowRef};
-use game_data::item::{Item, Rarity};
+use enum_map::{enum_map, EnumMap};
+use game_data::item::{Item, ItemLanguageRegistry, Rarity};
 use game_data::item::{ItemRegistry, ItemType};
 
-use crate::const_hash;
+use crate::lang::text_table_from_bdat;
 use crate::BdatRegistry;
+use crate::{const_hash, LangBdatRegistry};
 
 pub fn load_items(bdat: &BdatRegistry) -> ItemRegistry {
     let categories = [
@@ -14,7 +16,7 @@ pub fn load_items(bdat: &BdatRegistry) -> ItemRegistry {
         (ItemType::Accessory, const_hash!("ITM_Accessory")),
         (ItemType::Exchange, const_hash!("ITM_Exchange")),
         (ItemType::Gem, const_hash!("ITM_Gem")),
-        (ItemType::Exchange, const_hash!("ITM_Extra")),
+        (ItemType::Extra, const_hash!("ITM_Extra")),
         (ItemType::Info, const_hash!("ITM_Info")),
         (ItemType::Precious, const_hash!("ITM_Precious")),
         (ItemType::Collectopedia, const_hash!("ITM_Collepedia")),
@@ -31,6 +33,22 @@ pub fn load_items(bdat: &BdatRegistry) -> ItemRegistry {
     }
 
     registry
+}
+
+pub fn load_item_lang(bdat: &LangBdatRegistry) -> ItemLanguageRegistry {
+    let categories = enum_map! {
+        ItemType::Collection => const_hash!("msg_item_collection"),
+        ItemType::Cylinder => const_hash!("msg_item_cylinder"),
+        ItemType::Accessory => const_hash!("msg_item_accessory"),
+        ItemType::Exchange => const_hash!("msg_item_exchange"),
+        ItemType::Gem => const_hash!("msg_item_gem"),
+        ItemType::Extra => const_hash!("msg_item_extra"),
+        ItemType::Info => Label::Hash(0xCA2198EC),
+        ItemType::Precious => const_hash!("msg_item_precious"),
+        ItemType::Collectopedia => Label::Hash(0xBEDB6533),
+    };
+
+    ItemLanguageRegistry::new(categories.map(|_, label| text_table_from_bdat(bdat.table(&label))))
 }
 
 fn read_item(item_type: ItemType, row: RowRef) -> Option<Item> {
