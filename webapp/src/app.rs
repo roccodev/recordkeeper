@@ -5,28 +5,41 @@ use crate::lang::{Lang, LangManager};
 use crate::routes::Route;
 use crate::save::SaveProvider;
 
+use crate::data;
+use crate::data::{Data, DataAction, DataManager};
 use yew::prelude::*;
 use yew_router::history::{AnyHistory, MemoryHistory};
 use yew_router::{Router, Switch};
 
 #[function_component]
 fn App() -> Html {
+    let data = use_reducer_eq(DataManager::load);
+
     let lang = LangManager::DEFAULT_LANG;
     let lang = use_memo(|lang| LangManager::load(lang.clone()), lang);
+
+    let game_lang = data::DEFAULT_GAME_LANG;
+    let for_future = data.clone();
+    wasm_bindgen_futures::spawn_local(async move {
+        let lang = data::load_lang(game_lang).await.expect("extra lang load");
+        for_future.dispatch(DataAction::ChangeLanguage(lang, game_lang));
+    });
 
     let router_history = use_state(|| AnyHistory::from(MemoryHistory::new()));
 
     html! {
         <ContextProvider<Lang> context={lang}>
-            <DialogRenderer>
-                <SaveProvider>
-                    <Router history={(*router_history).clone()} basename="/">
-                        <Sidebar />
-                        <Navbar />
-                        <Switch<Route> render={crate::routes::render} />
-                    </Router>
-                </SaveProvider>
-            </DialogRenderer>
+            <ContextProvider<Data> context={data}>
+                <DialogRenderer>
+                    <SaveProvider>
+                        <Router history={(*router_history).clone()} basename="/">
+                            <Sidebar />
+                            <Navbar />
+                            <Switch<Route> render={crate::routes::render} />
+                        </Router>
+                    </SaveProvider>
+                </DialogRenderer>
+            </ContextProvider<Data>>
         </ContextProvider<Lang>>
     }
 }

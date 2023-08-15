@@ -36,3 +36,10 @@ pub fn load_game_data(mut reader: impl Read) -> Result<GameData, Box<dyn Error>>
     let res = bitcode::deserialize(&bytes)?;
     Ok(res)
 }
+
+pub fn load_lang_data(mut reader: impl Read) -> Result<LanguageData, Box<dyn Error>> {
+    let mut bytes = Vec::new();
+    reader.read_to_end(&mut bytes)?;
+    let res = bitcode::deserialize(&bytes)?;
+    Ok(res)
+}
