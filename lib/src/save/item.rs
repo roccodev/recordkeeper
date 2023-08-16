@@ -4,21 +4,21 @@ use recordkeeper_macros::SaveBin;
 pub struct Inventory {
     #[loc(0x28)]
     /// `ITM_Cylinder`
-    cylinders: [ItemSlot; 16],
+    pub cylinders: [ItemSlot; 16],
     /// `ITM_Gem`
-    gems: [ItemSlot; 300],
+    pub gems: [ItemSlot; 300],
     /// `ITM_Collection`
-    collectibles: [ItemSlot; 1500],
+    pub collectibles: [ItemSlot; 1500],
     /// `ITM_Info`, discussion info dialogues
-    infos: [ItemSlot; 800],
+    pub infos: [ItemSlot; 800],
     /// `ITM_Accessory`
-    accessories: [ItemSlot; 1500],
+    pub accessories: [ItemSlot; 1500],
     /// `ITM_Precious`
-    key_items: [ItemSlot; 200],
+    pub key_items: [ItemSlot; 200],
     /// `ITM_Exchange` (unused item type)
-    exchange: [ItemSlot; 16],
+    pub exchange: [ItemSlot; 16],
     /// `ITM_Extra`
-    extra: [ItemSlot; 64],
+    pub extra: [ItemSlot; 64],
 }
 
 #[derive(SaveBin, Debug)]

@@ -108,3 +108,19 @@ flag_value = Value
 # Placeholder text for the flag ID input field.
 # Allows the user to jump to the page that contains the flag
 flag_jump_page = Go to flag...
+
+## Items screen
+
+item_type = Item Type
+item_slot_index = Slot ID
+item_item = Item
+item_amount = Amount
+item_actions = Actions
+
+# Item types
+
+item_type_collection = Collectibles
+item_type_accessory = Accessories
+item_type_precious = Key Items
+item_type_gem = Gems
+item_type_cylinder = Cylinders

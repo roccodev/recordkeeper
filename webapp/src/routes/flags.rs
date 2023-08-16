@@ -4,6 +4,7 @@ use web_sys::{EventTarget, HtmlInputElement};
 use ybc::{Button, Buttons, Container, Field, Pagination, PaginationEllipsis, Table, Tile};
 use yew::prelude::*;
 
+use crate::components::page::PageOrganizer;
 use crate::{
     components::edit::{FlagEditor, NumberInput},
     lang::{Lang, Text},
@@ -39,17 +40,10 @@ pub fn FlagList() -> Html {
     let flag_type = use_state(|| FlagType::Bit);
     let page = use_state(|| 0);
 
-    let mut open_pages = [(0, 0); PAGES_PER_VIEW];
-    let mut start = ROWS_PER_PAGE * *page;
-    let last_page = (flag_type.num_flags() + ROWS_PER_PAGE * PAGES_PER_VIEW - 1)
-        / (ROWS_PER_PAGE * PAGES_PER_VIEW);
-    for (st, end) in &mut open_pages {
-        *st = start;
-        start = (start + ROWS_PER_PAGE).min(flag_type.num_flags());
-        *end = start - 1;
-    }
-
-    let current_page_for_display = 1 + *page / PAGES_PER_VIEW;
+    let page_organizer =
+        PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, flag_type.num_flags());
+    let current_page_for_display = page_organizer.page_display_id();
+    let last_page = page_organizer.last_page;
 
     let change_page_callback = |new_page: usize| {
         let page = page.clone();
@@ -99,7 +93,7 @@ pub fn FlagList() -> Html {
             </Tile>
 
             <Tile>
-                {for open_pages.into_iter().map(|(start, end)| html! {
+                {for page_organizer.current_bounds.into_iter().map(|(start, end)| html! {
                     <Tile>
                         <TablePage flag_type={*flag_type} start={start} end={end} />
                     </Tile>

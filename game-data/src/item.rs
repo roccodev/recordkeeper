@@ -74,6 +74,22 @@ impl ItemLanguageRegistry {
     }
 }
 
+impl ItemType {
+    pub fn lang_id(self) -> &'static str {
+        match self {
+            Self::Cylinder => "cylinder",
+            Self::Gem => "gem",
+            Self::Collection => "collection",
+            Self::Collectopedia => "collepedia",
+            Self::Info => "info",
+            Self::Accessory => "accessory",
+            Self::Precious => "precious",
+            Self::Exchange => "exchange",
+            Self::Extra => "extra",
+        }
+    }
+}
+
 impl Nameable for Item {
     fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l str> {
         self.name_id

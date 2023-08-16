@@ -4,6 +4,7 @@ use std::{
 };
 
 use gloo::file::FileReadError;
+use log::info;
 use recordkeeper::{SaveData, SaveFile, SaveResult};
 use yew::prelude::*;
 
@@ -73,6 +74,13 @@ impl SaveManager {
 
     fn load(&mut self, bytes: &[u8]) -> SaveResult<()> {
         let save = SaveFile::from_bytes(bytes)?;
+
+        info!(
+            "Loaded save file, last saved {} {}",
+            save.save().timestamp.to_iso_date(),
+            save.save().timestamp.to_iso_time()
+        );
+
         self.save_buffers.fill_with(|| None); // TODO replace with fill with Clone
         self.save_buffers[0] = Some(save);
         self.change_id = if self.change_id == 0 { 1 } else { 0 };

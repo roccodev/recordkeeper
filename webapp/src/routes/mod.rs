@@ -2,6 +2,7 @@ use yew::prelude::*;
 use yew_router::Routable;
 
 mod flags;
+mod item;
 mod meta;
 
 #[derive(Routable, Clone, PartialEq, Copy)]
@@ -42,7 +43,7 @@ pub fn render(route: Route) -> Html {
         Route::Meta => html!(<meta::SaveMeta />),
         Route::Characters => html!(),
         Route::Ouroboros => html!(),
-        Route::Items => html!(),
+        Route::Items => html!(<item::ItemInventory />),
         Route::Field => html!(),
         Route::Quests => html!(),
         Route::Uniques => html!(),
