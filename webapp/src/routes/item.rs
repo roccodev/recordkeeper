@@ -1,7 +1,9 @@
 use crate::components::page::PageOrganizer;
+use crate::components::select::{Options, SearchSelect};
+use crate::data::Data;
 use crate::lang::Text;
 use crate::save::SaveContext;
-use game_data::item::ItemType;
+use game_data::item::{Item, ItemType};
 use recordkeeper::item::{Inventory, ItemSlot};
 use ybc::{Button, Buttons, Container, Field, Table, Tile};
 use yew::prelude::*;
@@ -98,7 +100,17 @@ pub fn ItemInventory() -> Html {
 
 #[function_component]
 fn TablePage(props: &TableProps) -> Html {
-    let flag_type = props.item_type;
+    let data = use_context::<Data>().unwrap();
+    let item_type = props.item_type;
+    let lang = data.to_lang();
+
+    let items: Options<Item> = data
+        .game()
+        .items
+        .items_by_type(item_type)
+        .iter()
+        .copied()
+        .collect();
 
     html! {
         <Table classes={classes!("is-fullwidth")}>
@@ -116,7 +128,15 @@ fn TablePage(props: &TableProps) -> Html {
                     html! {
                         <tr>
                             <th>{index.to_string()}</th>
-                            <td></td>
+                            <td>
+                                <SearchSelect<Item>
+                                    selected={true}
+                                    current={None}
+                                    options={items.clone()}
+                                    on_select={Callback::from(|_| ())}
+                                    lang={lang.clone()}
+                                />
+                            </td>
                             <td></td>
                             <td></td>
                         </tr>

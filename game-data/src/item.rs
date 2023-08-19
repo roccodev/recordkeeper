@@ -13,7 +13,7 @@ pub struct ItemRegistry {
     items: EnumMap<ItemType, Vec<Item>>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Copy)]
 pub struct Item {
     pub id: u32,
     pub name_id: Option<NonZeroUsize>,
@@ -35,7 +35,7 @@ pub enum ItemType {
     Extra,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Copy, Clone)]
 pub enum Rarity {
     Common,
     Rare,
@@ -65,6 +65,10 @@ impl ItemRegistry {
             .binary_search_by_key(&item.id, |item| item.id)
             .expect_err("duplicate item");
         items.insert(index, item);
+    }
+    
+    pub fn items_by_type(&self, item_type: ItemType) -> &[Item] {
+        &self.items[item_type]
     }
 }
 
