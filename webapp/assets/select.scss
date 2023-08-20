@@ -1,0 +1,12 @@
+$dropdown-max-height: 12rem;
+
+.recordkeeper-dropdown {
+  position: absolute;
+  min-width: 100%;
+  z-index: 200;
+}
+
+.recordkeeper-dropdown-list {
+  max-height: $dropdown-max-height;
+  overflow: scroll;
+}

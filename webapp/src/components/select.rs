@@ -1,10 +1,11 @@
 use game_data::lang::Nameable;
 use game_data::LanguageData;
-use std::borrow::Cow;
-use std::ops::Deref;
 use std::rc::Rc;
+use wasm_bindgen::JsCast;
+use web_sys::{EventTarget, HtmlInputElement};
 use ybc::*;
 use yew::prelude::*;
+use yew_feather::ChevronDown;
 
 #[derive(Clone)]
 pub enum Options<O: 'static> {
@@ -14,9 +15,6 @@ pub enum Options<O: 'static> {
 
 #[derive(Properties)]
 pub struct SearchSelectProps<O: Clone + 'static> {
-    /// Whether the field is currently focused, meaning
-    /// the dropdown should display.
-    pub selected: bool,
     pub current: Option<usize>,
     /// List of searchable/selectable options
     pub options: Options<O>,
@@ -41,40 +39,78 @@ pub fn SearchSelect<O>(props: &SearchSelectProps<O>) -> Html
 where
     O: Nameable + Clone + 'static,
 {
-    let value = use_state(|| props.current);
-    let search_query = use_state(|| {
-        props
-            .current
-            //.and_then(|o| o.get_name(&lang.clone()))
-            .map(|_| "")
-            .unwrap_or("")
-    });
+    let value = props.current;
+    let default_search = use_memo(
+        |_| props.default_search_query(),
+        (props.options.id(), props.current),
+    );
+
+    let search_query = use_state(|| (*default_search).clone());
+    let focused = use_state(|| false);
+
+    let search_state = search_query.clone();
+    // Refresh search query when current value is changed as a prop
+    use_effect_with_deps(
+        move |_| search_state.set((*default_search).clone()),
+        (props.options.id(), props.current),
+    );
 
     let visible = props
         .options
         .iter()
         .filter(|o| {
             o.get_name(&props.lang)
-                .is_some_and(|n| n.contains(*search_query))
+                .is_some_and(|n| n.contains(&**search_query))
         })
         .cloned()
         .collect::<Vec<_>>();
 
     let on_select = props.on_select.clone();
-    let value_state = value.clone();
     let select_callback = Callback::from(move |option| {
         on_select.emit(option);
-        value_state.set(Some(option));
     });
 
     let current_display = value
-        .and_then(|v| visible[v].get_name(&props.lang))
+        .and_then(|v| props.options.get(v).get_name(&props.lang))
         .unwrap_or("");
+
+    let search_state = search_query.clone();
+    let update_search_query = Callback::from(move |e: InputEvent| {
+        let target: Option<EventTarget> = e.target();
+        let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+        if let Some(input) = input {
+            search_state.set(input.value().to_string().into());
+        }
+    });
+
+    let update_focus = |has_focus: bool| {
+        let focus_state = focused.clone();
+        Callback::from(move |_: FocusEvent| {
+            focus_state.set(has_focus);
+        })
+    };
+
+    // Having the dropdown inside form control gives it the correct width
 
     html! {
         <>
-            <Dropdown<O> open={props.selected} visible_options={visible} on_select={select_callback} lang={props.lang.clone()} />
-            <span>{current_display}</span>
+            <Control classes={classes!("has-icons-right")}>
+                <input class="input"
+                    value={(*search_query).clone()}
+                    oninput={update_search_query}
+                    onfocus={update_focus(true)}
+                    onblur={update_focus(false)}
+                />
+                <Icon classes={classes!("is-right")}>
+                    <ChevronDown />
+                </Icon>
+                <Dropdown<O>
+                    open={*focused}
+                    visible_options={visible}
+                    on_select={select_callback}
+                    lang={props.lang.clone()}
+                />
+            </Control>
         </>
     }
 }
@@ -88,14 +124,10 @@ where
         return html!();
     }
     html!(
-        <Menu>
-            <MenuList>
-                {for props.visible_options.iter().take(5).map(|item| {
-                    html!(
-                        <p class="menu-label">
-                            {item.get_name(&props.lang)}
-                        </p>
-                    )
+        <Menu classes={classes!("card", "recordkeeper-dropdown")}>
+            <MenuList classes={classes!("recordkeeper-dropdown-list")}>
+                {for props.visible_options.iter().map(|item| {
+                    html!(<li><a>{item.get_name(&props.lang)}</a></li>)
                 })}
             </MenuList>
         </Menu>
@@ -103,31 +135,60 @@ where
 }
 
 impl<O: 'static> Options<O> {
+    fn get(&self, i: usize) -> &O {
+        match self {
+            Self::Owned(v) => &v[i],
+            Self::Borrowed(s) => &s[i],
+        }
+    }
+
     fn iter(&self) -> std::slice::Iter<O> {
         match self {
             Self::Owned(v) => v.iter(),
             Self::Borrowed(s) => s.iter(),
         }
     }
+
+    fn id(&self) -> usize {
+        match self {
+            Self::Owned(v) => v.as_ptr() as usize,
+            Self::Borrowed(s) => s.as_ptr() as usize,
+        }
+    }
+}
+
+impl<O: Clone + Nameable + 'static> SearchSelectProps<O> {
+    fn default_search_query(&self) -> AttrValue {
+        self.current
+            .and_then(|o| {
+                self.options
+                    .get(o)
+                    .get_name(&self.lang.clone())
+                    .map(|s| AttrValue::from(s.to_string()))
+            })
+            .unwrap_or_default()
+    }
 }
 
 impl<O: 'static> PartialEq for Options<O> {
     fn eq(&self, other: &Self) -> bool {
-        let s1 = match self {
-            Self::Owned(v) => v,
-            Self::Borrowed(s) => *s,
-        };
-        let s2 = match other {
-            Self::Owned(v) => v,
-            Self::Borrowed(s) => *s,
-        };
-        std::ptr::eq(s1, s2)
+        match (self, other) {
+            (Self::Owned(s1), Self::Owned(s2)) => Rc::ptr_eq(s1, s2),
+            (Self::Borrowed(s1), Self::Borrowed(s2)) => std::ptr::eq(*s1, *s2),
+            _ => false,
+        }
     }
 }
 
 impl<O: 'static> From<&'static [O]> for Options<O> {
     fn from(value: &'static [O]) -> Self {
         Self::Borrowed(value)
+    }
+}
+
+impl<O: 'static> From<Rc<[O]>> for Options<O> {
+    fn from(value: Rc<[O]>) -> Self {
+        Self::Owned(value)
     }
 }
 
@@ -139,8 +200,7 @@ impl<O: 'static> FromIterator<O> for Options<O> {
 
 impl<O: Clone + 'static> PartialEq for SearchSelectProps<O> {
     fn eq(&self, other: &Self) -> bool {
-        self.selected == other.selected
-            && self.on_select == other.on_select
+        self.on_select == other.on_select
             && self.options == other.options
             && self.current == other.current
             && Rc::ptr_eq(&self.lang, &other.lang)

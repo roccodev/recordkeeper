@@ -24,12 +24,12 @@ pub struct Inventory {
 #[derive(SaveBin, Debug)]
 #[size(16)]
 pub struct ItemSlot {
-    item_id: u16,
-    slot_index: u16,
+    pub item_id: u16,
+    pub slot_index: u16,
     item_type: u32,
     sort_key: u32, // unsure
     #[loc(0xc)]
-    amount: u16,
+    pub amount: u16,
     flags: u8,
 }
 

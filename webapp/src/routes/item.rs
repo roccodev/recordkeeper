@@ -5,6 +5,7 @@ use crate::lang::Text;
 use crate::save::SaveContext;
 use game_data::item::{Item, ItemType};
 use recordkeeper::item::{Inventory, ItemSlot};
+use std::rc::Rc;
 use ybc::{Button, Buttons, Container, Field, Table, Tile};
 use yew::prelude::*;
 
@@ -101,10 +102,19 @@ pub fn ItemInventory() -> Html {
 #[function_component]
 fn TablePage(props: &TableProps) -> Html {
     let data = use_context::<Data>().unwrap();
+    let save = use_context::<SaveContext>().unwrap();
+    let save = save.get();
     let item_type = props.item_type;
     let lang = data.to_lang();
 
-    let items: Options<Item> = data
+    let items: Rc<[Item]> = data
+        .game()
+        .items
+        .items_by_type(item_type)
+        .iter()
+        .copied()
+        .collect();
+    let options: Options<Item> = data
         .game()
         .items
         .items_by_type(item_type)
@@ -125,14 +135,16 @@ fn TablePage(props: &TableProps) -> Html {
 
             <tbody>
                 {for (props.start..=props.end).map(|index| {
+                    let slot = &get_item_field(&save.get().save().inventory, item_type)[index];
+                    let current = items.binary_search_by_key(&(slot.item_id as u32), |i| i.id).ok();
+                    log::info!("Slot {} has {current:?}", index);
                     html! {
                         <tr>
                             <th>{index.to_string()}</th>
                             <td>
                                 <SearchSelect<Item>
-                                    selected={true}
-                                    current={None}
-                                    options={items.clone()}
+                                    current={current}
+                                    options={options.clone()}
                                     on_select={Callback::from(|_| ())}
                                     lang={lang.clone()}
                                 />
