@@ -1,11 +1,13 @@
-use game_data::lang::Nameable;
-use game_data::LanguageData;
 use std::rc::Rc;
+
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
 use ybc::*;
 use yew::prelude::*;
 use yew_feather::ChevronDown;
+
+use game_data::lang::Nameable;
+use game_data::LanguageData;
 
 #[derive(Clone)]
 pub enum Options<O: 'static> {
@@ -28,7 +30,7 @@ where
     O: Clone + 'static,
 {
     pub open: bool,
-    pub visible_options: Vec<O>,
+    pub visible_options: Vec<(usize, O)>,
     pub on_select: Callback<usize, ()>,
     pub lang: Rc<LanguageData>,
 }
@@ -39,11 +41,14 @@ pub fn SearchSelect<O>(props: &SearchSelectProps<O>) -> Html
 where
     O: Nameable + Clone + 'static,
 {
-    let value = props.current;
-    let default_search = use_memo(
-        |_| props.default_search_query(),
+    let value = use_state(|| props.current);
+    let value_state = value.clone();
+    use_effect_with_deps(
+        move |(_, new)| value_state.set(*new),
         (props.options.id(), props.current),
     );
+
+    let default_search = use_memo(|_| props.search_query(*value), (props.options.id(), *value));
 
     let search_query = use_state(|| (*default_search).clone());
     let focused = use_state(|| false);
@@ -52,21 +57,28 @@ where
     // Refresh search query when current value is changed as a prop
     use_effect_with_deps(
         move |_| search_state.set((*default_search).clone()),
-        (props.options.id(), props.current),
+        (props.options.id(), *value),
     );
+
+    if value.is_some_and(|v| v >= props.options.len()) {
+        return html!();
+    }
 
     let visible = props
         .options
         .iter()
-        .filter(|o| {
+        .enumerate()
+        .filter(|(_, o)| {
             o.get_name(&props.lang)
                 .is_some_and(|n| n.contains(&**search_query))
         })
-        .cloned()
+        .map(|(i, o)| (i, o.clone()))
         .collect::<Vec<_>>();
 
     let on_select = props.on_select.clone();
+    let value_state = value.clone();
     let select_callback = Callback::from(move |option| {
+        value_state.set(Some(option));
         on_select.emit(option);
     });
 
@@ -99,7 +111,7 @@ where
                     value={(*search_query).clone()}
                     oninput={update_search_query}
                     onfocus={update_focus(true)}
-                    onblur={update_focus(false)}
+
                 />
                 <Icon classes={classes!("is-right")}>
                     <ChevronDown />
@@ -123,11 +135,17 @@ where
     if !props.open {
         return html!();
     }
+
+    let callback = |index| {
+        let on_select = props.on_select.clone();
+        Callback::from(move |_: MouseEvent| on_select.emit(index))
+    };
+
     html!(
         <Menu classes={classes!("card", "recordkeeper-dropdown")}>
             <MenuList classes={classes!("recordkeeper-dropdown-list")}>
-                {for props.visible_options.iter().map(|item| {
-                    html!(<li><a>{item.get_name(&props.lang)}</a></li>)
+                {for props.visible_options.iter().map(|(index, item)| {
+                    html!(<li><a onclick={callback(*index)}>{item.get_name(&props.lang)}</a></li>)
                 })}
             </MenuList>
         </Menu>
@@ -136,33 +154,39 @@ where
 
 impl<O: 'static> Options<O> {
     fn get(&self, i: usize) -> &O {
-        match self {
-            Self::Owned(v) => &v[i],
-            Self::Borrowed(s) => &s[i],
-        }
+        &self.as_slice()[i]
+    }
+
+    fn get_if_present(&self, i: usize) -> Option<&O> {
+        self.as_slice().get(i)
+    }
+
+    fn len(&self) -> usize {
+        self.as_slice().len()
     }
 
     fn iter(&self) -> std::slice::Iter<O> {
-        match self {
-            Self::Owned(v) => v.iter(),
-            Self::Borrowed(s) => s.iter(),
-        }
+        self.as_slice().iter()
     }
 
     fn id(&self) -> usize {
+        self.as_slice().as_ptr() as usize
+    }
+
+    fn as_slice(&self) -> &[O] {
         match self {
-            Self::Owned(v) => v.as_ptr() as usize,
-            Self::Borrowed(s) => s.as_ptr() as usize,
+            Self::Owned(v) => &v,
+            Self::Borrowed(s) => &s,
         }
     }
 }
 
 impl<O: Clone + Nameable + 'static> SearchSelectProps<O> {
-    fn default_search_query(&self) -> AttrValue {
-        self.current
+    fn search_query(&self, current: Option<usize>) -> AttrValue {
+        current
             .and_then(|o| {
                 self.options
-                    .get(o)
+                    .get_if_present(o)?
                     .get_name(&self.lang.clone())
                     .map(|s| AttrValue::from(s.to_string()))
             })
