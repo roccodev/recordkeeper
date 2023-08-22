@@ -1,10 +1,12 @@
 use crate::components::edit::{editor, NumberInput};
 use crate::components::page::PageOrganizer;
-use crate::components::select::{Options, SearchSelect};
+use crate::components::select::{HtmlName, Options, SearchSelect};
 use crate::data::Data;
 use crate::lang::Text;
 use crate::save::{EditAction, SaveContext};
 use game_data::item::{Item, ItemType};
+use game_data::lang::Nameable;
+use game_data::LanguageData;
 use recordkeeper::item::{Inventory, ItemSlot};
 use std::rc::Rc;
 use ybc::{Button, Buttons, Container, Field, Table, Tile};
@@ -31,6 +33,14 @@ struct ItemProps {
     pub item_type: ItemType,
     pub slot: usize,
 }
+
+#[derive(Properties, PartialEq)]
+struct ItemDisplayProps {
+    pub item: Item,
+}
+
+#[derive(Clone, PartialEq, Copy)]
+struct HtmlItem(Item);
 
 const PAGES_PER_VIEW: usize = 2;
 const ROWS_PER_PAGE: usize = 10;
@@ -138,7 +148,12 @@ fn TablePage(props: &TableProps) -> Html {
         .iter()
         .copied()
         .collect();
-    let options: Options<Item> = items.clone().into();
+    let options: Options<HtmlItem> = items
+        .clone()
+        .into_iter()
+        .copied()
+        .map(|i| HtmlItem(i))
+        .collect();
 
     html! {
         <Table classes={classes!("is-fullwidth")}>
@@ -171,7 +186,7 @@ fn TablePage(props: &TableProps) -> Html {
                         <tr>
                             <th>{index.to_string()}</th>
                             <td>
-                                <SearchSelect<Item>
+                                <SearchSelect<HtmlItem>
                                     current={current}
                                     options={options.clone()}
                                     on_select={on_select}
@@ -191,4 +206,27 @@ fn TablePage(props: &TableProps) -> Html {
 #[function_component]
 fn ItemRow() -> Html {
     html! {}
+}
+
+#[function_component]
+fn ItemDisplay(props: &ItemDisplayProps) -> Html {
+    let data = use_context::<Data>().unwrap();
+
+    html! {
+        <>
+            <span><small>{props.item.id}{". "}</small></span>
+            <span>{props.item.get_name(data.lang())}</span>
+            <span><small>{" ("}<Text path={format!("item_rarity_{}", props.item.rarity.lang_id())} />{")"}</small></span>
+        </>
+    }
+}
+
+impl HtmlName for HtmlItem {
+    fn get_name_html(&self, language: &LanguageData) -> Html {
+        html!(<ItemDisplay item={self.0} />)
+    }
+
+    fn get_name_for_filter<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str> {
+        self.0.get_name(language)
+    }
 }

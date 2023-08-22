@@ -124,3 +124,9 @@ item_type_accessory = Accessories
 item_type_precious = Key Items
 item_type_gem = Gems
 item_type_cylinder = Cylinders
+
+# Item rarities
+
+item_rarity_common = Common
+item_rarity_rare = Rare
+item_rarity_legendary = Legendary

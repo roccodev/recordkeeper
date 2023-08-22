@@ -66,7 +66,7 @@ impl ItemRegistry {
             .expect_err("duplicate item");
         items.insert(index, item);
     }
-    
+
     pub fn items_by_type(&self, item_type: ItemType) -> &[Item] {
         &self.items[item_type]
     }
@@ -90,6 +90,16 @@ impl ItemType {
             Self::Precious => "precious",
             Self::Exchange => "exchange",
             Self::Extra => "extra",
+        }
+    }
+}
+
+impl Rarity {
+    pub fn lang_id(self) -> &'static str {
+        match self {
+            Self::Common => "common",
+            Self::Rare => "rare",
+            Self::Legendary => "legendary",
         }
     }
 }

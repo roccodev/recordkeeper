@@ -9,6 +9,11 @@ use yew_feather::ChevronDown;
 use game_data::lang::Nameable;
 use game_data::LanguageData;
 
+pub trait HtmlName {
+    fn get_name_html(&self, language: &LanguageData) -> Html;
+    fn get_name_for_filter<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str>;
+}
+
 #[derive(Clone)]
 pub enum Options<O: 'static> {
     Borrowed(&'static [O]),
@@ -39,7 +44,7 @@ where
 #[function_component]
 pub fn SearchSelect<O>(props: &SearchSelectProps<O>) -> Html
 where
-    O: Nameable + Clone + 'static,
+    O: HtmlName + Clone + 'static,
 {
     let value = use_state(|| props.current);
     let value_state = value.clone();
@@ -69,7 +74,7 @@ where
         .iter()
         .enumerate()
         .filter(|(_, o)| {
-            o.get_name(&props.lang)
+            o.get_name_for_filter(&props.lang)
                 .is_some_and(|n| n.contains(&**search_query))
         })
         .map(|(i, o)| (i, o.clone()))
@@ -83,8 +88,8 @@ where
     });
 
     let current_display = value
-        .and_then(|v| props.options.get(v).get_name(&props.lang))
-        .unwrap_or("");
+        .map(|v| props.options.get(v).get_name_html(&props.lang))
+        .unwrap_or_else(|| html!());
 
     let search_state = search_query.clone();
     let update_search_query = Callback::from(move |e: InputEvent| {
@@ -111,7 +116,7 @@ where
                     value={(*search_query).clone()}
                     oninput={update_search_query}
                     onfocus={update_focus(true)}
-
+                    onfocusout={update_focus(false)}
                 />
                 <Icon classes={classes!("is-right")}>
                     <ChevronDown />
@@ -130,7 +135,7 @@ where
 #[function_component]
 fn Dropdown<O>(props: &DropdownProps<O>) -> Html
 where
-    O: Clone + Nameable + 'static,
+    O: Clone + HtmlName + 'static,
 {
     if !props.open {
         return html!();
@@ -145,7 +150,7 @@ where
         <Menu classes={classes!("card", "recordkeeper-dropdown")}>
             <MenuList classes={classes!("recordkeeper-dropdown-list")}>
                 {for props.visible_options.iter().map(|(index, item)| {
-                    html!(<li><a onclick={callback(*index)}>{item.get_name(&props.lang)}</a></li>)
+                    html!(<li><a onclick={callback(*index)}>{item.get_name_html(&props.lang)}</a></li>)
                 })}
             </MenuList>
         </Menu>
@@ -181,13 +186,13 @@ impl<O: 'static> Options<O> {
     }
 }
 
-impl<O: Clone + Nameable + 'static> SearchSelectProps<O> {
+impl<O: Clone + HtmlName + 'static> SearchSelectProps<O> {
     fn search_query(&self, current: Option<usize>) -> AttrValue {
         current
             .and_then(|o| {
                 self.options
                     .get_if_present(o)?
-                    .get_name(&self.lang.clone())
+                    .get_name_for_filter(&self.lang.clone())
                     .map(|s| AttrValue::from(s.to_string()))
             })
             .unwrap_or_default()
@@ -240,5 +245,18 @@ impl<O: Clone + 'static> PartialEq for DropdownProps<O> {
                 other.visible_options.as_ptr(),
             )
             && Rc::ptr_eq(&self.lang, &other.lang)
+    }
+}
+
+impl<T> HtmlName for T
+where
+    T: Nameable,
+{
+    fn get_name_html(&self, language: &LanguageData) -> Html {
+        html!(<>{self.get_name(language)}</>)
+    }
+
+    fn get_name_for_filter<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str> {
+        self.get_name(language)
     }
 }
