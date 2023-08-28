@@ -1,6 +1,6 @@
 use crate::components::item::edit::{get_item_field, ItemRow};
 use crate::components::item::HtmlItem;
-use crate::components::page::PageOrganizer;
+use crate::components::page::{PageControls, PageOrganizer};
 use crate::components::select::Options;
 use crate::data::Data;
 use crate::lang::Text;
@@ -42,6 +42,10 @@ pub fn ItemInventory() -> Html {
     let save = use_context::<SaveContext>().unwrap();
     let num_slots = get_item_field(&save.get().get().save().inventory, *item_type).len();
 
+    // Reset page when item type changes
+    let page_state = page.clone();
+    use_effect_with_deps(move |_| page_state.set(0), *item_type);
+
     let page_organizer = PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, num_slots);
 
     html! {
@@ -82,6 +86,8 @@ pub fn ItemInventory() -> Html {
                     </Tile>
                 })}
             </Tile>
+
+            <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
         </Container>
     }
 }
