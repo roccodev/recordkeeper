@@ -1,13 +1,11 @@
-use crate::components::edit::{editor, NumberInput};
+use crate::components::item::edit::{get_item_field, ItemRow};
+use crate::components::item::HtmlItem;
 use crate::components::page::PageOrganizer;
-use crate::components::select::{HtmlName, Options, SearchSelect};
+use crate::components::select::Options;
 use crate::data::Data;
 use crate::lang::Text;
-use crate::save::{EditAction, SaveContext};
+use crate::save::SaveContext;
 use game_data::item::{Item, ItemType};
-use game_data::lang::Nameable;
-use game_data::LanguageData;
-use recordkeeper::item::{Inventory, ItemSlot};
 use std::rc::Rc;
 use ybc::{Button, Buttons, Container, Field, Table, Tile};
 use yew::prelude::*;
@@ -34,53 +32,8 @@ struct ItemProps {
     pub slot: usize,
 }
 
-#[derive(Properties, PartialEq)]
-struct ItemDisplayProps {
-    pub item: Item,
-}
-
-#[derive(Clone, PartialEq, Copy)]
-struct HtmlItem(Item);
-
 const PAGES_PER_VIEW: usize = 2;
 const ROWS_PER_PAGE: usize = 10;
-
-editor!(
-    pub AmountEditor,
-    u16,
-    get |editor, save| { get_item_field(&save.inventory, editor.item_type)[editor.index].amount },
-    set |editor, save, new_value| { get_item_field_mut(&mut save.inventory, editor.item_type)[editor.index].amount = new_value },
-    assert |editor, value| { Ok(()) },
-    capture item_type: ItemType, index: usize
-);
-
-fn get_item_field(inventory: &Inventory, item_type: ItemType) -> &[ItemSlot] {
-    match item_type {
-        ItemType::Cylinder => &inventory.cylinders,
-        ItemType::Gem => &inventory.gems,
-        ItemType::Collection => &inventory.collectibles,
-        ItemType::Collectopedia => &[],
-        ItemType::Info => &inventory.infos,
-        ItemType::Accessory => &inventory.accessories,
-        ItemType::Precious => &inventory.key_items,
-        ItemType::Exchange => &inventory.exchange,
-        ItemType::Extra => &inventory.extra,
-    }
-}
-
-fn get_item_field_mut(inventory: &mut Inventory, item_type: ItemType) -> &mut [ItemSlot] {
-    match item_type {
-        ItemType::Cylinder => &mut inventory.cylinders,
-        ItemType::Gem => &mut inventory.gems,
-        ItemType::Collection => &mut inventory.collectibles,
-        ItemType::Collectopedia => &mut [],
-        ItemType::Info => &mut inventory.infos,
-        ItemType::Accessory => &mut inventory.accessories,
-        ItemType::Precious => &mut inventory.key_items,
-        ItemType::Exchange => &mut inventory.exchange,
-        ItemType::Extra => &mut inventory.extra,
-    }
-}
 
 #[function_component]
 pub fn ItemInventory() -> Html {
@@ -136,10 +89,7 @@ pub fn ItemInventory() -> Html {
 #[function_component]
 fn TablePage(props: &TableProps) -> Html {
     let data = use_context::<Data>().unwrap();
-    let save_context = use_context::<SaveContext>().unwrap();
-    let save = save_context.get();
     let item_type = props.item_type;
-    let lang = data.to_lang();
 
     let items: Rc<[Item]> = data
         .game()
@@ -168,65 +118,9 @@ fn TablePage(props: &TableProps) -> Html {
 
             <tbody>
                 {for (props.start..=props.end).map(|index| {
-                    let slot = &get_item_field(&save.get().save().inventory, item_type)[index];
-                    let current = items.binary_search_by_key(&(slot.item_id as u32), |i| i.id).ok();
-
-                    let amount_editor = AmountEditor { index, item_type };
-
-                    let items = items.clone();
-                    let save_context = save_context.clone();
-                    let on_select = Callback::from(move |new: usize| {
-                        let new_id: u16 = items[new].id.try_into().unwrap();
-                        save_context.submit_action(EditAction::Edit(Box::new(move |save| {
-                            get_item_field_mut(&mut save.inventory, item_type)[index].item_id = new_id
-                        })));
-                    });
-
-                    html! {
-                        <tr>
-                            <th>{index.to_string()}</th>
-                            <td>
-                                <SearchSelect<HtmlItem>
-                                    current={current}
-                                    options={options.clone()}
-                                    on_select={on_select}
-                                    lang={lang.clone()}
-                                />
-                            </td>
-                            <td><NumberInput<AmountEditor> editor={amount_editor} /></td>
-                            <td></td>
-                        </tr>
-                    }
+                    html!(<ItemRow item_type={item_type} index={index} items={items.clone()} options={options.clone()} />)
                 })}
             </tbody>
         </Table>
-    }
-}
-
-#[function_component]
-fn ItemRow() -> Html {
-    html! {}
-}
-
-#[function_component]
-fn ItemDisplay(props: &ItemDisplayProps) -> Html {
-    let data = use_context::<Data>().unwrap();
-
-    html! {
-        <>
-            <span><small>{props.item.id}{". "}</small></span>
-            <span>{props.item.get_name(data.lang())}</span>
-            <span><small>{" ("}<Text path={format!("item_rarity_{}", props.item.rarity.lang_id())} />{")"}</small></span>
-        </>
-    }
-}
-
-impl HtmlName for HtmlItem {
-    fn get_name_html(&self, language: &LanguageData) -> Html {
-        html!(<ItemDisplay item={self.0} />)
-    }
-
-    fn get_name_for_filter<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str> {
-        self.0.get_name(language)
     }
 }

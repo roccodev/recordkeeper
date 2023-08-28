@@ -48,3 +48,17 @@ pub struct DlcManualSlot {
     inventory_slot_index: u16,
     item_type: u16,
 }
+
+impl ItemSlot {
+    pub fn is_valid(&self) -> bool {
+        self.flags & 1 != 0
+    }
+
+    pub fn clear(&mut self) {
+        self.item_id = 0;
+        self.amount = 0;
+        self.sort_key = 0;
+        self.item_type = 0;
+        self.flags &= 0xfe;
+    }
+}

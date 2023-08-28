@@ -4,3 +4,5 @@ pub mod page;
 pub mod select;
 pub mod sidebar;
 pub mod upload;
+
+pub mod item;

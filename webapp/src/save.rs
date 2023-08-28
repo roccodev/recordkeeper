@@ -4,7 +4,6 @@ use std::{
 };
 
 use gloo::file::FileReadError;
-use log::info;
 use recordkeeper::{SaveData, SaveFile, SaveResult};
 use yew::prelude::*;
 
@@ -96,8 +95,12 @@ impl SaveManager {
         // replace it with the new backup
         // self.save_buffers[1] = self.save_buffers[0].clone(); // TODO
         self.save_buffers[0].as_mut().unwrap().write()?;
-        self.change_id = self.change_id.wrapping_add(1);
+        self.mark_change();
         Ok(())
+    }
+
+    fn mark_change(&mut self) {
+        self.change_id = self.change_id.wrapping_add(1);
     }
 }
 
@@ -127,8 +130,9 @@ impl Reducible for SaveReducer {
         let res = match action {
             EditAction::Load(bytes) => handle.load(&bytes),
             EditAction::Save => handle.back_up_and_save(),
-            EditAction::Edit(mut callback) => {
+            EditAction::Edit(callback) => {
                 callback(handle.get_mut().save_mut());
+                handle.mark_change();
                 Ok(())
             }
             EditAction::ClearError => Ok(()),
