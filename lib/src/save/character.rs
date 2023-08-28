@@ -1,5 +1,7 @@
 use recordkeeper_macros::SaveBin;
 
+use crate::util::FixVec;
+
 pub const PARTY_MAX: usize = 16;
 pub const PARTY_GUEST_MAX: usize = 8;
 pub const CHARACTER_MAX: usize = 64;
@@ -7,13 +9,6 @@ pub const OUROBOROS_MAX: usize = 6;
 pub const PARTY_FORMATION_MAX: usize = 15;
 
 const CHARACTER_CLASS_MAX: usize = 64;
-
-/// Character IDs currently in the party
-#[derive(SaveBin, Debug)]
-pub struct CharacterParty<const MAX: usize> {
-    ids: [u16; MAX],
-    count: u64,
-}
 
 #[derive(SaveBin, Debug)]
 #[size(4444)]
@@ -78,7 +73,7 @@ pub struct OuroborosTree {
 #[size(9360)]
 pub struct PartyFormation {
     name_id: u64, // unsure
-    party: CharacterParty<PARTY_MAX>,
+    party: FixVec<u16, PARTY_MAX>,
     /// Indexed by character ID
     characters: [CharacterFormation; CHARACTER_MAX],
     ouroboros: [OuroborosFormation; OUROBOROS_MAX],

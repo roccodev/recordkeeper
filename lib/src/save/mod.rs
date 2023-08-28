@@ -1,15 +1,13 @@
-use crate::character::{
-    CharacterParty, PartyFormation, PARTY_FORMATION_MAX, PARTY_GUEST_MAX, PARTY_MAX,
-};
+use crate::character::{PartyFormation, PARTY_FORMATION_MAX, PARTY_GUEST_MAX, PARTY_MAX};
 use crate::error::SaveError;
 use crate::item::Inventory;
 use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX};
 use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
 use crate::save::flags::AllFlags;
-use menu::MenuFlags;
 
 use crate::dlc::ChallengeBattle;
 use crate::menu::MenuData;
+use crate::util::FixVec;
 use dlc::Dlc4;
 use recordkeeper_macros::SaveBin;
 
@@ -66,10 +64,10 @@ pub struct SaveData {
     pub flags: AllFlags,
 
     #[loc(0xe330)]
-    pub party_characters: CharacterParty<PARTY_MAX>,
+    pub party_characters: FixVec<u16, PARTY_MAX>,
     /// Guest IDs from FLD_NpcList
     #[loc(0xe358)]
-    pub party_guests: CharacterParty<PARTY_GUEST_MAX>,
+    pub party_guests: FixVec<u16, PARTY_GUEST_MAX>,
 
     #[loc(0xe3a0)]
     pub characters: [Character; CHARACTER_MAX],
@@ -119,6 +117,14 @@ pub struct Pos {
 pub struct MapTime {
     hour: u16,
     minute: u16,
+}
+
+impl SaveData {
+    /// Attempts to determine whether the save file is a Future Redeemed file.
+    pub fn is_dlc4(&self) -> bool {
+        // Current method: check if any party character has a FR ID
+        self.party_characters.iter().any(|&c| c >= 36)
+    }
 }
 
 impl PlayTime {

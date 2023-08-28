@@ -20,10 +20,17 @@ struct Tab(&'static str, Html, Route);
 enum MenuItem {
     Category(Category),
     Tabs(Vec<Tab>),
+    None,
 }
 
 #[function_component]
 pub fn Sidebar() -> Html {
+    let save = use_context::<SaveContext>().unwrap();
+    let route = use_route::<Route>();
+    let save = save.get();
+
+    let is_dlc4 = save.is_loaded() && save.get().save().is_dlc4();
+
     let menu = [
         MenuItem::Category(Category("meta")),
         MenuItem::Tabs(vec![Tab("meta_meta", html!(<Info />), Route::Meta)]),
@@ -43,29 +50,36 @@ pub fn Sidebar() -> Html {
             Tab("dlc_gauntlet", html!(<LifeBuoy />), Route::Gauntlet),
             Tab("dlc_masha", html!(<Scissors />), Route::Masha),
         ]),
-        MenuItem::Category(Category("dlc4")),
-        MenuItem::Tabs(vec![Tab(
-            "dlc4_enemypedia",
-            html!(<BookOpen />),
-            Route::Dlc4Enemypedia,
-        )]),
+        if is_dlc4 {
+            MenuItem::Category(Category("dlc4"))
+        } else {
+            MenuItem::None
+        },
+        if is_dlc4 {
+            MenuItem::Tabs(vec![Tab(
+                "dlc4_enemypedia",
+                html!(<BookOpen />),
+                Route::Dlc4Enemypedia,
+            )])
+        } else {
+            MenuItem::None
+        },
         MenuItem::Category(Category("danger")),
         MenuItem::Tabs(vec![Tab("danger_flags", html!(<Flag />), Route::Flags)]),
     ];
 
-    let save = use_context::<SaveContext>().unwrap();
-    let route = use_route::<Route>();
-
     html! {
       <aside class="aside is-placed-left is-expanded">
-          <div class="aside-tools">
-              <div class="aside-tools-label buttons">
-                  {edit_operations(&save.get()).collect::<Html>()}
-              </div>
-          </div>
-          <Menu>
-            {menu.into_iter().map(|i| i.into_html(route)).collect::<Html>()}
-          </Menu>
+            <div class="aside-tools">
+                <div class="aside-tools-label buttons">
+                    {edit_operations(&save).collect::<Html>()}
+                </div>
+            </div>
+            {if save.is_loaded() {
+                html!(<Menu>{menu.into_iter().map(|i| i.into_html(route)).collect::<Html>()}</Menu>)
+            } else {
+                html!()
+            }}
       </aside>
     }
 }
@@ -127,6 +141,7 @@ impl MenuItem {
                     {tabs.into_iter().map(|t| t.into_html(current_route)).collect::<Html>()}
                 </MenuList>
             },
+            MenuItem::None => html!(),
         }
     }
 }

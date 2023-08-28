@@ -4,6 +4,7 @@ use std::{
 };
 
 use gloo::file::FileReadError;
+use log::info;
 use recordkeeper::{SaveData, SaveFile, SaveResult};
 use yew::prelude::*;
 
