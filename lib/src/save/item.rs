@@ -51,7 +51,18 @@ pub struct DlcManualSlot {
 
 impl ItemSlot {
     pub fn is_valid(&self) -> bool {
-        self.flags & 1 != 0
+        self.flags & (SlotFlags::Active as u8) != 0
+    }
+
+    pub fn edit(&mut self, slot_id: u16, item_type: u32, editor: impl Fn(&mut ItemSlot)) {
+        editor(self);
+        if self.item_id == 0 || self.amount == 0 {
+            self.clear();
+        } else {
+            self.slot_index = slot_id;
+            self.item_type = item_type;
+            self.flags |= SlotFlags::Active as u8;
+        }
     }
 
     pub fn clear(&mut self) {
@@ -59,6 +70,6 @@ impl ItemSlot {
         self.amount = 0;
         self.sort_key = 0;
         self.item_type = 0;
-        self.flags &= 0xfe;
+        self.flags &= !(SlotFlags::Active as u8);
     }
 }

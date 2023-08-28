@@ -21,7 +21,13 @@ editor!(
     pub AmountEditor,
     u16,
     get |editor, save| { get_item_field(&save.inventory, editor.item_type)[editor.index].amount },
-    set |editor, save, new_value| { get_item_field_mut(&mut save.inventory, editor.item_type)[editor.index].amount = new_value },
+    set |editor, save, new_value| {
+        get_item_field_mut(&mut save.inventory, editor.item_type)[editor.index].edit(
+            editor.index as u16,
+            editor.item_type as u32,
+            |i| i.amount = new_value
+        )
+    },
     assert |editor, value| { Ok(()) },
     capture item_type: ItemType, index: usize
 );
@@ -60,7 +66,14 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
     let on_select = Callback::from(move |new: usize| {
         let new_id: u16 = items[new].id.try_into().unwrap();
         save.submit_action(EditAction::Edit(Box::new(move |save| {
-            get_item_field_mut(&mut save.inventory, item_type)[index].item_id = new_id
+            get_item_field_mut(&mut save.inventory, item_type)[index].edit(
+                index as u16,
+                item_type as u32,
+                |i| {
+                    i.item_id = new_id;
+                    i.amount = 1;
+                },
+            )
         })));
     });
 

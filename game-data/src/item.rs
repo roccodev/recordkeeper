@@ -24,15 +24,15 @@ pub struct Item {
 
 #[derive(Serialize, Deserialize, Enum, PartialEq, Clone, Copy)]
 pub enum ItemType {
-    Cylinder,
-    Gem,
-    Collection,
-    Collectopedia,
-    Info,
-    Accessory,
-    Precious,
-    Exchange,
-    Extra,
+    Cylinder = 1,
+    Gem = 2,
+    Collection = 3,
+    Info = 4,
+    Accessory = 5,
+    Precious = 6,
+    Exchange = 7,
+    Extra = 8,
+    Collectopedia = 9,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Copy, Clone)]

@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use wasm_bindgen::JsCast;
-use web_sys::{EventTarget, HtmlInputElement};
+use web_sys::{Element, EventTarget, HtmlElement, HtmlInputElement};
 use ybc::*;
 use yew::prelude::*;
 use yew_feather::ChevronDown;
@@ -82,14 +82,12 @@ where
 
     let on_select = props.on_select.clone();
     let value_state = value.clone();
+    let focus_state = focused.clone();
     let select_callback = Callback::from(move |option| {
         value_state.set(Some(option));
+        focus_state.set(false);
         on_select.emit(option);
     });
-
-    let current_display = value
-        .map(|v| props.options.get(v).get_name_html(&props.lang))
-        .unwrap_or_else(|| html!());
 
     let search_state = search_query.clone();
     let update_search_query = Callback::from(move |e: InputEvent| {
@@ -102,7 +100,17 @@ where
 
     let update_focus = |has_focus: bool| {
         let focus_state = focused.clone();
-        Callback::from(move |_: FocusEvent| {
+        Callback::from(move |e: FocusEvent| {
+            if !has_focus
+                && e.related_target().is_some_and(|e| {
+                    let html = e.dyn_into::<Element>().unwrap();
+                    let tag = html.tag_name();
+                    tag == "A" || tag == "DIV"
+                })
+            {
+                return;
+            }
+            e.prevent_default();
             focus_state.set(has_focus);
         })
     };
@@ -111,12 +119,12 @@ where
 
     html! {
         <>
-            <Control classes={classes!("has-icons-right")}>
+            <div class={classes!("control", "has-icons-right")} tabindex="-1">
                 <input class="input"
                     value={(*search_query).clone()}
                     oninput={update_search_query}
                     onfocus={update_focus(true)}
-                    onfocusout={update_focus(false)}
+                    onblur={update_focus(false)}
                 />
                 <Icon classes={classes!("is-right")}>
                     <ChevronDown />
@@ -127,7 +135,7 @@ where
                     on_select={select_callback}
                     lang={props.lang.clone()}
                 />
-            </Control>
+            </div>
         </>
     }
 }

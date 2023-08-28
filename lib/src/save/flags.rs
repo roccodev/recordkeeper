@@ -1,6 +1,5 @@
 use crate::error::SaveError;
 use crate::io::SaveBin;
-use crate::time::AmiiboTimeData;
 use recordkeeper_macros::SaveBin;
 use std::marker::PhantomData;
 
