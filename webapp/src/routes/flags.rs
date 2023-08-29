@@ -1,10 +1,10 @@
 use recordkeeper::flags::FlagType;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
-use ybc::{Button, Buttons, Container, Field, Pagination, PaginationEllipsis, Table, Tile};
+use ybc::{Button, Buttons, Container, Field, Table, Tile};
 use yew::prelude::*;
 
-use crate::components::page::PageOrganizer;
+use crate::components::page::{PageControls, PageOrganizer};
 use crate::{
     components::edit::{FlagEditor, NumberInput},
     lang::{Lang, Text},
@@ -42,23 +42,6 @@ pub fn FlagList() -> Html {
 
     let page_organizer =
         PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, flag_type.num_flags());
-    let current_page_for_display = page_organizer.page_display_id();
-    let last_page = page_organizer.last_page;
-
-    let change_page_callback = |new_page: usize| {
-        let page = page.clone();
-        Callback::from(move |_: MouseEvent| {
-            page.set((new_page - 1) * PAGES_PER_VIEW);
-        })
-    };
-
-    let pagination_classes = |new_page: usize| {
-        if new_page == current_page_for_display {
-            classes!("pagination-link", "is-current")
-        } else {
-            classes!("pagination-link")
-        }
-    };
 
     html! {
         <Container>
@@ -100,33 +83,7 @@ pub fn FlagList() -> Html {
                 })}
             </Tile>
 
-            <Pagination
-                previous={html!(<a class="pagination-previous" disabled={current_page_for_display == 1}
-                                onclick={change_page_callback(current_page_for_display.saturating_sub(1))}>{"Previous"}</a>)}
-                next={html!(<a class="pagination-next" disabled={current_page_for_display == last_page}
-                                onclick={change_page_callback(current_page_for_display.saturating_add(1))}>{"Next"}</a>)}
-            >
-                <a onclick={change_page_callback(1)} class={pagination_classes(1)}>
-                    {"1"}
-                </a>
-                {if current_page_for_display > 2 {
-                    html!(<PaginationEllipsis />)
-                } else {
-                    html!()
-                }}
-                {for (current_page_for_display-1..=current_page_for_display+1)
-                    .filter(|&page| page > 1 && page < last_page)
-                    .map(|page| html!(<a onclick={change_page_callback(page)} class={pagination_classes(page)}>{page.to_string()}</a>))
-                }
-                {if current_page_for_display <= last_page - 2 {
-                    html!(<PaginationEllipsis />)
-                } else {
-                    html!()
-                }}
-                <a onclick={change_page_callback(last_page)} class={pagination_classes(last_page)}>
-                    {last_page.to_string()}
-                </a>
-            </Pagination>
+            <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
         </Container>
     }
 }

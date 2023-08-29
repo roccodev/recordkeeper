@@ -1,11 +1,12 @@
 use crate::components::item::edit::{get_item_field, ItemRow};
 use crate::components::item::HtmlItem;
 use crate::components::page::{PageControls, PageOrganizer};
-use crate::components::select::Options;
+use crate::components::select::{Options, SearchSelect};
 use crate::data::Data;
-use crate::lang::Text;
+use crate::lang::{Lang, Text};
 use crate::save::SaveContext;
 use game_data::item::{Item, ItemType};
+use recordkeeper::item::{Inventory, ItemSlot};
 use std::rc::Rc;
 use ybc::{Button, Buttons, Container, Field, Table, Tile};
 use yew::prelude::*;
@@ -21,6 +22,8 @@ static ITEM_TYPES: &[ItemType] = &[
 
 #[derive(Properties, PartialEq)]
 struct TableProps {
+    pub items: Rc<[Item]>,
+    pub options: Options<HtmlItem>,
     pub item_type: ItemType,
     pub start: usize,
     pub end: usize,
@@ -32,6 +35,19 @@ struct ItemProps {
     pub slot: usize,
 }
 
+#[derive(Properties, PartialEq)]
+struct PageChangeProps {
+    pub item_type: ItemType,
+    pub options: Options<HtmlItem>,
+    pub page_state: UseStateHandle<usize>,
+}
+
+#[derive(Properties, PartialEq)]
+struct FirstEmptyProps {
+    pub item_type: ItemType,
+    pub page_state: UseStateHandle<usize>,
+}
+
 const PAGES_PER_VIEW: usize = 2;
 const ROWS_PER_PAGE: usize = 10;
 
@@ -40,6 +56,7 @@ pub fn ItemInventory() -> Html {
     let item_type = use_state(|| ITEM_TYPES[0]);
     let page = use_state(|| 0);
     let save = use_context::<SaveContext>().unwrap();
+    let data = use_context::<Data>().unwrap();
     let num_slots = get_item_field(&save.get().get().save().inventory, *item_type).len();
 
     // Reset page when item type changes
@@ -47,6 +64,21 @@ pub fn ItemInventory() -> Html {
     use_effect_with_deps(move |_| page_state.set(0), *item_type);
 
     let page_organizer = PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, num_slots);
+
+    let items: Rc<[Item]> = data
+        .game()
+        .items
+        .items_by_type(*item_type)
+        .iter()
+        .copied()
+        .collect();
+
+    let options: Options<HtmlItem> = items
+        .clone()
+        .into_iter()
+        .copied()
+        .map(|i| HtmlItem(i))
+        .collect();
 
     html! {
         <Container>
@@ -76,13 +108,15 @@ pub fn ItemInventory() -> Html {
                     </Field>
                 </Tile>
                 <Tile classes={classes!("is-4")}>
+                    <ItemFinder item_type={*item_type} page_state={page.clone()} options={options.clone()} />
+                    <FirstEmptySlot item_type={*item_type} page_state={page.clone()} />
                 </Tile>
             </Tile>
 
             <Tile>
                 {for page_organizer.current_bounds.into_iter().map(|(start, end)| html! {
                     <Tile>
-                        <TablePage item_type={*item_type} start={start} end={end} />
+                        <TablePage items={items.clone()} options={options.clone()} item_type={*item_type} start={start} end={end} />
                     </Tile>
                 })}
             </Tile>
@@ -94,22 +128,7 @@ pub fn ItemInventory() -> Html {
 
 #[function_component]
 fn TablePage(props: &TableProps) -> Html {
-    let data = use_context::<Data>().unwrap();
     let item_type = props.item_type;
-
-    let items: Rc<[Item]> = data
-        .game()
-        .items
-        .items_by_type(item_type)
-        .iter()
-        .copied()
-        .collect();
-    let options: Options<HtmlItem> = items
-        .clone()
-        .into_iter()
-        .copied()
-        .map(|i| HtmlItem(i))
-        .collect();
 
     html! {
         <Table classes={classes!("is-fullwidth")}>
@@ -124,9 +143,69 @@ fn TablePage(props: &TableProps) -> Html {
 
             <tbody>
                 {for (props.start..=props.end).map(|index| {
-                    html!(<ItemRow item_type={item_type} index={index} items={items.clone()} options={options.clone()} />)
+                    html!(<ItemRow item_type={item_type} index={index} items={props.items.clone()} options={props.options.clone()} />)
                 })}
             </tbody>
         </Table>
     }
+}
+
+#[function_component]
+fn ItemFinder(props: &PageChangeProps) -> Html {
+    let item_type = props.item_type;
+    let page_state = props.page_state.clone();
+    let data = use_context::<Data>().unwrap();
+    let lang = data.to_lang();
+    let save = use_context::<SaveContext>().unwrap();
+
+    let options = props.options.clone();
+    let on_select = Callback::from(move |i: usize| {
+        let item = &options.get(i).0;
+        if let Some(index) = index_of_item(&save.get().get().save().inventory, item_type, |slot| {
+            u32::from(slot.item_id) == item.id
+        }) {
+            let next_page = index / (PAGES_PER_VIEW * ROWS_PER_PAGE);
+            page_state.set(next_page * PAGES_PER_VIEW);
+        }
+    });
+
+    html! {
+        <SearchSelect<HtmlItem>
+            current={None}
+            options={props.options.clone()}
+            on_select={on_select}
+            lang={lang}
+        />
+    }
+}
+
+#[function_component]
+fn FirstEmptySlot(props: &FirstEmptyProps) -> Html {
+    let item_type = props.item_type;
+    let page_state = props.page_state.clone();
+    let save = use_context::<SaveContext>().unwrap();
+
+    let on_click = Callback::from(move |_: MouseEvent| {
+        if let Some(index) = index_of_item(&save.get().get().save().inventory, item_type, |slot| {
+            !slot.is_valid()
+        }) {
+            let next_page = index / (PAGES_PER_VIEW * ROWS_PER_PAGE);
+            page_state.set(next_page * PAGES_PER_VIEW);
+        }
+    });
+
+    html! {
+        <Button onclick={on_click}>
+            <Text path="item_first_empty" />
+        </Button>
+    }
+}
+
+fn index_of_item(
+    inventory: &Inventory,
+    item_type: ItemType,
+    predicate: impl Fn(&ItemSlot) -> bool,
+) -> Option<usize> {
+    let items = get_item_field(inventory, item_type);
+    items.iter().position(predicate)
 }

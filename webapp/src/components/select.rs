@@ -166,7 +166,7 @@ where
 }
 
 impl<O: 'static> Options<O> {
-    fn get(&self, i: usize) -> &O {
+    pub fn get(&self, i: usize) -> &O {
         &self.as_slice()[i]
     }
 
