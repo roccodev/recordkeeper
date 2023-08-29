@@ -5,13 +5,11 @@ use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX}
 use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
 use crate::save::flags::AllFlags;
 
-use crate::dlc::ChallengeBattle;
 use crate::menu::MenuData;
 use crate::util::FixVec;
-use dlc::Dlc4;
 use recordkeeper_macros::SaveBin;
 
-use self::dlc::{PowAugment, POW_AUGMENT_NUM};
+use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
 
 pub mod character;
 pub mod dlc;
@@ -84,6 +82,9 @@ pub struct SaveData {
 
     #[loc(0x1911f0)]
     pub pow_augment: [PowAugment; POW_AUGMENT_NUM],
+
+    #[loc(0x191250)]
+    pub accessory_crafting: AccessoryCrafting,
 
     #[loc(0x193ed8)]
     pub challenge_battle: ChallengeBattle,

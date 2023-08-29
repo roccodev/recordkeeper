@@ -1,5 +1,7 @@
 use recordkeeper_macros::SaveBin;
 
+pub const ITEM_ACCESSORY_MAX: usize = 1500;
+
 #[derive(SaveBin, Debug)]
 pub struct Inventory {
     #[loc(0x28)]
@@ -12,7 +14,7 @@ pub struct Inventory {
     /// `ITM_Info`, discussion info dialogues
     pub infos: [ItemSlot; 800],
     /// `ITM_Accessory`
-    pub accessories: [ItemSlot; 1500],
+    pub accessories: [ItemSlot; ITEM_ACCESSORY_MAX],
     /// `ITM_Precious`
     pub key_items: [ItemSlot; 200],
     /// `ITM_Exchange` (unused item type)
@@ -27,7 +29,7 @@ pub struct ItemSlot {
     pub item_id: u16,
     pub slot_index: u16,
     item_type: u32,
-    sort_key: u32, // unsure
+    chronological_id: u32,
     #[loc(0xc)]
     pub amount: u16,
     flags: u8,
@@ -68,7 +70,7 @@ impl ItemSlot {
     pub fn clear(&mut self) {
         self.item_id = 0;
         self.amount = 0;
-        self.sort_key = 0;
+        self.chronological_id = 0;
         self.item_type = 0;
         self.flags &= !(SlotFlags::Active as u8);
     }
