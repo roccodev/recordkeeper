@@ -3,7 +3,8 @@ use std::{
     rc::Rc,
 };
 
-use gloo::file::FileReadError;
+use anyhow::{anyhow, Result};
+use gloo::file::{Blob, FileReadError, ObjectUrl};
 use log::info;
 use recordkeeper::{SaveData, SaveFile, SaveResult};
 use yew::prelude::*;
@@ -22,6 +23,7 @@ pub enum EditAction {
     Save,
     ClearError,
     Edit(Box<dyn FnOnce(&mut SaveData)>),
+    Download,
 }
 
 #[derive(Properties, PartialEq)]
@@ -100,6 +102,16 @@ impl SaveManager {
         Ok(())
     }
 
+    fn download(&self) -> Result<()> {
+        let bytes = Blob::new(self.save_buffers[0].as_ref().unwrap().bytes());
+        let url = ObjectUrl::from(bytes);
+        web_sys::window()
+            .expect("no window")
+            .location()
+            .set_href(&url)
+            .map_err(|v| anyhow!("Download error: {v:?}"))
+    }
+
     fn mark_change(&mut self) {
         self.change_id = self.change_id.wrapping_add(1);
     }
@@ -128,15 +140,16 @@ impl Reducible for SaveReducer {
 
     fn reduce(self: Rc<Self>, action: Self::Action) -> Rc<Self> {
         let mut handle = self.manager.borrow_mut();
-        let res = match action {
-            EditAction::Load(bytes) => handle.load(&bytes),
-            EditAction::Save => handle.back_up_and_save(),
+        let res: Result<()> = match action {
+            EditAction::Load(bytes) => handle.load(&bytes).map_err(Into::into),
+            EditAction::Save => handle.back_up_and_save().map_err(Into::into),
             EditAction::Edit(callback) => {
                 callback(handle.get_mut().save_mut());
                 handle.mark_change();
                 Ok(())
             }
             EditAction::ClearError => Ok(()),
+            EditAction::Download => handle.download(),
         };
         Rc::new(Self {
             manager: Rc::clone(&self.manager),
