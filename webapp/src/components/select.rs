@@ -27,6 +27,9 @@ pub struct SearchSelectProps<O: Clone + 'static> {
     pub options: Options<O>,
     pub on_select: Callback<usize, ()>,
     pub lang: Rc<LanguageData>,
+
+    #[prop_or_default]
+    pub placeholder: AttrValue,
 }
 
 #[derive(Properties)]
@@ -125,6 +128,7 @@ where
                     oninput={update_search_query}
                     onfocus={update_focus(true)}
                     onblur={update_focus(false)}
+                    placeholder={props.placeholder.clone()}
                 />
                 <Icon classes={classes!("is-right")}>
                     <ChevronDown />

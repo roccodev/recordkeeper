@@ -117,6 +117,10 @@ item_item = Item
 item_amount = Amount
 item_actions = Actions
 
+# You are searching item slots for items
+item_search = Search item slots...
+item_first_empty = Go to empty slot
+
 # Item types
 
 item_type_collection = Collectibles
@@ -124,6 +128,7 @@ item_type_accessory = Accessories
 item_type_precious = Key Items
 item_type_gem = Gems
 item_type_cylinder = Cylinders
+item_masha = Crafted Accessory
 
 # Item rarities
 

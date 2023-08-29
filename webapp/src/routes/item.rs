@@ -8,7 +8,7 @@ use crate::save::SaveContext;
 use game_data::item::{Item, ItemType};
 use recordkeeper::item::{Inventory, ItemSlot};
 use std::rc::Rc;
-use ybc::{Button, Buttons, Container, Field, Table, Tile};
+use ybc::{Button, Buttons, Container, Control, Field, Table, Tile};
 use yew::prelude::*;
 
 /// List of supported item types, in order of importance
@@ -107,9 +107,11 @@ pub fn ItemInventory() -> Html {
                         </Buttons>
                     </Field>
                 </Tile>
-                <Tile classes={classes!("is-4")}>
+                <Tile classes={classes!("field", "is-grouped", "is-grouped-right", "is-4")}>
                     <ItemFinder item_type={*item_type} page_state={page.clone()} options={options.clone()} />
-                    <FirstEmptySlot item_type={*item_type} page_state={page.clone()} />
+                    <Control>
+                        <FirstEmptySlot item_type={*item_type} page_state={page.clone()} />
+                    </Control>
                 </Tile>
             </Tile>
 
@@ -155,7 +157,8 @@ fn ItemFinder(props: &PageChangeProps) -> Html {
     let item_type = props.item_type;
     let page_state = props.page_state.clone();
     let data = use_context::<Data>().unwrap();
-    let lang = data.to_lang();
+    let game_lang = data.to_lang();
+    let ui_lang = use_context::<Lang>().unwrap();
     let save = use_context::<SaveContext>().unwrap();
 
     let options = props.options.clone();
@@ -174,7 +177,8 @@ fn ItemFinder(props: &PageChangeProps) -> Html {
             current={None}
             options={props.options.clone()}
             on_select={on_select}
-            lang={lang}
+            lang={game_lang}
+            placeholder={ui_lang.translate("item_search").to_string()}
         />
     }
 }

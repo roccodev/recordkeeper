@@ -1,4 +1,5 @@
 use game_data::{item::Item, lang::Nameable, LanguageData};
+use recordkeeper::dlc::CRAFTED_ITEM_ID;
 use yew::prelude::*;
 
 use crate::{data::Data, lang::Text};
@@ -22,7 +23,13 @@ pub fn ItemDisplay(props: &ItemDisplayProps) -> Html {
     html! {
         <>
             <span><small>{props.item.id}{". "}</small></span>
-            <span>{props.item.get_name(data.lang())}</span>
+            <span>
+                {if props.item.id != CRAFTED_ITEM_ID {
+                    html!(<>{props.item.get_name(data.lang())}</>)
+                } else {
+                    html!(<b><Text path="item_masha" /></b>)
+                }}
+            </span>
             <span><small>{" ("}<Text path={format!("item_rarity_{}", props.item.rarity.lang_id())} />{")"}</small></span>
         </>
     }

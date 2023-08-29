@@ -1,11 +1,14 @@
 use std::rc::Rc;
 
 use game_data::item::{Item, ItemType};
-use recordkeeper::item::{Inventory, ItemSlot};
+use recordkeeper::{
+    dlc::CRAFTED_ITEM_ID,
+    item::{Inventory, ItemSlot},
+};
 use yew::prelude::*;
 
-use ybc::{Button, Buttons, Icon};
-use yew_feather::X;
+use ybc::{Button, Control, Field, Icon, Tile};
+use yew_feather::{Tool, X};
 
 use crate::{
     components::{
@@ -91,24 +94,50 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
         <tr>
             <th>{props.index.to_string()}</th>
             <td>
-                <SearchSelect<HtmlItem>
-                    current={current}
-                    options={options.clone()}
-                    on_select={on_select}
-                    lang={lang.clone()}
-                />
+                <Tile classes={classes!("is-align-items-end")}>
+                    <Tile classes={classes!("mr-1")}>
+                        {if slot.is_valid() {
+                            html!(<span class={classes!("recordkeeper-item-id")}>{slot.item_id.to_string()}{"."}</span>)
+                        } else {
+                            html!()
+                        }}
+                    </Tile>
+                    <Tile classes={classes!("is-10")}>
+                        <SearchSelect<HtmlItem>
+                            current={current}
+                            options={options.clone()}
+                            on_select={on_select}
+                            lang={lang.clone()}
+                        />
+                    </Tile>
+                </Tile>
             </td>
             <td>
                 <NumberInput<AmountEditor> editor={amount_editor} />
             </td>
             <td>
-                <Buttons>
-                    <Button disabled={!slot.is_valid()} onclick={clear_callback}>
-                        <Icon>
-                            <X />
-                        </Icon>
-                    </Button>
-                </Buttons>
+                <Field classes={classes!("has-addons")}>
+                    {if u32::from(slot.item_id) == CRAFTED_ITEM_ID {
+                        html! {
+                            <Control>
+                                <Button>
+                                    <Icon>
+                                        <Tool />
+                                    </Icon>
+                                </Button>
+                            </Control>
+                        }
+                    } else {
+                        html!()
+                    }}
+                    <Control>
+                        <Button disabled={!slot.is_valid()} onclick={clear_callback}>
+                            <Icon>
+                                <X />
+                            </Icon>
+                        </Button>
+                    </Control>
+                </Field>
             </td>
         </tr>
     }
