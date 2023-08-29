@@ -11,6 +11,7 @@ use game_data::LanguageData;
 
 pub trait HtmlName {
     fn get_name_html(&self, language: &LanguageData) -> Html;
+    fn get_search_query<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str>;
     fn get_name_for_filter<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str>;
 }
 
@@ -72,13 +73,14 @@ where
         return html!();
     }
 
+    let lower_search = (*search_query).to_lowercase();
     let visible = props
         .options
         .iter()
         .enumerate()
         .filter(|(_, o)| {
             o.get_name_for_filter(&props.lang)
-                .is_some_and(|n| n.contains(&**search_query))
+                .is_some_and(|n| n.contains(&lower_search))
         })
         .map(|(i, o)| (i, o.clone()))
         .collect::<Vec<_>>();
@@ -204,7 +206,7 @@ impl<O: Clone + HtmlName + 'static> SearchSelectProps<O> {
             .and_then(|o| {
                 self.options
                     .get_if_present(o)?
-                    .get_name_for_filter(&self.lang.clone())
+                    .get_search_query(&self.lang.clone())
                     .map(|s| AttrValue::from(s.to_string()))
             })
             .unwrap_or_default()
@@ -265,10 +267,14 @@ where
     T: Nameable,
 {
     fn get_name_html(&self, language: &LanguageData) -> Html {
-        html!(<>{self.get_name(language)}</>)
+        html!(<>{self.get_name_str(language)}</>)
     }
 
     fn get_name_for_filter<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str> {
-        self.get_name(language)
+        self.get_name(language).map(|t| t.text_lower())
+    }
+
+    fn get_search_query<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str> {
+        self.get_name(language).map(|t| t.text())
     }
 }

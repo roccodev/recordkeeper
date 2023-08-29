@@ -25,7 +25,7 @@ pub fn ItemDisplay(props: &ItemDisplayProps) -> Html {
             <span><small>{props.item.id}{". "}</small></span>
             <span>
                 {if props.item.id != CRAFTED_ITEM_ID {
-                    html!(<>{props.item.get_name(data.lang())}</>)
+                    html!(<>{props.item.get_name_str(data.lang())}</>)
                 } else {
                     html!(<b><Text path="item_masha" /></b>)
                 }}
@@ -40,7 +40,11 @@ impl HtmlName for HtmlItem {
         html!(<ItemDisplay item={self.0} />)
     }
 
+    fn get_search_query<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str> {
+        self.0.get_name(language).map(|t| t.text())
+    }
+
     fn get_name_for_filter<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str> {
-        self.0.get_name(language)
+        self.0.get_name(language).map(|t| t.text_lower())
     }
 }

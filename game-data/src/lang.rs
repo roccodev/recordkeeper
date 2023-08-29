@@ -1,6 +1,5 @@
 use crate::LanguageData;
 use serde::{Deserialize, Serialize};
-use std::ops::Deref;
 
 #[derive(Serialize, Deserialize)]
 pub struct TextTable {
@@ -10,11 +9,16 @@ pub struct TextTable {
 #[derive(Serialize, Deserialize)]
 pub struct TextEntry {
     text: Box<str>,
+    text_lower: Box<str>,
     id: usize,
 }
 
 pub trait Nameable {
-    fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l str>;
+    fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l TextEntry>;
+
+    fn get_name_str<'l>(&self, language: &'l LanguageData) -> Option<&'l str> {
+        self.get_name(language).map(|t| t.text())
+    }
 }
 
 impl TextTable {
@@ -24,11 +28,11 @@ impl TextTable {
         Self { entries }
     }
 
-    pub fn get(&self, id: usize) -> Option<&str> {
+    pub fn get(&self, id: usize) -> Option<&TextEntry> {
         self.entries
             .binary_search_by_key(&id, |e| e.id)
             .ok()
-            .map(|i| self.entries[i].text.as_ref())
+            .map(|i| &self.entries[i])
     }
 }
 
@@ -36,7 +40,16 @@ impl TextEntry {
     pub fn new(text: &str, id: usize) -> Self {
         Self {
             text: Box::from(text),
+            text_lower: Box::from(text.to_lowercase()),
             id,
         }
+    }
+
+    pub fn text(&self) -> &str {
+        &self.text
+    }
+
+    pub fn text_lower(&self) -> &str {
+        &self.text_lower
     }
 }

@@ -2,7 +2,7 @@
 
 use std::num::NonZeroUsize;
 
-use crate::lang::{Nameable, TextTable};
+use crate::lang::{Nameable, TextEntry, TextTable};
 use enum_map::{Enum, EnumMap};
 use serde::{Deserialize, Serialize};
 
@@ -105,7 +105,7 @@ impl Rarity {
 }
 
 impl Nameable for Item {
-    fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l str> {
+    fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l TextEntry> {
         self.name_id
             .and_then(|id| language.items.tables[self.item_type].get(id.get()))
     }
