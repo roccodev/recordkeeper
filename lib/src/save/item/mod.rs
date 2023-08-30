@@ -66,10 +66,10 @@ pub enum ItemType {
     Collection = 3,
     Info = 4,
     Accessory = 5,
-    Precious = 6,
-    Exchange = 7,
-    Extra = 8,
-    Collectopedia = 9,
+    Collectopedia = 6,
+    Precious = 7,
+    Exchange = 8,
+    Extra = 9,
 }
 
 #[derive(Error, Debug)]
@@ -167,7 +167,7 @@ impl TryFrom<u32> for ItemType {
             5 => Self::Accessory,
             6 => Self::Precious,
             7 => Self::Exchange,
-            8 => Self::Extra,
+            9 => Self::Extra,
             9 => Self::Collectopedia,
             i => return Err(TypeFromIntError(i)),
         })
