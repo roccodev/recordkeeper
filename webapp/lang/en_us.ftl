@@ -129,6 +129,7 @@ item_type_precious = Key Items
 item_type_gem = Gems
 item_type_cylinder = Cylinders
 item_masha = Crafted Accessory
+item_unnamed = (No Name)
 
 # Item rarities
 

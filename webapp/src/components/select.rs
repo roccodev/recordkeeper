@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{borrow::Cow, rc::Rc};
 
 use wasm_bindgen::JsCast;
 use web_sys::{Element, EventTarget, HtmlElement, HtmlInputElement};
@@ -9,10 +9,20 @@ use yew_feather::ChevronDown;
 use game_data::lang::Nameable;
 use game_data::LanguageData;
 
+use crate::lang::{Lang, LangManager};
+
 pub trait HtmlName {
     fn get_name_html(&self, language: &LanguageData) -> Html;
-    fn get_search_query<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str>;
-    fn get_name_for_filter<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str>;
+    fn get_search_query<'a, 'b: 'a>(
+        &'a self,
+        language: &'b LanguageData,
+        ui_lang: &'b LangManager,
+    ) -> Option<Cow<'a, str>>;
+    fn get_name_for_filter<'a, 'b: 'a>(
+        &'a self,
+        language: &'b LanguageData,
+        ui_lang: &'b LangManager,
+    ) -> Option<Cow<'a, str>>;
 }
 
 #[derive(Clone)]
@@ -50,6 +60,8 @@ pub fn SearchSelect<O>(props: &SearchSelectProps<O>) -> Html
 where
     O: HtmlName + Clone + 'static,
 {
+    let lang = use_context::<Lang>().unwrap();
+
     let value = use_state(|| props.current);
     let value_state = value.clone();
     use_effect_with_deps(
@@ -57,7 +69,10 @@ where
         (props.options.id(), props.current),
     );
 
-    let default_search = use_memo(|_| props.search_query(*value), (props.options.id(), *value));
+    let default_search = use_memo(
+        |_| props.search_query(*value, &lang),
+        (props.options.id(), *value),
+    );
 
     let search_query = use_state(|| (*default_search).clone());
     let focused = use_state(|| false);
@@ -79,7 +94,7 @@ where
         .iter()
         .enumerate()
         .filter(|(_, o)| {
-            o.get_name_for_filter(&props.lang)
+            o.get_name_for_filter(&props.lang, &lang)
                 .is_some_and(|n| n.contains(&lower_search))
         })
         .map(|(i, o)| (i, o.clone()))
@@ -201,12 +216,12 @@ impl<O: 'static> Options<O> {
 }
 
 impl<O: Clone + HtmlName + 'static> SearchSelectProps<O> {
-    fn search_query(&self, current: Option<usize>) -> AttrValue {
+    fn search_query(&self, current: Option<usize>, lang: &LangManager) -> AttrValue {
         current
             .and_then(|o| {
                 self.options
                     .get_if_present(o)?
-                    .get_search_query(&self.lang.clone())
+                    .get_search_query(&self.lang.clone(), lang)
                     .map(|s| AttrValue::from(s.to_string()))
             })
             .unwrap_or_default()
@@ -270,11 +285,19 @@ where
         html!(<>{self.get_name_str(language)}</>)
     }
 
-    fn get_name_for_filter<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str> {
-        self.get_name(language).map(|t| t.text_lower())
+    fn get_search_query<'a, 'b: 'a>(
+        &'a self,
+        language: &'b LanguageData,
+        _: &'b LangManager,
+    ) -> Option<Cow<'a, str>> {
+        self.get_name(language).map(|t| t.text_lower().into())
     }
 
-    fn get_search_query<'a, 'b: 'a>(&'a self, language: &'b LanguageData) -> Option<&'a str> {
-        self.get_name(language).map(|t| t.text())
+    fn get_name_for_filter<'a, 'b: 'a>(
+        &'a self,
+        language: &'b LanguageData,
+        _: &'b LangManager,
+    ) -> Option<Cow<'a, str>> {
+        self.get_name(language).map(|t| t.text().into())
     }
 }

@@ -165,10 +165,10 @@ impl TryFrom<u32> for ItemType {
             3 => Self::Collection,
             4 => Self::Info,
             5 => Self::Accessory,
-            6 => Self::Precious,
-            7 => Self::Exchange,
+            6 => Self::Collectopedia,
+            7 => Self::Precious,
+            8 => Self::Exchange,
             9 => Self::Extra,
-            9 => Self::Collectopedia,
             i => return Err(TypeFromIntError(i)),
         })
     }

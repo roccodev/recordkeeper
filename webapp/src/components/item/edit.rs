@@ -1,10 +1,7 @@
 use std::rc::Rc;
 
 use game_data::item::Item;
-use recordkeeper::{
-    dlc::CRAFTED_ITEM_ID,
-    item::{edit::ItemEditor, Inventory, ItemSlot, ItemType},
-};
+use recordkeeper::item::{edit::ItemEditor, ItemType};
 use yew::prelude::*;
 
 use ybc::{Button, Control, Field, Icon, Tile};

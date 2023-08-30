@@ -73,12 +73,7 @@ pub fn ItemInventory() -> Html {
         .copied()
         .collect();
 
-    let options: Options<HtmlItem> = items
-        .clone()
-        .into_iter()
-        .copied()
-        .map(|i| HtmlItem(i))
-        .collect();
+    let options: Options<HtmlItem> = items.clone().into_iter().copied().map(HtmlItem).collect();
 
     html! {
         <Container>
@@ -87,7 +82,7 @@ pub fn ItemInventory() -> Html {
                     <Field>
                         <label class="label"><Text path="item_type" /></label>
                         <Buttons classes={classes!("has-addons")}>
-                            {for ITEM_TYPES.into_iter().map(|ty| {
+                            {for ITEM_TYPES.iter().map(|ty| {
                                 let item_type = item_type.clone();
                                 let classes = if ty == &*item_type {
                                     classes!("is-info", "is-selected")
