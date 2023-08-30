@@ -63,16 +63,12 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
     let save = save_context.clone();
     let on_select = Callback::from(move |new: usize| {
         let new_id: u16 = items[new].id.try_into().unwrap();
-        save.submit_action(EditAction::TryEdit(Box::new(move |save| {
-            Ok(ItemEditor::new(save, item_type, index).set_item_id(new_id)?)
-        })));
+        save.try_edit(move |save| Ok(ItemEditor::new(save, item_type, index).set_item_id(new_id)?));
     });
 
     let save = save_context.clone();
     let clear_callback = Callback::from(move |_: MouseEvent| {
-        save.submit_action(EditAction::Edit(Box::new(move |save| {
-            ItemEditor::new(save, item_type, index).clear();
-        })));
+        save.edit(move |save| ItemEditor::new(save, item_type, index).clear());
     });
 
     // Buttons:

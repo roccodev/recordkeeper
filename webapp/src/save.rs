@@ -22,10 +22,13 @@ pub enum EditAction {
     Load(Vec<u8>),
     Save,
     ClearError,
-    Edit(Box<dyn FnOnce(&mut SaveData)>),
-    TryEdit(Box<dyn FnOnce(&mut SaveData) -> Result<()>>),
+    Edit(EditFn),
+    TryEdit(TryEditFn),
     Download,
 }
+
+pub type EditFn = Box<dyn FnOnce(&mut SaveData)>;
+pub type TryEditFn = Box<dyn FnOnce(&mut SaveData) -> Result<()>>;
 
 #[derive(Properties, PartialEq)]
 pub struct SaveProviderProps {
@@ -125,6 +128,14 @@ impl SaveContext {
 
     pub fn submit_action(&self, action: EditAction) {
         self.handle.dispatch(action);
+    }
+
+    pub fn edit(&self, editor: impl FnOnce(&mut SaveData) + 'static) {
+        self.submit_action(EditAction::Edit(Box::new(editor)))
+    }
+
+    pub fn try_edit(&self, editor: impl FnOnce(&mut SaveData) -> Result<()> + 'static) {
+        self.submit_action(EditAction::TryEdit(Box::new(editor)))
     }
 
     pub fn get(&self) -> Ref<'_, SaveManager> {

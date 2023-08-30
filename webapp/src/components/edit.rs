@@ -104,8 +104,7 @@ where
                 .and_then(|v| editor.validate(&v).map_err(|_| ()).map(|_| v))
             {
                 Ok(v) => {
-                    save_context
-                        .submit_action(EditAction::Edit(Box::new(move |save| editor.set(save, v))));
+                    save_context.edit(move |save| editor.set(save, v));
                 }
                 Err(_) => {
                     // Invalid number, out of range, etc.
