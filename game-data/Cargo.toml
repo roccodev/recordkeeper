@@ -7,3 +7,4 @@ edition = "2021"
 bitcode = { version = "0.4.0", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }
 enum-map = { version = "2.6", features = ["serde"] }
+recordkeeper = { path = "../lib" }

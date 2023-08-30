@@ -1,9 +1,9 @@
 use std::rc::Rc;
 
-use game_data::item::{Item, ItemType};
+use game_data::item::Item;
 use recordkeeper::{
     dlc::CRAFTED_ITEM_ID,
-    item::{Inventory, ItemSlot},
+    item::{edit::ItemEditor, Inventory, ItemSlot, ItemType},
 };
 use yew::prelude::*;
 
@@ -23,13 +23,11 @@ use crate::{
 editor!(
     pub AmountEditor,
     u16,
-    get |editor, save| { get_item_field(&save.inventory, editor.item_type)[editor.index].amount },
+    get |editor, save| {
+        save.inventory.slots(editor.item_type)[editor.index].amount()
+    },
     set |editor, save, new_value| {
-        get_item_field_mut(&mut save.inventory, editor.item_type)[editor.index].edit(
-            editor.index as u16,
-            editor.item_type as u32,
-            |i| i.amount = new_value
-        )
+        ItemEditor::new(save, editor.item_type, editor.index).set_amount(new_value)
     },
     assert |editor, value| { Ok(()) },
     capture item_type: ItemType, index: usize
@@ -57,9 +55,9 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
         options,
     } = props.clone();
 
-    let slot = &get_item_field(&save.get().save().inventory, item_type)[index];
+    let slot = &save.get().save().inventory.slots(item_type)[index];
     let current = items
-        .binary_search_by_key(&(slot.item_id as u32), |i| i.id)
+        .binary_search_by_key(&(slot.item_id() as u32), |i| i.id)
         .ok();
 
     let amount_editor = AmountEditor { index, item_type };
@@ -68,22 +66,15 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
     let save = save_context.clone();
     let on_select = Callback::from(move |new: usize| {
         let new_id: u16 = items[new].id.try_into().unwrap();
-        save.submit_action(EditAction::Edit(Box::new(move |save| {
-            get_item_field_mut(&mut save.inventory, item_type)[index].edit(
-                index as u16,
-                item_type as u32,
-                |i| {
-                    i.item_id = new_id;
-                    i.amount = 1;
-                },
-            )
+        save.submit_action(EditAction::TryEdit(Box::new(move |save| {
+            Ok(ItemEditor::new(save, item_type, index).set_item_id(new_id)?)
         })));
     });
 
     let save = save_context.clone();
     let clear_callback = Callback::from(move |_: MouseEvent| {
         save.submit_action(EditAction::Edit(Box::new(move |save| {
-            get_item_field_mut(&mut save.inventory, item_type)[index].clear();
+            ItemEditor::new(save, item_type, index).clear();
         })));
     });
 
@@ -97,7 +88,7 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
                 <Tile classes={classes!("is-align-items-end")}>
                     <Tile classes={classes!("mr-1")}>
                         {if slot.is_valid() {
-                            html!(<span class={classes!("recordkeeper-item-id")}>{slot.item_id.to_string()}{"."}</span>)
+                            html!(<span class={classes!("recordkeeper-item-id")}>{slot.item_id().to_string()}{"."}</span>)
                         } else {
                             html!()
                         }}
@@ -117,7 +108,7 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
             </td>
             <td>
                 <Field classes={classes!("has-addons")}>
-                    {if u32::from(slot.item_id) == CRAFTED_ITEM_ID {
+                    {if slot.is_crafted_accessory() {
                         html! {
                             <Control>
                                 <Button>
@@ -140,33 +131,5 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
                 </Field>
             </td>
         </tr>
-    }
-}
-
-pub fn get_item_field(inventory: &Inventory, item_type: ItemType) -> &[ItemSlot] {
-    match item_type {
-        ItemType::Cylinder => &inventory.cylinders,
-        ItemType::Gem => &inventory.gems,
-        ItemType::Collection => &inventory.collectibles,
-        ItemType::Collectopedia => &[],
-        ItemType::Info => &inventory.infos,
-        ItemType::Accessory => &inventory.accessories,
-        ItemType::Precious => &inventory.key_items,
-        ItemType::Exchange => &inventory.exchange,
-        ItemType::Extra => &inventory.extra,
-    }
-}
-
-fn get_item_field_mut(inventory: &mut Inventory, item_type: ItemType) -> &mut [ItemSlot] {
-    match item_type {
-        ItemType::Cylinder => &mut inventory.cylinders,
-        ItemType::Gem => &mut inventory.gems,
-        ItemType::Collection => &mut inventory.collectibles,
-        ItemType::Collectopedia => &mut [],
-        ItemType::Info => &mut inventory.infos,
-        ItemType::Accessory => &mut inventory.accessories,
-        ItemType::Precious => &mut inventory.key_items,
-        ItemType::Exchange => &mut inventory.exchange,
-        ItemType::Extra => &mut inventory.extra,
     }
 }

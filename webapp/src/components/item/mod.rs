@@ -24,7 +24,7 @@ pub fn ItemDisplay(props: &ItemDisplayProps) -> Html {
         <>
             <span><small>{props.item.id}{". "}</small></span>
             <span>
-                {if props.item.id != CRAFTED_ITEM_ID {
+                {if props.item.id != u32::from(CRAFTED_ITEM_ID) {
                     html!(<>{props.item.get_name_str(data.lang())}</>)
                 } else {
                     html!(<b><Text path="item_masha" /></b>)

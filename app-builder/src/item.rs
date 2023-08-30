@@ -1,9 +1,10 @@
 use std::num::NonZeroUsize;
 
 use bdat::{Label, RowRef};
-use enum_map::{enum_map, EnumMap};
+use enum_map::enum_map;
 use game_data::item::{Item, ItemLanguageRegistry, Rarity};
-use game_data::item::{ItemRegistry, ItemType};
+use game_data::item::{ItemRegistry, Type};
+use recordkeeper::item::ItemType;
 
 use crate::lang::text_table_from_bdat;
 use crate::BdatRegistry;
@@ -37,15 +38,15 @@ pub fn load_items(bdat: &BdatRegistry) -> ItemRegistry {
 
 pub fn load_item_lang(bdat: &LangBdatRegistry) -> ItemLanguageRegistry {
     let categories = enum_map! {
-        ItemType::Collection => const_hash!("msg_item_collection"),
-        ItemType::Cylinder => const_hash!("msg_item_cylinder"),
-        ItemType::Accessory => const_hash!("msg_item_accessory"),
-        ItemType::Exchange => const_hash!("msg_item_exchange"),
-        ItemType::Gem => const_hash!("msg_item_gem"),
-        ItemType::Extra => const_hash!("msg_item_extra"),
-        ItemType::Info => Label::Hash(0xCA2198EC),
-        ItemType::Precious => const_hash!("msg_item_precious"),
-        ItemType::Collectopedia => Label::Hash(0xBEDB6533),
+        Type(ItemType::Collection) => const_hash!("msg_item_collection"),
+        Type(ItemType::Cylinder) => const_hash!("msg_item_cylinder"),
+        Type(ItemType::Accessory) => const_hash!("msg_item_accessory"),
+        Type(ItemType::Exchange) => const_hash!("msg_item_exchange"),
+        Type(ItemType::Gem) => const_hash!("msg_item_gem"),
+        Type(ItemType::Extra) => const_hash!("msg_item_extra"),
+        Type(ItemType::Info) => Label::Hash(0xCA2198EC),
+        Type(ItemType::Precious) => const_hash!("msg_item_precious"),
+        Type(ItemType::Collectopedia) => Label::Hash(0xBEDB6533),
     };
 
     ItemLanguageRegistry::new(categories.map(|_, label| text_table_from_bdat(bdat.table(&label))))
@@ -78,7 +79,7 @@ fn read_item(item_type: ItemType, row: RowRef) -> Option<Item> {
         name_id: NonZeroUsize::new(
             row[const_hash!("Name")].as_single().unwrap().to_integer() as usize
         ),
-        item_type,
+        item_type: Type(item_type),
         amount_max,
         rarity,
     })

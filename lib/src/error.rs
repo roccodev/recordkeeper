@@ -18,4 +18,6 @@ pub enum SaveError {
     Infallible(#[from] Infallible),
     #[error("Unexpected EOF while writing byte")]
     UnexpectedEof,
+    #[error("Could not set crafted accessory data: the craft inventory is full.")]
+    MashaInventoryFull,
 }

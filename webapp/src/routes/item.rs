@@ -1,12 +1,12 @@
-use crate::components::item::edit::{get_item_field, ItemRow};
+use crate::components::item::edit::ItemRow;
 use crate::components::item::HtmlItem;
 use crate::components::page::{PageControls, PageOrganizer};
 use crate::components::select::{Options, SearchSelect};
 use crate::data::Data;
 use crate::lang::{Lang, Text};
 use crate::save::SaveContext;
-use game_data::item::{Item, ItemType};
-use recordkeeper::item::{Inventory, ItemSlot};
+use game_data::item::Item;
+use recordkeeper::item::{Inventory, ItemSlot, ItemType};
 use std::rc::Rc;
 use ybc::{Button, Buttons, Container, Control, Field, Table, Tile};
 use yew::prelude::*;
@@ -57,7 +57,7 @@ pub fn ItemInventory() -> Html {
     let page = use_state(|| 0);
     let save = use_context::<SaveContext>().unwrap();
     let data = use_context::<Data>().unwrap();
-    let num_slots = get_item_field(&save.get().get().save().inventory, *item_type).len();
+    let num_slots = save.get().get().save().inventory.slots(*item_type).len();
 
     // Reset page when item type changes
     let page_state = page.clone();
@@ -165,7 +165,7 @@ fn ItemFinder(props: &PageChangeProps) -> Html {
     let on_select = Callback::from(move |i: usize| {
         let item = &options.get(i).0;
         if let Some(index) = index_of_item(&save.get().get().save().inventory, item_type, |slot| {
-            u32::from(slot.item_id) == item.id
+            u32::from(slot.item_id()) == item.id
         }) {
             let next_page = index / (PAGES_PER_VIEW * ROWS_PER_PAGE);
             page_state.set(next_page * PAGES_PER_VIEW);
@@ -210,6 +210,6 @@ fn index_of_item(
     item_type: ItemType,
     predicate: impl Fn(&ItemSlot) -> bool,
 ) -> Option<usize> {
-    let items = get_item_field(inventory, item_type);
+    let items = inventory.slots(item_type);
     items.iter().position(predicate)
 }

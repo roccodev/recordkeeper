@@ -23,6 +23,7 @@ pub enum EditAction {
     Save,
     ClearError,
     Edit(Box<dyn FnOnce(&mut SaveData)>),
+    TryEdit(Box<dyn FnOnce(&mut SaveData) -> Result<()>>),
     Download,
 }
 
@@ -147,6 +148,9 @@ impl Reducible for SaveReducer {
                 callback(handle.get_mut().save_mut());
                 handle.mark_change();
                 Ok(())
+            }
+            EditAction::TryEdit(callback) => {
+                callback(handle.get_mut().save_mut()).map(|_| handle.mark_change())
             }
             EditAction::ClearError => Ok(()),
             EditAction::Download => handle.download(),

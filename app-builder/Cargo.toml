@@ -8,3 +8,4 @@ bdat = "0.3.0"
 game-data = { path = "../game-data" }
 anyhow = "1.0.72"
 enum-map = { version = "2.6" }
+recordkeeper = { path = "../lib" }

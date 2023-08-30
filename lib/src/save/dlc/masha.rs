@@ -1,9 +1,9 @@
 use recordkeeper_macros::SaveBin;
 
-use crate::item::ITEM_ACCESSORY_MAX;
+use crate::{error::SaveError, item::ITEM_ACCESSORY_MAX, SaveResult};
 
 /// Item ID to be used to mark accessories as crafted.
-pub const CRAFTED_ITEM_ID: u32 = 793;
+pub const CRAFTED_ITEM_ID: u16 = 793;
 
 const MASHA_STAT_BOOSTS_MAX: usize = 4;
 const MASHA_DATA_MAX: usize = 300;
@@ -61,5 +61,54 @@ impl AccessoryCrafting {
         self.offsets
             .get_mut(item_slot)
             .and_then(|i| self.data.get_mut(*i as usize))
+    }
+
+    /// Removes craft accessory data for the given item slot.
+    pub fn remove_data(&mut self, item_slot: usize) {
+        if let Some(slot) = self.offsets.get_mut(item_slot) {
+            *slot = u16::MAX;
+        }
+    }
+
+    /// Creates or replaces a crafted data slot for the given item slot.
+    ///
+    /// ## Errors
+    ///
+    /// The function fails if an entry must be created, but the craft data inventory is full.
+    pub fn set_data(&mut self, item_slot: usize, data: CraftItemData) -> SaveResult<()> {
+        let offset = self.offsets[item_slot];
+
+        if offset != u16::MAX {
+            // Slot already initialized
+            self.data[offset as usize] = data;
+            return Ok(());
+        }
+
+        // Need to allocate a new data sector: first, find an
+        // unused offset.
+        let mut offsets = self.offsets.clone();
+        offsets.sort_unstable();
+
+        let Some((_, empty)) = offsets
+                .into_iter()
+                .zip(0..MASHA_DATA_MAX)
+                .find(|(a, b)| *a as usize != *b) else { return Err(SaveError::MashaInventoryFull) };
+
+        // Place the data at the new offset.
+        self.data[empty] = data;
+        self.offsets[item_slot] = empty.try_into().unwrap();
+
+        Ok(())
+    }
+}
+
+impl Default for CraftItemData {
+    fn default() -> Self {
+        Self {
+            stat_boosts: [StatBoost { stat: 1, amount: 0 }; MASHA_STAT_BOOSTS_MAX],
+            display_id: 1,
+            enhance_id: 1,
+            level: 1,
+        }
     }
 }
