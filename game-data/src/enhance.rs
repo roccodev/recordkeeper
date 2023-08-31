@@ -33,6 +33,13 @@ pub struct EnhanceEffect {
 }
 
 impl EnhanceRegistry {
+    pub fn get_instance(&self, id: u32) -> Option<&Enhance> {
+        self.instances
+            .binary_search_by_key(&id, |i| i.instance_id)
+            .map(|i| &self.instances[i])
+            .ok()
+    }
+
     pub fn register_instance(&mut self, instance: Enhance) {
         let index = self
             .instances

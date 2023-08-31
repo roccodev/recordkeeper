@@ -6,7 +6,7 @@ pub struct TextTable {
     entries: Vec<TextEntry>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct TextEntry {
     text: Box<str>,
     text_lower: Box<str>,
