@@ -2,7 +2,7 @@
 
 use std::num::NonZeroUsize;
 
-use crate::lang::{Nameable, TextEntry, TextTable};
+use crate::lang::{FilterTable, Filterable};
 use enum_map::{Enum, EnumArray, EnumMap};
 use recordkeeper::item::ItemType;
 use serde::{Deserialize, Serialize};
@@ -39,7 +39,7 @@ pub struct RarityFromIntError;
 
 #[derive(Serialize, Deserialize)]
 pub struct ItemLanguageRegistry {
-    tables: EnumMap<Type, TextTable>,
+    tables: EnumMap<Type, FilterTable>,
 }
 
 impl ItemRegistry {
@@ -65,7 +65,7 @@ impl ItemRegistry {
 }
 
 impl ItemLanguageRegistry {
-    pub fn new(tables: EnumMap<Type, TextTable>) -> Self {
+    pub fn new(tables: EnumMap<Type, FilterTable>) -> Self {
         Self { tables }
     }
 }
@@ -80,8 +80,8 @@ impl Rarity {
     }
 }
 
-impl Nameable for Item {
-    fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l TextEntry> {
+impl Filterable for Item {
+    fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l crate::lang::FilterEntry> {
         self.name_id
             .and_then(|id| language.items.tables[self.item_type].get(id.get()))
     }

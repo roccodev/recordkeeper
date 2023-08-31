@@ -1,6 +1,10 @@
 use std::borrow::Cow;
 
-use game_data::{item::Item, lang::Nameable, LanguageData};
+use game_data::{
+    item::Item,
+    lang::{Filterable, Nameable},
+    LanguageData,
+};
 use recordkeeper::{dlc::CRAFTED_ITEM_ID, item::ItemType};
 use yew::prelude::*;
 
@@ -81,7 +85,7 @@ impl HtmlName for HtmlItem {
     ) -> Option<Cow<'a, str>> {
         Some(
             self.0
-                .get_name(language)
+                .get_filter(language)
                 .map(|t| t.text_lower().into())
                 .unwrap_or_else(|| self.unnamed_name(lang).to_lowercase().into()),
         )

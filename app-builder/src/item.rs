@@ -6,7 +6,7 @@ use game_data::item::{Item, ItemLanguageRegistry, Rarity};
 use game_data::item::{ItemRegistry, Type};
 use recordkeeper::item::ItemType;
 
-use crate::lang::text_table_from_bdat;
+use crate::lang::filter_table_from_bdat;
 use crate::BdatRegistry;
 use crate::{const_hash, LangBdatRegistry};
 
@@ -49,7 +49,7 @@ pub fn load_item_lang(bdat: &LangBdatRegistry) -> ItemLanguageRegistry {
         Type(ItemType::Collectopedia) => Label::Hash(0xBEDB6533),
     };
 
-    ItemLanguageRegistry::new(categories.map(|_, label| text_table_from_bdat(bdat.table(&label))))
+    ItemLanguageRegistry::new(categories.map(|_, label| filter_table_from_bdat(bdat.table(&label))))
 }
 
 fn read_item(item_type: ItemType, row: RowRef) -> Option<Item> {

@@ -6,7 +6,7 @@ use ybc::*;
 use yew::prelude::*;
 use yew_feather::ChevronDown;
 
-use game_data::lang::Nameable;
+use game_data::lang::{Filterable, Nameable};
 use game_data::LanguageData;
 
 use crate::lang::{Lang, LangManager};
@@ -279,7 +279,7 @@ impl<O: Clone + 'static> PartialEq for DropdownProps<O> {
 
 impl<T> HtmlName for T
 where
-    T: Nameable,
+    T: Filterable,
 {
     fn get_name_html(&self, language: &LanguageData) -> Html {
         html!(<>{self.get_name_str(language)}</>)
@@ -290,7 +290,7 @@ where
         language: &'b LanguageData,
         _: &'b LangManager,
     ) -> Option<Cow<'a, str>> {
-        self.get_name(language).map(|t| t.text_lower().into())
+        self.get_filter(language).map(|t| t.text_lower().into())
     }
 
     fn get_name_for_filter<'a, 'b: 'a>(
