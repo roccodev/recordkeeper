@@ -25,7 +25,7 @@ pub struct CraftItemData {
     pub display_id: u16,
     /// Index for `4548D8B2`
     pub enhance_id: u16,
-    pub level: u32,
+    pub level: u8,
 }
 
 #[derive(SaveBin, Debug, Clone, Copy, PartialEq, Eq)]

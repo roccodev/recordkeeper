@@ -1,9 +1,12 @@
 use std::io::{Read, Write};
 
+use enhance::{EnhanceLang, EnhanceRegistry};
 use item::{ItemLanguageRegistry, ItemRegistry};
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
+pub mod dlc;
+pub mod enhance;
 pub mod item;
 pub mod lang;
 pub mod quest;
@@ -11,11 +14,13 @@ pub mod quest;
 #[derive(Serialize, Deserialize)]
 pub struct GameData {
     pub items: ItemRegistry,
+    pub enhance: EnhanceRegistry,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct LanguageData {
     pub items: ItemLanguageRegistry,
+    pub enhance: EnhanceLang,
 }
 
 pub fn save_game_data(data: &GameData, mut writer: impl Write) -> Result<(), Box<dyn Error>> {

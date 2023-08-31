@@ -2,6 +2,7 @@ use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
 
 use bdat::{Label, SwitchEndian, Table};
 
+mod enhance;
 mod item;
 mod lang;
 
@@ -46,12 +47,14 @@ fn main() {
 fn read_game_data(bdat: &BdatRegistry) -> GameData {
     GameData {
         items: item::load_items(bdat),
+        enhance: enhance::load_enhance(bdat),
     }
 }
 
 fn read_lang_data(bdat: &LangBdatRegistry) -> LanguageData {
     LanguageData {
         items: item::load_item_lang(bdat),
+        enhance: enhance::load_enhance_lang(bdat),
     }
 }
 
