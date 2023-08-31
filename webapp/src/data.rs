@@ -43,7 +43,7 @@ impl DataManager {
         }
     }
 
-    pub fn game(&self) -> &GameData {
+    pub fn game(&self) -> &'static GameData {
         &self.game_data
     }
 

@@ -5,4 +5,5 @@ pub mod select;
 pub mod sidebar;
 pub mod upload;
 
+pub mod dlc;
 pub mod item;

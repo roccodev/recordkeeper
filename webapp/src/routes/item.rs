@@ -7,7 +7,6 @@ use crate::lang::{Lang, Text};
 use crate::save::SaveContext;
 use game_data::item::Item;
 use recordkeeper::item::{Inventory, ItemSlot, ItemType};
-use std::rc::Rc;
 use ybc::{Button, Buttons, Container, Control, Field, Table, Tile};
 use yew::prelude::*;
 
@@ -22,7 +21,7 @@ static ITEM_TYPES: &[ItemType] = &[
 
 #[derive(Properties, PartialEq)]
 struct TableProps {
-    pub items: Rc<[Item]>,
+    pub items: &'static [Item],
     pub options: Options<HtmlItem>,
     pub item_type: ItemType,
     pub start: usize,
@@ -65,14 +64,7 @@ pub fn ItemInventory() -> Html {
 
     let page_organizer = PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, num_slots);
 
-    let items: Rc<[Item]> = data
-        .game()
-        .items
-        .items_by_type(*item_type)
-        .iter()
-        .copied()
-        .collect();
-
+    let items: &'static [Item] = data.game().items.items_by_type(*item_type);
     let options: Options<HtmlItem> = items.clone().into_iter().copied().map(HtmlItem).collect();
 
     html! {
@@ -113,7 +105,7 @@ pub fn ItemInventory() -> Html {
             <Tile>
                 {for page_organizer.current_bounds.into_iter().map(|(start, end)| html! {
                     <Tile>
-                        <TablePage items={items.clone()} options={options.clone()} item_type={*item_type} start={start} end={end} />
+                        <TablePage items={items} options={options.clone()} item_type={*item_type} start={start} end={end} />
                     </Tile>
                 })}
             </Tile>
@@ -140,7 +132,7 @@ fn TablePage(props: &TableProps) -> Html {
 
             <tbody>
                 {for (props.start..=props.end).map(|index| {
-                    html!(<ItemRow item_type={item_type} index={index} items={props.items.clone()} options={props.options.clone()} />)
+                    html!(<ItemRow item_type={item_type} index={index} items={props.items} options={props.options.clone()} />)
                 })}
             </tbody>
         </Table>

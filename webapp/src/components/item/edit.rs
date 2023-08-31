@@ -14,7 +14,7 @@ use crate::{
         select::{Options, SearchSelect},
     },
     data::Data,
-    save::{EditAction, SaveContext},
+    save::SaveContext,
 };
 
 editor!(
@@ -34,7 +34,7 @@ editor!(
 pub struct ItemEditorProps {
     pub index: usize,
     pub item_type: ItemType,
-    pub items: Rc<[Item]>,
+    pub items: &'static [Item],
     pub options: Options<HtmlItem>,
 }
 
