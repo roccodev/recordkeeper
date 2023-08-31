@@ -40,10 +40,13 @@ menu_base_quests = Quests
 menu_base_ums = Unique Monsters
 menu_base_formations = Party Formations
 
+menu_dlc_powaugment = Inoswap
 menu_dlc_challenge = Challenge Battle
 menu_dlc_gauntlet = Archsage's Gauntlet
 menu_dlc_masha = Accessory Crafting
 
+menu_dlc4_growth = Affinity Growth
+menu_dlc4_collepedia = Collectopedia
 menu_dlc4_enemypedia = Enemypedia
 
 menu_meta_meta = Save Info

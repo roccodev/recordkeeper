@@ -1,12 +1,8 @@
-use ybc::{Button, Icon, NavbarDropdown, NavbarFixed, NavbarItem, Size};
+use ybc::{Icon, NavbarDropdown, NavbarFixed, NavbarItem, Size};
 use yew::prelude::*;
-use yew_feather::{Download, Github, Info, Key};
+use yew_feather::{Github, Info, Key};
 
-use crate::{
-    lang::Text,
-    save::{EditAction, SaveContext},
-    BRAND_DISPLAY,
-};
+use crate::{lang::Text, BRAND_DISPLAY};
 
 #[function_component]
 pub fn Navbar() -> Html {
@@ -14,33 +10,10 @@ pub fn Navbar() -> Html {
         <ybc::Navbar fixed={NavbarFixed::Top} classes={classes!("has-shadow")}
             navend={html! {
                 <>
-                    <DownloadButton />
                     <Brand />
                 </>
             }}
         />
-    }
-}
-
-#[function_component]
-fn DownloadButton() -> Html {
-    let save = use_context::<SaveContext>().unwrap();
-
-    let save_context = save.clone();
-    let on_click = Callback::from(move |_: MouseEvent| {
-        save_context.submit_action(EditAction::Save);
-        save_context.submit_action(EditAction::Download);
-    });
-
-    html! {
-        <NavbarItem>
-            <Button classes={classes!("is-success")} disabled={!save.get().is_loaded()} onclick={on_click}>
-                <span class="icon-text">
-                    <Icon><Download /></Icon>
-                    <span><Text path="download" /></span>
-                </span>
-            </Button>
-        </NavbarItem>
     }
 }
 

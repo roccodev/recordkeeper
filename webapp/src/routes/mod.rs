@@ -25,12 +25,16 @@ pub enum Route {
     Uniques,
     #[at("/formations")]
     Formations,
+    #[at("/powaugment")]
+    PowAugment,
     #[at("/chbtl")]
     ChallengeBattle,
     #[at("/gauntlet")]
     Gauntlet,
     #[at("/masha")]
     Masha,
+    #[at("/dlc4colle")]
+    Dlc4Collepedia,
     #[at("/dlc4enemy")]
     Dlc4Enemypedia,
     #[at("/flags")]
@@ -48,9 +52,11 @@ pub fn render(route: Route) -> Html {
         Route::Quests => html!(),
         Route::Uniques => html!(),
         Route::Formations => html!(),
+        Route::PowAugment => html!(),
         Route::ChallengeBattle => html!(),
         Route::Gauntlet => html!(),
         Route::Masha => html!(),
+        Route::Dlc4Collepedia => html!(),
         Route::Dlc4Enemypedia => html!(),
         Route::Flags => html!(<flags::FlagList />),
     }

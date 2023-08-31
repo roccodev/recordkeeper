@@ -1,8 +1,8 @@
 use ybc::{Button, Icon, Menu, MenuList, Size};
 use yew::prelude::*;
 use yew_feather::{
-    BookOpen, CornerUpLeft, CornerUpRight, Crosshair, FilePlus, Flag, HelpCircle, Info, LifeBuoy,
-    Map, Save, Scissors, ShoppingBag, Target, Triangle, Users, Watch,
+    BookOpen, Crosshair, Download, FilePlus, Flag, HelpCircle, Info, LifeBuoy, Map, ShoppingBag,
+    Target, TrendingUp, Triangle, Users, Watch,
 };
 use yew_router::prelude::{use_route, Link};
 
@@ -10,7 +10,7 @@ use crate::{
     components::upload::UploadButton,
     lang::Text,
     routes::Route,
-    save::{SaveContext, SaveManager},
+    save::{EditAction, SaveContext},
 };
 
 struct Category(&'static str);
@@ -46,9 +46,17 @@ pub fn Sidebar() -> Html {
         ]),
         MenuItem::Category(Category("dlc")),
         MenuItem::Tabs(vec![
+            Tab(
+                if is_dlc4 {
+                    "dlc4_growth"
+                } else {
+                    "dlc_powaugment"
+                },
+                html!(<TrendingUp />),
+                Route::PowAugment,
+            ),
             Tab("dlc_challenge", html!(<Watch />), Route::ChallengeBattle),
             Tab("dlc_gauntlet", html!(<LifeBuoy />), Route::Gauntlet),
-            Tab("dlc_masha", html!(<Scissors />), Route::Masha),
         ]),
         if is_dlc4 {
             MenuItem::Category(Category("dlc4"))
@@ -56,11 +64,18 @@ pub fn Sidebar() -> Html {
             MenuItem::None
         },
         if is_dlc4 {
-            MenuItem::Tabs(vec![Tab(
-                "dlc4_enemypedia",
-                html!(<BookOpen />),
-                Route::Dlc4Enemypedia,
-            )])
+            MenuItem::Tabs(vec![
+                Tab(
+                    "dlc4_collepedia",
+                    html!(<BookOpen />),
+                    Route::Dlc4Collepedia,
+                ),
+                Tab(
+                    "dlc4_enemypedia",
+                    html!(<BookOpen />),
+                    Route::Dlc4Enemypedia,
+                ),
+            ])
         } else {
             MenuItem::None
         },
@@ -72,7 +87,11 @@ pub fn Sidebar() -> Html {
       <aside class="aside is-placed-left is-expanded">
             <div class="aside-tools">
                 <div class="aside-tools-label buttons">
-                    {edit_operations(&save).collect::<Html>()}
+                    <UploadButton>
+                        <Icon><FilePlus /></Icon>
+                        <span><Text path="open" /></span>
+                    </UploadButton>
+                    <DownloadButton />
                 </div>
             </div>
             {if save.is_loaded() {
@@ -84,32 +103,24 @@ pub fn Sidebar() -> Html {
     }
 }
 
-fn edit_operations(save: &SaveManager) -> impl Iterator<Item = Html> {
-    let ops = [
-        (
-            Some(html!(<Text path="save" />)),
-            html!(<Save />),
-            "is-info",
-            save.is_loaded(),
-        ),
-        (None, html!(<CornerUpLeft />), "is-light", false), // Undo
-        (None, html!(<CornerUpRight />), "is-light", false), // Redo
-    ];
+#[function_component]
+fn DownloadButton() -> Html {
+    let save = use_context::<SaveContext>().unwrap();
 
-    std::iter::once(html! {
-        <UploadButton>
-            <Icon><FilePlus /></Icon>
-            <span><Text path="open" /></span>
-        </UploadButton>
-    })
-    .chain(ops.into_iter().map(|(name, icon, style, enabled)| {
-        html! {
-            <Button classes={classes!(style)} disabled={!enabled}>
-                <Icon>{icon}</Icon>
-                {if let Some(name) = name { html!(<span>{name}</span>) } else { html!() }}
-            </Button>
-        }
-    }))
+    let save_context = save.clone();
+    let on_click = Callback::from(move |_: MouseEvent| {
+        save_context.submit_action(EditAction::Save);
+        save_context.submit_action(EditAction::Download);
+    });
+
+    html! {
+        <Button classes={classes!("is-info")} disabled={!save.get().is_loaded()} onclick={on_click}>
+            <span class="icon-text">
+                <Icon><Download /></Icon>
+                <span><Text path="download" /></span>
+            </span>
+        </Button>
+    }
 }
 
 impl Tab {
