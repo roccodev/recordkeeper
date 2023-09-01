@@ -40,6 +40,13 @@ impl EnhanceRegistry {
             .ok()
     }
 
+    pub fn get_effect(&self, id: u32) -> Option<&EnhanceEffect> {
+        self.effects
+            .binary_search_by_key(&id, |i| i.id)
+            .map(|i| &self.effects[i])
+            .ok()
+    }
+
     pub fn register_instance(&mut self, instance: Enhance) {
         let index = self
             .instances
@@ -52,7 +59,7 @@ impl EnhanceRegistry {
         let index = self
             .effects
             .binary_search_by_key(&effect.id, |e| e.id)
-            .expect_err("duplicate enhance instance");
+            .expect_err("duplicate enhance effect");
         self.effects.insert(index, effect);
     }
 }
@@ -66,8 +73,33 @@ impl EnhanceLang {
 impl Enhance {
     pub fn format<'l>(&self, game: &GameData, lang: &'l LanguageData) -> Option<Cow<'l, str>> {
         let caption = self.get_name_str(lang)?;
-        if caption.contains('[') {
-            // TODO: format
+        let reformat = caption.chars().any(|c| c == '[' || c == '\n');
+
+        if !reformat {
+            return Some(caption.into());
+        }
+
+        let mut caption = caption.replace('\n', " ");
+        let pat = "[ML:EnhanceParam paramtype=";
+        while let Some(pos) = caption.find(pat) {
+            let extra_pos = pos + pat.len();
+            let param_type = caption.as_bytes()[extra_pos];
+            caption.replace_range(extra_pos..extra_pos + 3, "");
+
+            let value = match param_type {
+                b'1' => format!("{:0}", self.param_1),
+                b'2' => format!("{:0}", self.param_2),
+                b'3' => format!(
+                    "{}",
+                    game.enhance
+                        .get_effect(self.effect_id)
+                        .expect("no effect")
+                        .param
+                ),
+                p => panic!("unknown param type {p}"),
+            };
+
+            caption.replace_range(pos..extra_pos, &value);
         }
         Some(caption.into())
     }
