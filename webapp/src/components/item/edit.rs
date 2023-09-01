@@ -77,13 +77,17 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
     let masha_callback = Callback::from(move |_: MouseEvent| {
         masha_state.set(true);
     });
+    let masha_state = masha_modal.clone();
+    let masha_close_callback = Callback::from(move |_| {
+        masha_state.set(false);
+    });
 
     // Buttons:
     // - Clear slot
 
     html! {
         <>
-            <MashaModal item_slot={(*masha_modal).then_some(props.index)} />
+            <MashaModal item_slot={(*masha_modal).then_some(props.index)} close_callback={masha_close_callback} />
             <tr>
                 <th>{props.index.to_string()}</th>
                 <td>

@@ -50,9 +50,11 @@ enum SlotFlags {
     /// The slot has an item inside
     Active = 1,
     /// The player has marked the item as favorite
-    Favorite = 1 << 2,
+    Favorite = 1 << 1,
     /// The small circle icon for "unchecked" items
-    New = 1 << 3,
+    New = 1 << 2,
+    /// Whether the item has crafted accessory data associated to it
+    HasCraftData = 1 << 3,
 }
 
 #[derive(SaveBin, Debug)]

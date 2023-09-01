@@ -68,6 +68,7 @@ impl<'a> ItemEditor<'a> {
         if self.slot.is_crafted_accessory() {
             // Delete accessory crafting slot
             self.crafting.remove_data(self.slot_id);
+            self.slot.flags &= !(SlotFlags::HasCraftData as u8);
         }
 
         let slot = &mut self.slot;
@@ -90,8 +91,9 @@ impl<'a> ItemEditor<'a> {
         slot.item_type = self.item_type as u32;
         slot.flags |= SlotFlags::Active as u8;
 
-        if self.slot.is_crafted_accessory() && self.crafting.get_data(self.slot_id).is_none() {
+        if slot.is_crafted_accessory() && self.crafting.get_data(self.slot_id).is_none() {
             // Init accessory crafting slot, if not initialized
+            slot.flags |= SlotFlags::HasCraftData as u8;
             self.crafting
                 .set_data(self.slot_id, CraftItemData::default())?;
         }

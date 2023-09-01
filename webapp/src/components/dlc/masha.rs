@@ -22,6 +22,8 @@ use crate::{
 #[derive(Properties, PartialEq)]
 pub struct MashaModalProps {
     pub item_slot: Option<usize>,
+    #[prop_or_default]
+    pub close_callback: Callback<()>,
 }
 
 #[derive(Properties, PartialEq)]
@@ -180,11 +182,17 @@ pub fn MashaModal(props: &MashaModalProps) -> Html {
         })
     });
 
+    let close_fn = props.close_callback.clone();
+    let close_callback = Callback::from(move |_: MouseEvent| {
+        close_fn.emit(());
+    });
+
     html! {
         <Modal id="card" classes={classes!("is-active")}>
             <div class="modal-card">
                 <header class="modal-card-head">
                     <p class="modal-card-title"><Text path="menu_dlc_masha" /></p>
+                    <button class="delete" aria-label="close" onclick={close_callback}></button>
                 </header>
                 <section class="modal-card-body">
                     <Field>
