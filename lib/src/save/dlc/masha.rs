@@ -1,4 +1,5 @@
 use recordkeeper_macros::SaveBin;
+use strum::{EnumIter, FromRepr};
 
 use crate::{error::SaveError, item::ITEM_ACCESSORY_MAX, SaveResult};
 
@@ -34,6 +35,8 @@ pub struct StatBoost {
     pub amount: u16,
 }
 
+#[derive(FromRepr, EnumIter, Clone, Copy, PartialEq)]
+#[repr(u16)]
 pub enum Statistic {
     HP = 1,
     Strength = 2,

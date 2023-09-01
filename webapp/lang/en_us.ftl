@@ -147,3 +147,11 @@ masha_level = Craft Level
 masha_enhance = Effect
 masha_boost_stat = Statistic
 masha_boost_value = Value
+
+masha_stat_hp = HP
+masha_stat_str = Strength
+masha_stat_heal = Healing Power
+masha_stat_dex = Dexterity
+masha_stat_agi = Agility
+masha_stat_crit = Crit Rate
+masha_stat_block = Block Rate

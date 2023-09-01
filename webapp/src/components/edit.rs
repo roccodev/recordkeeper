@@ -1,11 +1,13 @@
 use std::{fmt::Display, str::FromStr};
 
 use recordkeeper::SaveData;
+use strum::IntoEnumIterator;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
+use ybc::Select;
 use yew::prelude::*;
 
-use crate::save::{EditAction, SaveContext};
+use crate::{save::SaveContext, ToHtml};
 
 /// Helper structs that query and edit a field or a portion
 /// of the save file.
@@ -75,6 +77,8 @@ macro_rules! editor {
 
 pub(crate) use editor;
 
+use super::select::HtmlName;
+
 #[derive(Properties, PartialEq, Clone, Copy)]
 pub struct NumberEditorProps<E: Editor + PartialEq>
 where
@@ -85,6 +89,14 @@ where
     pub min: Option<<E as Editor>::Target>,
     #[prop_or_default]
     pub max: Option<<E as Editor>::Target>,
+}
+
+#[derive(Properties, PartialEq, Clone, Copy)]
+pub struct EnumEditorProps<E: Editor + PartialEq>
+where
+    <E as Editor>::Target: PartialEq,
+{
+    pub editor: E,
 }
 
 /// General-purpose number input that automatically saves changes to
@@ -131,6 +143,37 @@ where
             value={current_value.to_string()}
             oninput={change_listener.reform(|e: InputEvent| e.dyn_into().unwrap())}
         />
+    }
+}
+
+/// Select dropdown for enum-like types
+#[function_component]
+pub fn EnumInput<E: Editor + PartialEq>(props: &EnumEditorProps<E>) -> Html
+where
+    <E as Editor>::Target: PartialEq + IntoEnumIterator + ToHtml,
+{
+    let save_context = use_context::<SaveContext>().unwrap();
+    let current_value = {
+        let save = save_context.get();
+        props.editor.get(save.get().save())
+    };
+    let current_index = <E as Editor>::Target::iter()
+        .position(|e| e == current_value)
+        .unwrap();
+
+    let editor = props.editor;
+    let callback = Callback::from(move |val: String| {
+        let value = val.parse::<usize>().unwrap();
+        let value = <E as Editor>::Target::iter().nth(value).unwrap();
+        save_context.edit(move |save| editor.set(save, value));
+    });
+
+    html! {
+        <Select name="" value={current_index.to_string()} update={callback}>
+            {for <E as Editor>::Target::iter().enumerate().map(|(i, v)| {
+                html!(<option value={i.to_string()} selected={v == current_value}>{v.to_html()}</option>)
+            })}
+        </Select>
     }
 }
 

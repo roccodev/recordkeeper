@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use game_data::{dlc::masha::CraftTypeText, enhance::Enhance, GameData, LanguageData};
 use recordkeeper::{
-    dlc::MASHA_STAT_BOOSTS_MAX,
+    dlc::{Statistic, MASHA_STAT_BOOSTS_MAX},
     item::{edit::ItemEditor, ItemType},
 };
 use ybc::{Field, Modal, Table};
@@ -10,12 +10,13 @@ use yew::prelude::*;
 
 use crate::{
     components::{
-        edit::{editor, Editor, NumberInput},
+        edit::{editor, Editor, EnumInput, NumberInput},
         select::{HtmlName, Options, SearchSelect},
     },
     data::Data,
     lang::{LangManager, Text},
     save::SaveContext,
+    ToHtml,
 };
 
 #[derive(Properties, PartialEq)]
@@ -55,6 +56,27 @@ editor!(
     },
     assert |editor, value| { Ok(()) },
     capture item_slot: usize
+);
+
+editor!(
+    pub BoostStatEditor,
+    Statistic,
+    get |editor, save| {
+        Statistic::from_repr(save.inventory.slots(ItemType::Accessory)[editor.item_slot]
+            .craft_data(save)
+            .unwrap()
+            .stat_boosts[editor.boost]
+            .stat).expect("unknown stat")
+    },
+    set |editor, save, new_value| {
+        ItemEditor::new(save, ItemType::Accessory, editor.item_slot)
+            .craft_data_mut()
+            .unwrap()
+            .stat_boosts[editor.boost]
+            .stat = new_value as u16
+    },
+    assert |editor, value| { Ok(()) },
+    capture item_slot: usize, boost: usize
 );
 
 editor!(
@@ -221,10 +243,15 @@ fn StatBoost(props: &StatBoostProps) -> Html {
         boost: props.index,
     };
 
+    let stat_editor = BoostStatEditor {
+        item_slot: props.item_slot,
+        boost: props.index,
+    };
+
     html! {
         <tr>
             <td>
-
+                <EnumInput<BoostStatEditor> editor={stat_editor} />
             </td>
             <td>
                 <NumberInput<BoostValueEditor> editor={value_editor} />
@@ -274,5 +301,20 @@ impl HtmlName for DisplayEnhance {
         _: &'b LangManager,
     ) -> Option<Cow<'a, str>> {
         self.enhance.format(self.game, lang)
+    }
+}
+
+impl ToHtml for Statistic {
+    fn to_html(&self) -> Html {
+        let id = match self {
+            Statistic::HP => "hp",
+            Statistic::Strength => "str",
+            Statistic::Heal => "heal",
+            Statistic::Dexterity => "dex",
+            Statistic::Agility => "agi",
+            Statistic::CritRate => "crit",
+            Statistic::BlockRate => "block",
+        };
+        html!(<Text path={format!("masha_stat_{id}")} />)
     }
 }
