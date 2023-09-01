@@ -75,17 +75,24 @@ macro_rules! editor {
 
 pub(crate) use editor;
 
-#[derive(Properties, PartialEq)]
-pub struct EditorProps<E: PartialEq> {
+#[derive(Properties, PartialEq, Clone, Copy)]
+pub struct NumberEditorProps<E: Editor + PartialEq>
+where
+    <E as Editor>::Target: PartialEq + Copy,
+{
     pub editor: E,
+    #[prop_or_default]
+    pub min: Option<<E as Editor>::Target>,
+    #[prop_or_default]
+    pub max: Option<<E as Editor>::Target>,
 }
 
 /// General-purpose number input that automatically saves changes to
 /// the save file.
 #[function_component]
-pub fn NumberInput<E: Editor + PartialEq>(props: &EditorProps<E>) -> Html
+pub fn NumberInput<E: Editor + PartialEq>(props: &NumberEditorProps<E>) -> Html
 where
-    <E as Editor>::Target: Display + FromStr,
+    <E as Editor>::Target: PartialEq + PartialOrd + Display + FromStr + Copy,
 {
     let save_context = use_context::<SaveContext>().unwrap();
     let current_value = {
@@ -95,6 +102,7 @@ where
     let value_display = current_value.to_string();
     let editor = props.editor;
 
+    let props = *props;
     let change_listener = Callback::from(move |e: Event| {
         let target: Option<EventTarget> = e.target();
         let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
@@ -102,11 +110,13 @@ where
             match <E as Editor>::Target::from_str(&input.value())
                 .map_err(|_| ())
                 .and_then(|v| editor.validate(&v).map_err(|_| ()).map(|_| v))
+                .ok()
+                .and_then(|v| props.check_range(v).then_some(v))
             {
-                Ok(v) => {
+                Some(v) => {
                     save_context.edit(move |save| editor.set(save, v));
                 }
-                Err(_) => {
+                None => {
                     // Invalid number, out of range, etc.
                     e.prevent_default();
                     input.set_value(&value_display);
@@ -121,5 +131,20 @@ where
             value={current_value.to_string()}
             oninput={change_listener.reform(|e: InputEvent| e.dyn_into().unwrap())}
         />
+    }
+}
+
+impl<E: Editor + PartialEq> NumberEditorProps<E>
+where
+    <E as Editor>::Target: PartialEq + PartialOrd + Copy,
+{
+    fn check_range(&self, val: <E as Editor>::Target) -> bool {
+        if matches!(&self.min, Some(min) if &val < min) {
+            return false;
+        }
+        if matches!(&self.max, Some(max) if &val > max) {
+            return false;
+        }
+        true
     }
 }

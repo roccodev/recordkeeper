@@ -176,7 +176,7 @@ pub fn MashaModal(props: &MashaModalProps) -> Html {
                     </Field>
                     <Field>
                         <label class="label"><Text path="masha_level" /></label>
-                        <NumberInput<LevelEditor> editor={level_editor} />
+                        <NumberInput<LevelEditor> editor={level_editor} min={1} max={5} />
                     </Field>
                     <Field>
                         <label class="label"><Text path="masha_enhance" /></label>
