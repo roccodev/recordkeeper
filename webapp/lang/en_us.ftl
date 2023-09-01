@@ -139,3 +139,11 @@ item_unnamed = (No Name)
 item_rarity_common = Common
 item_rarity_rare = Rare
 item_rarity_legendary = Legendary
+
+# Accessory crafting
+
+masha_item_type = Accessory Name
+masha_level = Craft Level
+masha_enhance = Effect
+masha_boost_stat = Statistic
+masha_boost_value = Value

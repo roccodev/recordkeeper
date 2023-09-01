@@ -1,7 +1,10 @@
 use recordkeeper_macros::SaveBin;
 use thiserror::Error;
 
-use crate::dlc::CRAFTED_ITEM_ID;
+use crate::{
+    dlc::{CraftItemData, CRAFTED_ITEM_ID},
+    SaveData,
+};
 
 pub const ITEM_ACCESSORY_MAX: usize = 1500;
 
@@ -136,6 +139,11 @@ impl ItemSlot {
         self.is_valid()
             && self.item_type() == ItemType::Accessory
             && self.item_id() == CRAFTED_ITEM_ID
+    }
+
+    /// Returns the accessory crafting data for the item slot, if present.
+    pub fn craft_data<'s>(&self, save: &'s SaveData) -> Option<&'s CraftItemData> {
+        save.accessory_crafting.get_data(self.slot_index as usize)
     }
 }
 

@@ -1,7 +1,7 @@
 use bdat::{hash::murmur3_str, Label};
 use game_data::dlc::masha::{CraftEnhance, GameCraftItems, LangCraftItems};
 
-use crate::{const_hash, lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry};
+use crate::{const_hash, lang::filter_table_from_bdat, BdatRegistry, LangBdatRegistry};
 
 pub fn read_game(bdat: &BdatRegistry) -> GameCraftItems {
     let table = bdat.table(&Label::Hash(0x4548D8B2));
@@ -23,7 +23,7 @@ pub fn read_game(bdat: &BdatRegistry) -> GameCraftItems {
 }
 
 pub fn read_lang(bdat: &LangBdatRegistry) -> LangCraftItems {
-    let msg = text_table_from_bdat(bdat.table(&const_hash!("msg_extra_accessory")));
+    let msg = filter_table_from_bdat(bdat.table(&const_hash!("msg_extra_accessory")));
     let item_types = bdat.table(&Label::Hash(0xE0A85A79));
 
     LangCraftItems::new(

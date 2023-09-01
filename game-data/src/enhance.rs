@@ -17,7 +17,7 @@ pub struct EnhanceLang {
     captions: TextTable,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
 pub struct Enhance {
     pub instance_id: u32,
     pub effect_id: u32,

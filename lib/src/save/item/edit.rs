@@ -78,6 +78,11 @@ impl<'a> ItemEditor<'a> {
         slot.flags &= !(SlotFlags::Active as u8);
     }
 
+    /// Returns a mutable view of the accessory crafting data for the item slot, if present.
+    pub fn craft_data_mut(&mut self) -> Option<&mut CraftItemData> {
+        self.crafting.get_data_mut(self.slot_id)
+    }
+
     fn init(&mut self) -> SaveResult<()> {
         let slot = &mut self.slot;
         slot.slot_index = self.slot_id.try_into().unwrap();

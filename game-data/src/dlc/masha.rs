@@ -1,8 +1,10 @@
+use std::rc::Rc;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
     enhance::Enhance,
-    lang::{TextEntry, TextTable},
+    lang::{FilterEntry, FilterTable},
     GameData,
 };
 
@@ -13,20 +15,20 @@ pub struct GameCraftItems {
 
 #[derive(Serialize, Deserialize)]
 pub struct LangCraftItems {
-    type_names: Vec<CraftTypeText>,
+    pub type_names: Rc<[CraftTypeText]>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Copy)]
 pub struct CraftEnhance(pub [u32; 5]);
 
-#[derive(Serialize, Deserialize)]
-struct CraftTypeText {
-    id: u32,
-    text: Option<TextEntry>,
+#[derive(Serialize, Deserialize, Clone)]
+pub struct CraftTypeText {
+    pub id: u32,
+    pub text: Option<FilterEntry>,
 }
 
 impl LangCraftItems {
-    pub fn new(table: TextTable, id_to_lang: impl IntoIterator<Item = (u32, u32)>) -> Self {
+    pub fn new(table: FilterTable, id_to_lang: impl IntoIterator<Item = (u32, u32)>) -> Self {
         let type_names = id_to_lang
             .into_iter()
             .map(|(id, lang_id)| CraftTypeText {
@@ -35,6 +37,10 @@ impl LangCraftItems {
             })
             .collect();
         Self { type_names }
+    }
+
+    pub fn index_of(&self, id: u32) -> Option<usize> {
+        self.type_names.binary_search_by_key(&id, |t| t.id).ok()
     }
 }
 

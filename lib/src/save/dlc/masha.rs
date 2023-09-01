@@ -5,7 +5,7 @@ use crate::{error::SaveError, item::ITEM_ACCESSORY_MAX, SaveResult};
 /// Item ID to be used to mark accessories as crafted.
 pub const CRAFTED_ITEM_ID: u16 = 793;
 
-const MASHA_STAT_BOOSTS_MAX: usize = 4;
+pub const MASHA_STAT_BOOSTS_MAX: usize = 4;
 const MASHA_DATA_MAX: usize = 300;
 
 #[derive(SaveBin, Debug)]

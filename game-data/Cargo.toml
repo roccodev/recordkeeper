@@ -5,6 +5,6 @@ edition = "2021"
 
 [dependencies]
 bitcode = { version = "0.4.0", features = ["serde"] }
-serde = { version = "1", features = ["derive"] }
+serde = { version = "1", features = ["derive", "rc"] }
 enum-map = { version = "2.6", features = ["serde"] }
 recordkeeper = { path = "../lib" }

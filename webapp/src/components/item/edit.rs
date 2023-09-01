@@ -9,6 +9,7 @@ use yew_feather::{Tool, X};
 
 use crate::{
     components::{
+        dlc::masha::MashaModal,
         edit::{editor, NumberInput},
         item::HtmlItem,
         select::{Options, SearchSelect},
@@ -44,6 +45,7 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
     let lang = data.to_lang();
     let save_context = use_context::<SaveContext>().unwrap();
     let save = save_context.get();
+    let masha_modal = use_state(|| false);
 
     let ItemEditorProps {
         index,
@@ -71,58 +73,66 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
         save.edit(move |save| ItemEditor::new(save, item_type, index).clear());
     });
 
+    let masha_state = masha_modal.clone();
+    let masha_callback = Callback::from(move |_: MouseEvent| {
+        masha_state.set(true);
+    });
+
     // Buttons:
     // - Clear slot
 
     html! {
-        <tr>
-            <th>{props.index.to_string()}</th>
-            <td>
-                <Tile classes={classes!("is-align-items-end")}>
-                    <Tile classes={classes!("mr-1")}>
-                        {if slot.is_valid() {
-                            html!(<span class={classes!("recordkeeper-item-id")}>{slot.item_id().to_string()}{"."}</span>)
+        <>
+            <MashaModal item_slot={(*masha_modal).then_some(props.index)} />
+            <tr>
+                <th>{props.index.to_string()}</th>
+                <td>
+                    <Tile classes={classes!("is-align-items-end")}>
+                        <Tile classes={classes!("mr-1")}>
+                            {if slot.is_valid() {
+                                html!(<span class={classes!("recordkeeper-item-id")}>{slot.item_id().to_string()}{"."}</span>)
+                            } else {
+                                html!()
+                            }}
+                        </Tile>
+                        <Tile classes={classes!("is-10")}>
+                            <SearchSelect<HtmlItem>
+                                current={current}
+                                options={options.clone()}
+                                on_select={on_select}
+                                lang={lang.clone()}
+                            />
+                        </Tile>
+                    </Tile>
+                </td>
+                <td>
+                    <NumberInput<AmountEditor> editor={amount_editor} />
+                </td>
+                <td>
+                    <Field classes={classes!("has-addons")}>
+                        {if slot.is_crafted_accessory() {
+                            html! {
+                                <Control>
+                                    <Button onclick={masha_callback}>
+                                        <Icon>
+                                            <Tool />
+                                        </Icon>
+                                    </Button>
+                                </Control>
+                            }
                         } else {
                             html!()
                         }}
-                    </Tile>
-                    <Tile classes={classes!("is-10")}>
-                        <SearchSelect<HtmlItem>
-                            current={current}
-                            options={options.clone()}
-                            on_select={on_select}
-                            lang={lang.clone()}
-                        />
-                    </Tile>
-                </Tile>
-            </td>
-            <td>
-                <NumberInput<AmountEditor> editor={amount_editor} />
-            </td>
-            <td>
-                <Field classes={classes!("has-addons")}>
-                    {if slot.is_crafted_accessory() {
-                        html! {
-                            <Control>
-                                <Button>
-                                    <Icon>
-                                        <Tool />
-                                    </Icon>
-                                </Button>
-                            </Control>
-                        }
-                    } else {
-                        html!()
-                    }}
-                    <Control>
-                        <Button disabled={!slot.is_valid()} onclick={clear_callback}>
-                            <Icon>
-                                <X />
-                            </Icon>
-                        </Button>
-                    </Control>
-                </Field>
-            </td>
-        </tr>
+                        <Control>
+                            <Button disabled={!slot.is_valid()} onclick={clear_callback}>
+                                <Icon>
+                                    <X />
+                                </Icon>
+                            </Button>
+                        </Control>
+                    </Field>
+                </td>
+            </tr>
+        </>
     }
 }
