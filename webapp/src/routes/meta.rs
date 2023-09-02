@@ -1,18 +1,16 @@
 use recordkeeper::flags::FlagType;
-use ybc::{Checkbox, Container, Control, Field, Select, Tile, Title};
+use ybc::{Container, Control, Field, Select, Tile, Title};
 use yew::prelude::*;
 
 use crate::{
     components::edit::{FlagEditor, NumberInput},
+    components::meta::misc::Settings,
     lang::Text,
     save::SaveContext,
 };
 
 #[function_component]
 pub fn SaveMeta() -> Html {
-    let save = use_context::<SaveContext>().unwrap();
-    let save = save.get();
-
     html! {
         <Container>
             <Tile>
@@ -136,41 +134,6 @@ fn ScenarioFlag() -> Html {
                     <Select name="scenario-ev" value="ev001" update={Callback::from(move |_| ())}>
                         <option value="ev001">{"ev001"}</option>
                     </Select>
-                </Control>
-            </Field>
-        </Tile>
-    }
-}
-
-#[function_component]
-fn Settings() -> Html {
-    let save = use_context::<SaveContext>().unwrap();
-    let save = save.get();
-    let save = save.get().save();
-
-    let ngp_flag = save.flags.get(FlagType::Bit, 23894).unwrap() != 0;
-    let difficulty = save.flags.get(FlagType::TwoBits, 4554).unwrap() as usize;
-
-    html! {
-        <Tile classes={classes!("is-child", "notification")}>
-            <Title><Text path="meta_settings" /></Title>
-
-            <Field>
-                <label class="label"><Text path="difficulty" /></label>
-                <Control>
-                    <Select name="difficulty" value={difficulty.to_string()} update={Callback::from(move |_| ())}>
-                        {for ["normal", "easy", "hard", "veryhard"].into_iter().enumerate().map(|(i, key)| html! {
-                            <option value={i.to_string()} selected={i == difficulty}><Text path={format!("difficulty_{key}")}/></option>
-                        })}
-                    </Select>
-                </Control>
-            </Field>
-
-            <Field>
-                <Control>
-                    <Checkbox name="ngp" checked={ngp_flag} update={Callback::from(move |_| ())}>
-                        {" "}<Text path="meta_ngp" />
-                    </Checkbox>
                 </Control>
             </Field>
         </Tile>

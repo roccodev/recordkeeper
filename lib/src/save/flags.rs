@@ -126,9 +126,10 @@ impl<const BITS: usize, const WORDS: usize> BitFlags<BITS, WORDS> {
             BITS
         );
         let shift = (index * BITS) & Self::MAX_SHIFT;
+        let reset = !(Self::MASK << shift);
         self.words
             .get_mut(index / Self::SLOT_LEN)
-            .map(|slot| *slot |= (value & Self::MASK) << shift)
+            .map(|slot| *slot = (*slot & reset) | (value & Self::MASK) << shift)
             .expect("index out of bounds")
     }
 }
@@ -183,6 +184,22 @@ mod tests {
 
         for i in 0..8 {
             assert_eq!(i as u32, flags_4b.get(i).unwrap());
+        }
+
+        for i in 0..32 {
+            flags_1b.set(i, 0);
+        }
+
+        for i in 0..32 {
+            assert_eq!(0, flags_1b.get(i).unwrap());
+        }
+
+        for i in 0..8 {
+            flags_4b.set(i, 0);
+        }
+
+        for i in 0..8 {
+            assert_eq!(0, flags_4b.get(i).unwrap());
         }
     }
 }

@@ -7,3 +7,4 @@ pub mod upload;
 
 pub mod dlc;
 pub mod item;
+pub mod meta;

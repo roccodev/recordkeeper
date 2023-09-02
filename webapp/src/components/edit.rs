@@ -4,7 +4,7 @@ use recordkeeper::SaveData;
 use strum::IntoEnumIterator;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
-use ybc::Select;
+use ybc::{Checkbox, Select};
 use yew::prelude::*;
 
 use crate::{save::SaveContext, ToHtml};
@@ -77,7 +77,15 @@ macro_rules! editor {
 
 pub(crate) use editor;
 
-use super::select::HtmlName;
+#[derive(Clone, Copy, PartialEq)]
+pub struct ToBool<E: Editor>(pub E)
+where
+    E::Target: FlagConvert;
+
+pub trait FlagConvert {
+    fn to_bool(self) -> bool;
+    fn from_bool(b: bool) -> Self;
+}
 
 #[derive(Properties, PartialEq, Clone, Copy)]
 pub struct NumberEditorProps<E: Editor + PartialEq>
@@ -97,6 +105,15 @@ where
     <E as Editor>::Target: PartialEq,
 {
     pub editor: E,
+}
+
+#[derive(Properties, PartialEq, Clone)]
+pub struct CheckboxInputProps<E: Editor + PartialEq>
+where
+    <E as Editor>::Target: PartialEq,
+{
+    pub editor: E,
+    pub children: Children,
 }
 
 /// General-purpose number input that automatically saves changes to
@@ -177,6 +194,25 @@ where
     }
 }
 
+/// Checkbox field for boolean editors
+#[function_component]
+pub fn CheckboxInput<E: Editor<Target = bool> + PartialEq>(props: &CheckboxInputProps<E>) -> Html {
+    let save_context = use_context::<SaveContext>().unwrap();
+    let checked = {
+        let save = save_context.get();
+        props.editor.get(save.get().save())
+    };
+
+    let editor = props.editor;
+    let update = Callback::from(move |_| save_context.edit(move |save| editor.set(save, !checked)));
+
+    html! {
+        <Checkbox name="ngp" checked={checked} update={update}>
+            {for props.children.clone()}
+        </Checkbox>
+    }
+}
+
 impl<E: Editor + PartialEq> NumberEditorProps<E>
 where
     <E as Editor>::Target: PartialEq + PartialOrd + Copy,
@@ -189,5 +225,30 @@ where
             return false;
         }
         true
+    }
+}
+
+impl<E: Editor> Editor for ToBool<E>
+where
+    E::Target: FlagConvert,
+{
+    type Target = bool;
+
+    fn get(&self, save: &SaveData) -> Self::Target {
+        self.0.get(save).to_bool()
+    }
+
+    fn set(&self, save: &mut SaveData, new: Self::Target) {
+        self.0.set(save, E::Target::from_bool(new))
+    }
+}
+
+impl FlagConvert for u32 {
+    fn from_bool(b: bool) -> Self {
+        u8::from(b).into()
+    }
+
+    fn to_bool(self) -> bool {
+        self != 0
     }
 }
