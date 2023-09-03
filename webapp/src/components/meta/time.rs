@@ -1,5 +1,5 @@
 use crate::{lang::Text, save::SaveContext};
-use recordkeeper::PlayTime as SavePlayTime;
+use recordkeeper::{PlayTime as SavePlayTime, SaveTimestamp};
 use std::str::FromStr;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
@@ -68,11 +68,16 @@ pub fn PlayTime() -> Html {
 
 #[function_component]
 pub fn Timestamps() -> Html {
-    let save = use_context::<SaveContext>().unwrap();
-    let save = save.get();
+    let save_context = use_context::<SaveContext>().unwrap();
+    let save = save_context.get();
     let save = save.get().save();
-    let date = save.timestamp.to_iso_date();
-    let time = save.timestamp.to_iso_time();
+
+    let timestamp = save.timestamp;
+
+    let update_timestamp = {
+        let save_context = save_context.clone();
+        Callback::from(move |timestamp| save_context.edit(move |save| save.timestamp = timestamp))
+    };
 
     html! {
         <Tile classes={classes!("is-child", "notification")}>
@@ -81,14 +86,19 @@ pub fn Timestamps() -> Html {
             <Field>
                 <label class="label"><Text path="date" /></label>
                 <Control>
-                    <input class="input" type="date" value={date} />
+                    <input class="input" type="date" value={timestamp.to_iso_date()} oninput={
+                        let update_timestamp = update_timestamp.clone();
+                        Callback::from(move |e: InputEvent| update_timestamp.emit(date_from_event(e, timestamp)))
+                    } />
                 </Control>
             </Field>
 
             <Field>
                 <label class="label"><Text path="time" /></label>
                 <Control>
-                    <input class="input" type="time" value={time} />
+                    <input class="input" type="time" value={timestamp.to_iso_time()} oninput={Callback::from(move |e: InputEvent| {
+                        update_timestamp.emit(time_from_event(e, timestamp))
+                    })} />
                 </Control>
             </Field>
         </Tile>
@@ -106,4 +116,31 @@ fn number_from_event(event: InputEvent, prev_value: u32) -> u32 {
             prev_value
         }
     }
+}
+
+fn date_from_event(event: InputEvent, prev_time: SaveTimestamp) -> SaveTimestamp {
+    let target: Option<EventTarget> = event.target();
+    let Some(input) = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok()) else { return prev_time };
+    let value = input.value();
+    let mut split = value.split('-');
+    let Ok(year) = split.next().unwrap().parse() else { return prev_time };
+    let Ok(month) = split.next().unwrap().parse() else { return prev_time };
+    let Ok(day) = split.next().unwrap().parse() else { return prev_time };
+    SaveTimestamp::from_date_time(year, month, day, prev_time.hour(), prev_time.minute())
+}
+
+fn time_from_event(event: InputEvent, prev_time: SaveTimestamp) -> SaveTimestamp {
+    let target: Option<EventTarget> = event.target();
+    let Some(input) = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok()) else { return prev_time };
+    let value = input.value();
+    let mut split = value.split(':');
+    let Ok(hour) = split.next().unwrap().parse() else { return prev_time };
+    let Ok(minute) = split.next().unwrap().parse() else { return prev_time };
+    SaveTimestamp::from_date_time(
+        prev_time.year(),
+        prev_time.month(),
+        prev_time.day(),
+        hour,
+        minute,
+    )
 }

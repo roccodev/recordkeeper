@@ -101,7 +101,7 @@ pub struct PlayTime {
     raw: u32,
 }
 
-#[derive(SaveBin, Debug)]
+#[derive(SaveBin, Debug, Clone, Copy, PartialEq)]
 pub struct SaveTimestamp {
     time: u32,
     date: u32,
@@ -144,6 +144,12 @@ impl PlayTime {
 }
 
 impl SaveTimestamp {
+    pub fn from_date_time(year: u32, month: u8, day: u8, hour: u8, minute: u8) -> Self {
+        let date = (year << 0x12) | (((month as u32) & 0xf) << 0xe) | (day as u32 & 0x1f);
+        let time = ((hour as u32) << 0x1a) | ((minute as u32 & 0x3f) << 0x14);
+        Self { date, time }
+    }
+
     pub fn year(&self) -> u32 {
         self.date >> 0x12
     }
@@ -170,5 +176,20 @@ impl SaveTimestamp {
 
     pub fn to_iso_time(&self) -> String {
         format!("{:02}:{:02}", self.hour(), self.minute())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::SaveTimestamp;
+
+    #[test]
+    fn test_timestamp() {
+        let ts = SaveTimestamp::from_date_time(2023, 1, 2, 12, 28);
+        assert_eq!(2023, ts.year());
+        assert_eq!(1, ts.month());
+        assert_eq!(2, ts.day());
+        assert_eq!(12, ts.hour());
+        assert_eq!(28, ts.minute());
     }
 }
