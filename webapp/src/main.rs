@@ -11,6 +11,9 @@ pub mod save;
 pub const BRAND_NAME: &str = "Recordkeeper";
 pub const BRAND_DISPLAY: &str = concat!("Recordkeeper", " v. ", env!("CARGO_PKG_VERSION"));
 
+pub const GITHUB_URL: &str = "https://github.com/RoccoDev/recordkeeper";
+pub const LICENSE_URL: &str = "https://github.com/RoccoDev/recordkeeper/blob/master/COPYING";
+
 pub trait ToHtml {
     fn to_html(&self) -> Html;
 }
