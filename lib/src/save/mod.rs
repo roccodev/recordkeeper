@@ -129,6 +129,10 @@ impl SaveData {
 }
 
 impl PlayTime {
+    pub fn from_seconds(seconds: u32) -> Self {
+        Self { raw: seconds }
+    }
+
     pub fn to_seconds(self) -> u32 {
         self.raw
     }
