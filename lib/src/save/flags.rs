@@ -49,6 +49,18 @@ where
 }
 
 impl FlagType {
+    pub fn from_bits(bits: usize) -> Self {
+        match bits {
+            1 => Self::Bit,
+            2 => Self::TwoBits,
+            4 => Self::FourBits,
+            8 => Self::Byte,
+            16 => Self::Short,
+            32 => Self::Int,
+            n => panic!("unknown bit count for flag {n}"),
+        }
+    }
+
     pub const fn is_valid(&self, value: u32) -> bool {
         match self {
             Self::Bit => value < 2,

@@ -3,6 +3,7 @@ use std::io::{Read, Write};
 use dlc::{DlcData, DlcLang};
 use enhance::{EnhanceLang, EnhanceRegistry};
 use item::{ItemLanguageRegistry, ItemRegistry};
+use manual::ManualData;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
@@ -10,6 +11,7 @@ pub mod dlc;
 pub mod enhance;
 pub mod item;
 pub mod lang;
+pub mod manual;
 pub mod quest;
 
 #[derive(Serialize, Deserialize)]
@@ -17,6 +19,10 @@ pub struct GameData {
     pub items: ItemRegistry,
     pub enhance: EnhanceRegistry,
     pub dlc: DlcData,
+
+    /// Manually inputted data, that can't be read
+    /// from game files.
+    pub manual: ManualData,
 }
 
 #[derive(Serialize, Deserialize)]

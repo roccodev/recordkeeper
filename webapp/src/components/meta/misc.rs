@@ -1,23 +1,32 @@
 use recordkeeper::flags::FlagType;
-use ybc::{Control, Field, Select, Tile, Title};
+use strum::{EnumIter, FromRepr};
+use ybc::{Control, Field, Tile, Title};
 use yew::prelude::*;
 
-use crate::components::edit::{CheckboxInput, FlagEditor, ToBool};
+use crate::components::edit::{CheckboxInput, Editor, EnumInput, FlagEditor, ToBool};
+use crate::data::Data;
 use crate::lang::Text;
-use crate::save::SaveContext;
+use crate::ToHtml;
+
+#[derive(EnumIter, FromRepr, Clone, Copy, PartialEq)]
+#[repr(u32)]
+enum Difficulty {
+    Easy = 1,
+    Normal = 0,
+    Hard = 2,
+    VeryHard = 3,
+}
+
+#[derive(Clone, Copy, PartialEq)]
+struct DifficultyEditor(FlagEditor);
 
 #[function_component]
 pub fn Settings() -> Html {
-    let save = use_context::<SaveContext>().unwrap();
-    let save = save.get();
-    let save = save.get().save();
+    let data = use_context::<Data>().unwrap();
+    let flags = &data.game().manual.flags;
 
-    // TODO: load from json
-    let ngp_editor = ToBool(FlagEditor {
-        flag_type: FlagType::Bit,
-        flag_index: 23894,
-    });
-    let difficulty = save.flags.get(FlagType::TwoBits, 4554).unwrap() as usize;
+    let ngp_editor = ToBool(flags.new_game_plus.into());
+    let difficulty_editor = DifficultyEditor(flags.difficulty.into());
 
     html! {
         <Tile classes={classes!("is-child", "notification")}>
@@ -26,11 +35,7 @@ pub fn Settings() -> Html {
             <Field>
                 <label class="label"><Text path="difficulty" /></label>
                 <Control>
-                    <Select name="difficulty" value={difficulty.to_string()} update={Callback::from(move |_| ())}>
-                        {for ["normal", "easy", "hard", "veryhard"].into_iter().enumerate().map(|(i, key)| html! {
-                            <option value={i.to_string()} selected={i == difficulty}><Text path={format!("difficulty_{key}")}/></option>
-                        })}
-                    </Select>
+                    <EnumInput<DifficultyEditor> editor={difficulty_editor} />
                 </Control>
             </Field>
 
@@ -42,5 +47,29 @@ pub fn Settings() -> Html {
                 </Control>
             </Field>
         </Tile>
+    }
+}
+
+impl Editor for DifficultyEditor {
+    type Target = Difficulty;
+
+    fn get(&self, save: &recordkeeper::SaveData) -> Self::Target {
+        Difficulty::from_repr(self.0.get(save)).expect("unknown difficulty")
+    }
+
+    fn set(&self, save: &mut recordkeeper::SaveData, new: Self::Target) {
+        self.0.set(save, new as u32);
+    }
+}
+
+impl ToHtml for Difficulty {
+    fn to_html(&self) -> Html {
+        let id = match self {
+            Difficulty::Easy => "easy",
+            Difficulty::Normal => "normal",
+            Difficulty::Hard => "hard",
+            Difficulty::VeryHard => "veryhard",
+        };
+        html!(<Text path={format!("difficulty_{id}")} />)
     }
 }

@@ -5,9 +5,12 @@ license = "LGPL-3.0-only"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+strum = ["dep:strum"]
+
 [dependencies]
 recordkeeper-macros = { path = "../macros" }
 byteorder = "1.4.3"
 thiserror = "1.0.44"
 paste = "1.0.14"
-strum = { version = "0.25.0", features = ["derive"] }
+strum = { version = "0.25.0", features = ["derive"], optional = true }

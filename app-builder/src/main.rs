@@ -6,6 +6,7 @@ mod dlc;
 mod enhance;
 mod item;
 mod lang;
+mod manual;
 
 macro_rules! const_hash {
     ($name:literal) => {{
@@ -54,6 +55,7 @@ fn read_game_data(bdat: &BdatRegistry) -> GameData {
         items: item::load_items(bdat),
         enhance: enhance::load_enhance(bdat),
         dlc: dlc::read_dlc_game(bdat),
+        manual: manual::read_manual_data(),
     }
 }
 

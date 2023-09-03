@@ -104,14 +104,6 @@ editor!(
 
 #[function_component]
 pub fn MashaModal(props: &MashaModalProps) -> Html {
-    // - Item Display dropdown
-    // - Level dropdown
-    // - Enhance dropdown
-
-    // Stat boosts
-    // - Stat dropdown
-    // - Value number input
-
     let save_context = use_context::<SaveContext>().unwrap();
     let save = save_context.get();
     let save = save.get().save();

@@ -1,6 +1,7 @@
 use std::{fmt::Display, str::FromStr};
 
-use recordkeeper::SaveData;
+use game_data::manual::Flag;
+use recordkeeper::{flags::FlagType, SaveData};
 use strum::IntoEnumIterator;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
@@ -250,5 +251,14 @@ impl FlagConvert for u32 {
 
     fn to_bool(self) -> bool {
         self != 0
+    }
+}
+
+impl From<Flag> for FlagEditor {
+    fn from(value: Flag) -> Self {
+        Self {
+            flag_index: value.index,
+            flag_type: FlagType::from_bits(value.bits),
+        }
     }
 }
