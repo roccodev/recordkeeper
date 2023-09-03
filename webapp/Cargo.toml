@@ -11,7 +11,12 @@ ybc = "0.4.0"
 yew-feather = "1.0"
 fluent = "0.16"
 unic-langid = { version = "0.9", features = ["macros"] }
-web-sys = { version = "0.3.64", default-features = false, features = ["FileList", "File", "HtmlInputElement"] }
+web-sys = { version = "0.3.64", default-features = false, features = [
+    "FileList", 
+    "File", 
+    "HtmlInputElement", 
+    "HtmlAnchorElement"
+] }
 js-sys = "0.3.64"
 gloo = "0.9.0"
 gloo-net = "0.4.0"

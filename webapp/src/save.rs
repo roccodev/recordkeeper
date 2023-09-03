@@ -1,5 +1,5 @@
 use std::{
-    cell::{Ref, RefCell, RefMut},
+    cell::{Ref, RefCell},
     rc::Rc,
 };
 
@@ -7,19 +7,26 @@ use anyhow::{anyhow, Result};
 use gloo::file::{Blob, FileReadError, ObjectUrl};
 use log::info;
 use recordkeeper::{SaveData, SaveFile, SaveResult};
+use wasm_bindgen::JsCast;
+use web_sys::HtmlAnchorElement;
 use yew::prelude::*;
 
 use crate::dialog::{Dialog, DialogLayout, DialogQueue, Severity};
 
 #[derive(Default)]
 pub struct SaveManager {
-    save_buffers: [Option<SaveFile>; 4],
+    save_buffers: [Option<SaveEntry>; 4],
     // discriminant for PartialEq
     change_id: usize,
 }
 
+struct SaveEntry {
+    file: SaveFile,
+    name: String,
+}
+
 pub enum EditAction {
-    Load(Vec<u8>),
+    Load(Vec<u8>, String),
     Save,
     ClearError,
     Edit(EditFn),
@@ -67,18 +74,18 @@ pub fn SaveProvider(props: &SaveProviderProps) -> Html {
 
 impl SaveManager {
     pub fn get(&self) -> &SaveFile {
-        self.save_buffers[0].as_ref().unwrap()
+        self.save_buffers[0].as_ref().map(|s| &s.file).unwrap()
     }
 
     pub fn get_mut(&mut self) -> &mut SaveFile {
-        self.save_buffers[0].as_mut().unwrap()
+        self.save_buffers[0].as_mut().map(|s| &mut s.file).unwrap()
     }
 
     pub fn is_loaded(&self) -> bool {
         self.save_buffers[0].is_some()
     }
 
-    fn load(&mut self, bytes: &[u8]) -> SaveResult<()> {
+    fn load(&mut self, bytes: &[u8], file_name: String) -> SaveResult<()> {
         let save = SaveFile::from_bytes(bytes)?;
 
         info!(
@@ -88,7 +95,10 @@ impl SaveManager {
         );
 
         self.save_buffers.fill_with(|| None); // TODO replace with fill with Clone
-        self.save_buffers[0] = Some(save);
+        self.save_buffers[0] = Some(SaveEntry {
+            file: save,
+            name: file_name,
+        });
         self.change_id = if self.change_id == 0 { 1 } else { 0 };
         Ok(())
     }
@@ -101,19 +111,27 @@ impl SaveManager {
         // Least recently used buffer is now in position 1,
         // replace it with the new backup
         // self.save_buffers[1] = self.save_buffers[0].clone(); // TODO
-        self.save_buffers[0].as_mut().unwrap().write()?;
+        self.save_buffers[0].as_mut().unwrap().file.write()?;
         self.mark_change();
         Ok(())
     }
 
     fn download(&self) -> Result<()> {
-        let bytes = Blob::new(self.save_buffers[0].as_ref().unwrap().bytes());
+        let slot = self.save_buffers[0].as_ref().unwrap();
+        let bytes = Blob::new(slot.file.bytes());
         let url = ObjectUrl::from(bytes);
-        web_sys::window()
+        let link = web_sys::window()
             .expect("no window")
-            .location()
-            .set_href(&url)
-            .map_err(|v| anyhow!("Download error: {v:?}"))
+            .document()
+            .expect("no document")
+            .create_element("a")
+            .map_err(|v| anyhow!("Download DOM error: {v:?}"))?
+            .dyn_into::<HtmlAnchorElement>()
+            .unwrap();
+        link.set_href(&url);
+        link.set_download(&slot.name);
+        link.click();
+        Ok(())
     }
 
     fn mark_change(&mut self) {
@@ -142,8 +160,8 @@ impl SaveContext {
         self.handle.manager.borrow()
     }
 
-    pub fn on_file_upload(&self, data: Result<Vec<u8>, FileReadError>) {
-        self.submit_action(EditAction::Load(data.unwrap()));
+    pub fn on_file_upload(&self, name: String, data: Result<Vec<u8>, FileReadError>) {
+        self.submit_action(EditAction::Load(data.unwrap(), name));
     }
 }
 
@@ -153,7 +171,7 @@ impl Reducible for SaveReducer {
     fn reduce(self: Rc<Self>, action: Self::Action) -> Rc<Self> {
         let mut handle = self.manager.borrow_mut();
         let res: Result<()> = match action {
-            EditAction::Load(bytes) => handle.load(&bytes).map_err(Into::into),
+            EditAction::Load(bytes, name) => handle.load(&bytes, name).map_err(Into::into),
             EditAction::Save => handle.back_up_and_save().map_err(Into::into),
             EditAction::Edit(callback) => {
                 callback(handle.get_mut().save_mut());
