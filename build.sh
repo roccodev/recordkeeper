@@ -1,7 +1,10 @@
 #!/bin/sh
 
 # Syntax:
-# ./build.sh <bdat dir> <webapp output dir>
+# ./build.sh <bdat dir>
+#
+# On success, the webapp output will be in webapp/dist.
+set -e
 
 cwd=$(pwd)
 commit=$(git describe --always --dirty)

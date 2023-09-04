@@ -9,6 +9,7 @@ pub struct ManualData {
 pub struct Flags {
     pub new_game_plus: Flag,
     pub difficulty: Flag,
+    pub scenario: Flag,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]

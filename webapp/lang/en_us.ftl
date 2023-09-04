@@ -69,7 +69,8 @@ difficulty_veryhard = Very Hard (Unreleased)
 
 scenario_flag_flag = Flag
 scenario_flag_chapter = Chapter
-scenario_flag_event = Event
+# $id: the chapter ID
+scenario_flag_chapter_id = Chapter { $id }
 
 meta_playtime = Play Time
 # When the game was last saved

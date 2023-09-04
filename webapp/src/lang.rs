@@ -1,8 +1,10 @@
 use std::borrow::Cow;
 use std::rc::Rc;
 
+use fluent::FluentArgs;
 use fluent::FluentBundle;
 use fluent::FluentResource;
+use fluent::FluentValue;
 use unic_langid::langid;
 use unic_langid::LanguageIdentifier;
 
@@ -20,13 +22,16 @@ pub struct LangManager {
 #[derive(Properties, PartialEq)]
 pub struct TextProps {
     pub path: AttrValue,
+    #[prop_or_default]
+    pub args: Vec<(Cow<'static, str>, FluentValue<'static>)>,
 }
 
 #[function_component]
 pub fn Text(props: &TextProps) -> Html {
     let lang = use_context::<Lang>().unwrap();
     let key = props.path.as_cow().to_string(); // TODO
-    let translated = lang.translate(key);
+    let args = FluentArgs::from(props.args.iter().cloned().collect());
+    let translated = lang.translate_with_args(key, Some(&args));
     html! {translated}
 }
 
@@ -56,6 +61,14 @@ impl LangManager {
     }
 
     pub fn translate(&self, key: impl Into<Cow<'static, str>>) -> Cow<str> {
+        self.translate_with_args(key, None)
+    }
+
+    pub fn translate_with_args<'args, 'bundle>(
+        &'bundle self,
+        key: impl Into<Cow<'static, str>>,
+        args: Option<&'bundle FluentArgs<'args>>,
+    ) -> Cow<str> {
         let key = key.into();
         let message = match self.bundle.get_message(&key) {
             Some(msg) => msg,
@@ -63,7 +76,7 @@ impl LangManager {
         };
         let value = message.value().expect("no lang value");
         let mut errors = vec![];
-        self.bundle.format_pattern(value, None, &mut errors)
+        self.bundle.format_pattern(value, args, &mut errors)
     }
 }
 

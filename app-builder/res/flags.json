@@ -6,5 +6,9 @@
     "difficulty": {
         "bits": 2,
         "index": 4554
+    },
+    "scenario": {
+        "bits": 16,
+        "index": 1
     }
 }

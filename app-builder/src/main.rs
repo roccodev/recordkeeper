@@ -7,6 +7,7 @@ mod enhance;
 mod item;
 mod lang;
 mod manual;
+mod scenario;
 
 macro_rules! const_hash {
     ($name:literal) => {{
@@ -56,6 +57,7 @@ fn read_game_data(bdat: &BdatRegistry) -> GameData {
         enhance: enhance::load_enhance(bdat),
         dlc: dlc::read_dlc_game(bdat),
         manual: manual::read_manual_data(),
+        events: scenario::read_scenario_events(bdat),
     }
 }
 
@@ -72,7 +74,7 @@ impl<'b> BdatRegistry<'b> {
         let mut game_tables = HashMap::default();
         let base_path = base_path.as_ref();
 
-        for file in ["fld", "qst", "btl", "sys", "dlc"] {
+        for file in ["fld", "qst", "btl", "sys", "dlc", "mnu"] {
             let reader =
                 BufReader::new(File::open(base_path.join(format!("{file}.bdat"))).unwrap());
             let tables = bdat::modern::from_reader::<_, SwitchEndian>(reader)
