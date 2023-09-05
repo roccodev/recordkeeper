@@ -8,3 +8,4 @@ bitcode = { version = "0.4.0", features = ["serde"] }
 serde = { version = "1", features = ["derive", "rc"] }
 enum-map = { version = "2.6", features = ["serde"] }
 recordkeeper = { path = "../lib" }
+strum = { version = "0.25.0", features = ["derive"] }

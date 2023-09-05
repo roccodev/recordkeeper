@@ -7,6 +7,7 @@ mod enhance;
 mod item;
 mod lang;
 mod manual;
+mod quest;
 mod scenario;
 
 macro_rules! const_hash {
@@ -58,6 +59,7 @@ fn read_game_data(bdat: &BdatRegistry) -> GameData {
         dlc: dlc::read_dlc_game(bdat),
         manual: manual::read_manual_data(),
         events: scenario::read_scenario_events(bdat),
+        quests: quest::read_quests(bdat),
     }
 }
 
@@ -66,6 +68,7 @@ fn read_lang_data(bdat: &LangBdatRegistry) -> LanguageData {
         items: item::load_item_lang(bdat),
         enhance: enhance::load_enhance_lang(bdat),
         dlc: dlc::read_dlc_lang(bdat),
+        quests: quest::read_quest_lang(bdat),
     }
 }
 
