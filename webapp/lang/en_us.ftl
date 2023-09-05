@@ -156,3 +156,15 @@ masha_stat_dex = Dexterity
 masha_stat_agi = Agility
 masha_stat_crit = Crit Rate
 masha_stat_block = Block Rate
+
+## Quest screen
+
+quest_id = ID
+quest_name = Name
+quest_status = Status
+quest_actions = Actions
+
+quest_status_unstarted = Not Started
+quest_status_progress = In Progress
+quest_status_complete_a = Completed (A)
+quest_status_complete_b = Completed (B)

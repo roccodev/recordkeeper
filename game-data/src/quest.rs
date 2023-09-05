@@ -1,9 +1,9 @@
 //! Quest IDs, flag IDs, conditions, etc.
 
 use serde::{Deserialize, Serialize};
-use strum::FromRepr;
+use strum::{EnumIter, FromRepr};
 
-use crate::lang::TextTable;
+use crate::lang::{Nameable, TextTable};
 
 #[derive(Serialize, Deserialize)]
 pub struct QuestRegistry {
@@ -39,7 +39,15 @@ pub struct PurposeTask {
     pub branch: u8,
 }
 
-#[derive(Serialize, Deserialize, FromRepr)]
+#[derive(Serialize, Deserialize, FromRepr, Clone, Copy, PartialEq, EnumIter)]
+pub enum QuestStatus {
+    Unstarted = 0,
+    InProgress = 1,
+    CompletedA = 2,
+    CompletedB = 3,
+}
+
+#[derive(Serialize, Deserialize, FromRepr, Clone, Copy, PartialEq)]
 pub enum TaskType {
     Ask = 3,
     Battle = 0,
@@ -63,10 +71,32 @@ impl QuestRegistry {
     pub fn get(&self, id: usize) -> Option<&Quest> {
         id.checked_sub(1).and_then(|id| self.quests.get(id))
     }
+
+    pub fn len(&self) -> usize {
+        self.quests.len()
+    }
 }
 
 impl QuestLang {
     pub fn new(table: TextTable) -> Self {
         Self { text: table }
+    }
+}
+
+impl Nameable for Quest {
+    fn get_name<'l>(
+        &self,
+        language: &'l crate::LanguageData,
+    ) -> Option<&'l crate::lang::TextEntry> {
+        self.name_id.and_then(|id| language.quests.text.get(id))
+    }
+}
+
+impl Nameable for PurposeTask {
+    fn get_name<'l>(
+        &self,
+        language: &'l crate::LanguageData,
+    ) -> Option<&'l crate::lang::TextEntry> {
+        self.name_id.and_then(|id| language.quests.text.get(id))
     }
 }

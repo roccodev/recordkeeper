@@ -5,6 +5,7 @@ mod about;
 mod flags;
 mod item;
 mod meta;
+mod quest;
 
 #[derive(Routable, Clone, PartialEq, Copy)]
 pub enum Route {
@@ -53,7 +54,7 @@ pub fn render(route: Route) -> Html {
         Route::Ouroboros => html!(),
         Route::Items => html!(<item::ItemInventory />),
         Route::Field => html!(),
-        Route::Quests => html!(),
+        Route::Quests => html!(<quest::Quests />),
         Route::Uniques => html!(),
         Route::Formations => html!(),
         Route::PowAugment => html!(),
