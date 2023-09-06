@@ -8,6 +8,7 @@ use crate::lang::{Nameable, TextTable};
 #[derive(Serialize, Deserialize)]
 pub struct QuestRegistry {
     quests: Vec<Quest>,
+    dlc4_spacer: usize,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -23,14 +24,14 @@ pub struct Quest {
     pub purposes: Vec<QuestPurpose>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct QuestPurpose {
     pub id: usize,
     pub flag: usize,
     pub tasks: [Option<PurposeTask>; 4],
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct PurposeTask {
     pub id: usize,
     pub name_id: Option<usize>,
@@ -64,16 +65,31 @@ pub enum TaskType {
 }
 
 impl QuestRegistry {
-    pub fn new(quests: Vec<Quest>) -> Self {
-        Self { quests }
+    pub fn new(quests: Vec<Quest>, dlc4_spacer: usize) -> Self {
+        Self {
+            quests,
+            dlc4_spacer,
+        }
     }
 
     pub fn get(&self, id: usize) -> Option<&Quest> {
         id.checked_sub(1).and_then(|id| self.quests.get(id))
     }
 
-    pub fn len(&self) -> usize {
-        self.quests.len()
+    pub fn start(&self, dlc4: bool) -> usize {
+        if dlc4 {
+            self.dlc4_spacer.checked_add(1).unwrap()
+        } else {
+            1
+        }
+    }
+
+    pub fn end(&self, dlc4: bool) -> usize {
+        if dlc4 {
+            self.quests.len()
+        } else {
+            self.dlc4_spacer.checked_sub(1).unwrap()
+        }
     }
 }
 

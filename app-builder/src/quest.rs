@@ -8,6 +8,13 @@ pub fn read_quests(bdat: &BdatRegistry) -> QuestRegistry {
     let purposes = bdat.table(&const_hash!("QST_Purpose"));
     let tasks = bdat.table(&const_hash!("QST_Task"));
 
+    // This is an empty row with parameters set to 0.
+    // The game usually includes these rows as spacers
+    let min_dlc4_quest = quests
+        .get_row_by_hash(0xF7E2ACDC)
+        .expect("no dlc4 quest marker")
+        .id();
+
     let mut quests = quests
         .rows()
         .map(|r| read_quest(&quests.row(r.id())))
@@ -17,7 +24,7 @@ pub fn read_quests(bdat: &BdatRegistry) -> QuestRegistry {
         read_purpose(&row, &tasks, &mut quests);
     }
 
-    QuestRegistry::new(quests)
+    QuestRegistry::new(quests, min_dlc4_quest)
 }
 
 pub fn read_quest_lang(bdat: &LangBdatRegistry) -> QuestLang {

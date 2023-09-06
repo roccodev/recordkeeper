@@ -13,23 +13,28 @@ struct TableProps {
 }
 
 const PAGES_PER_VIEW: usize = 2;
-const ROWS_PER_PAGE: usize = 20;
+const ROWS_PER_PAGE: usize = 12;
 
 #[function_component]
 pub fn Quests() -> Html {
     let save = use_context::<SaveContext>().unwrap();
     let data = use_context::<Data>().unwrap();
 
+    let quests = &data.game().quests;
+    let is_dlc4 = save.get().get().save().is_dlc4();
+    let start = quests.start(is_dlc4);
+    let end = quests.end(is_dlc4);
+
     let page = use_state(|| 0);
     let page_organizer =
-        PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, data.game().quests.len() - 1);
+        PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, end + 1 - start);
 
     html! {
         <Container>
             <Tile>
-                {for page_organizer.current_bounds.into_iter().map(|(start, end)| html! {
+                {for page_organizer.current_bounds.into_iter().map(|(s, e)| html! {
                     <Tile>
-                        <TablePage start={start + 1} end={end} />
+                        <TablePage start={start + s} end={start + e} />
                     </Tile>
                 })}
             </Tile>

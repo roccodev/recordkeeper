@@ -168,3 +168,7 @@ quest_status_unstarted = Not Started
 quest_status_progress = In Progress
 quest_status_complete_a = Completed (A)
 quest_status_complete_b = Completed (B)
+
+quest_purpose = Edit Quest Objectives
+quest_purpose_id = Objective ID
+quest_purpose_status = Objective Status
