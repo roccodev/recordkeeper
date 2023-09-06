@@ -1,5 +1,6 @@
 use std::io::{Read, Write};
 
+use character::{CharacterData, CharacterLang};
 use dlc::{DlcData, DlcLang};
 use enhance::{EnhanceLang, EnhanceRegistry};
 use item::{ItemLanguageRegistry, ItemRegistry};
@@ -9,6 +10,7 @@ use scenario::ScenarioRanges;
 use serde::{Deserialize, Serialize};
 use std::error::Error;
 
+pub mod character;
 pub mod dlc;
 pub mod enhance;
 pub mod item;
@@ -24,6 +26,7 @@ pub struct GameData {
     pub dlc: DlcData,
     pub events: ScenarioRanges,
     pub quests: QuestRegistry,
+    pub characters: CharacterData,
 
     /// Manually inputted data, that can't be read
     /// from game files.
@@ -36,6 +39,7 @@ pub struct LanguageData {
     pub enhance: EnhanceLang,
     pub dlc: DlcLang,
     pub quests: QuestLang,
+    pub characters: CharacterLang,
 }
 
 pub fn save_game_data(data: &GameData, mut writer: impl Write) -> Result<(), Box<dyn Error>> {

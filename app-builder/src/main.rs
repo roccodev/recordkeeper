@@ -2,6 +2,7 @@ use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
 
 use bdat::{Label, SwitchEndian, Table};
 
+mod character;
 mod dlc;
 mod enhance;
 mod item;
@@ -60,6 +61,7 @@ fn read_game_data(bdat: &BdatRegistry) -> GameData {
         manual: manual::read_manual_data(),
         events: scenario::read_scenario_events(bdat),
         quests: quest::read_quests(bdat),
+        characters: character::read_data(bdat),
     }
 }
 
@@ -69,6 +71,7 @@ fn read_lang_data(bdat: &LangBdatRegistry) -> LanguageData {
         enhance: enhance::load_enhance_lang(bdat),
         dlc: dlc::read_dlc_lang(bdat),
         quests: quest::read_quest_lang(bdat),
+        characters: character::read_lang(bdat),
     }
 }
 
