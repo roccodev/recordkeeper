@@ -172,3 +172,17 @@ quest_status_complete_b = Completed (B)
 quest_purpose = Edit Quest Objectives
 quest_purpose_id = Objective ID
 quest_purpose_status = Objective Status
+quest_purpose_tasks_a = Tasks (Branch A)
+quest_purpose_tasks_b = Tasks (Branch B)
+
+quest_task_ask = Ask
+quest_task_battle = Battle
+quest_task_collect = Collect
+quest_task_collepedia = Collectopedia
+quest_task_condition = Condition
+quest_task_event = Event
+quest_task_follow = Follow
+quest_task_gimmick = Gimmick
+quest_task_reach = Location
+quest_task_request = Item List
+quest_task_talk = Talk

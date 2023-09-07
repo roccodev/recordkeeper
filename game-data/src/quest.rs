@@ -99,6 +99,25 @@ impl QuestLang {
     }
 }
 
+impl TaskType {
+    pub fn lang_id(&self) -> &str {
+        match self {
+            TaskType::Ask => "ask",
+            TaskType::Battle => "battle",
+            TaskType::Chase => "chase",
+            TaskType::Collect => "collect",
+            TaskType::Collepedia => "collepedia",
+            TaskType::Condition => "condition",
+            TaskType::Event => "event",
+            TaskType::Follow => "follow",
+            TaskType::Gimmick => "gimmick",
+            TaskType::Reach => "reach",
+            TaskType::Request => "request",
+            TaskType::Talk => "talk",
+        }
+    }
+}
+
 impl Nameable for Quest {
     fn get_name<'l>(
         &self,
