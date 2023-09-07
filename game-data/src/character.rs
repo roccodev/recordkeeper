@@ -11,6 +11,7 @@ pub struct CharacterData {
     characters: Rc<[Character]>,
     arts: Rc<[Art]>,
     skills: Rc<[Skill]>,
+    classes: Rc<[Class]>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -18,6 +19,7 @@ pub struct CharacterLang {
     pub characters: FilterTable,
     pub arts: FilterTable,
     pub skills: FilterTable,
+    pub classes: FilterTable,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
@@ -38,16 +40,24 @@ pub struct Skill {
     pub name_id: usize,
 }
 
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+pub struct Class {
+    pub id: usize,
+    pub name_id: usize,
+}
+
 impl CharacterData {
     pub fn new(
         characters: impl IntoIterator<Item = Character>,
         arts: impl IntoIterator<Item = Art>,
         skills: impl IntoIterator<Item = Skill>,
+        classes: impl IntoIterator<Item = Class>,
     ) -> Self {
         Self {
             characters: characters.into_iter().collect(),
             arts: arts.into_iter().collect(),
             skills: skills.into_iter().collect(),
+            classes: classes.into_iter().collect(),
         }
     }
 
@@ -61,6 +71,18 @@ impl CharacterData {
 
     pub fn get_skill(&self, id: usize) -> Option<&Skill> {
         id.checked_sub(1).and_then(|id| self.skills.get(id))
+    }
+
+    pub fn get_class(&self, id: usize) -> Option<&Class> {
+        id.checked_sub(1).and_then(|id| self.classes.get(id))
+    }
+
+    pub fn characters(&self) -> &[Character] {
+        &self.characters
+    }
+
+    pub fn classes(&self) -> &[Class] {
+        &self.classes
     }
 }
 
@@ -79,5 +101,11 @@ impl Filterable for Art {
 impl Filterable for Skill {
     fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
         language.characters.skills.get(self.name_id)
+    }
+}
+
+impl Filterable for Class {
+    fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
+        language.characters.classes.get(self.name_id)
     }
 }

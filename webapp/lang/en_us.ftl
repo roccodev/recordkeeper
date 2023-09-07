@@ -79,22 +79,6 @@ meta_scenario_flag = Scenario Flag
 meta_ngp = New Game Plus
 meta_settings = Settings
 
-## Character translations
-
-character_level = Level
-character_exp = EXP
-character_bonus_exp = Bonus EXP
-character_selected_class = Selected {-class}
-
-# The character's selected costume
-character_costume = Costume
-
-# The level the character first joined the party at
-character_arrival_level = Initial Level
-
-# Character clothes dirty level
-character_dirt = Dirtiness
-
 ## Ouroboros translations
 
 ouroboros_sp = SP
@@ -177,6 +161,7 @@ quest_purpose_tasks_b = Tasks (Branch B)
 
 quest_task_ask = Ask
 quest_task_battle = Battle
+quest_task_chase = Chase
 quest_task_collect = Collect
 quest_task_collepedia = Collectopedia
 quest_task_condition = Condition
@@ -186,3 +171,22 @@ quest_task_gimmick = Gimmick
 quest_task_reach = Location
 quest_task_request = Item List
 quest_task_talk = Talk
+
+
+## Character screen
+
+character_character = Character
+character_class = Class
+character_level = Level
+character_exp = EXP
+character_bexp = Bonus EXP
+character_selected_class = Selected {-class}
+
+# The character's selected costume
+character_costume = Costume
+
+# The level the character first joined the party at
+character_arrival_level = Initial Level
+
+# Character clothes dirty level
+character_dirt = Dirtiness

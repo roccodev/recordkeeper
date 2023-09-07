@@ -2,6 +2,7 @@ use yew::prelude::*;
 use yew_router::Routable;
 
 mod about;
+mod character;
 mod flags;
 mod item;
 mod meta;
@@ -50,7 +51,7 @@ pub fn render(route: Route) -> Html {
         Route::Home => html!(),
         Route::About => html!(<about::About />),
         Route::Meta => html!(<meta::SaveMeta />),
-        Route::Characters => html!(),
+        Route::Characters => html!(<character::Characters />),
         Route::Ouroboros => html!(),
         Route::Items => html!(<item::ItemInventory />),
         Route::Field => html!(),

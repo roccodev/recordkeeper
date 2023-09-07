@@ -5,6 +5,7 @@ pub mod select;
 pub mod sidebar;
 pub mod upload;
 
+pub mod character;
 pub mod dlc;
 pub mod item;
 pub mod meta;
