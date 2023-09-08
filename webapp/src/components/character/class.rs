@@ -99,13 +99,13 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
                     </Field>
                 </Tile>
                 <Tile>
-                    <Field>
+                    <Field classes={classes!("mr-2")}>
                         <label class="label"><Text path="character_class_cp" /></label>
                         <Control>
                             <NumberInput<CpEditor> editor={CpEditor { char_idx: char_idx, class_id: *class_id }} />
                         </Control>
                     </Field>
-                    <Field>
+                    <Field classes={classes!("mr-2")}>
                         <label class="label"><Text path="character_class_unlock" /></label>
                         <Control>
                             <NumberInput<UnlockPointsEditor> editor={UnlockPointsEditor { char_idx: char_idx, class_id: *class_id }} />
@@ -120,7 +120,7 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
                 </Tile>
             </Tile>
             <Tile classes={classes!("is-parent")}>
-                <Tile classes={classes!("is-child")}>
+                <Tile classes={classes!("is-vertical", "mr-2")}>
                     {for (0..CHARACTER_CLASS_ART_MAX).map(|i| html! {
                         <Field>
                             <label class="label"><Text path={"character_art"} args={vec![("id".into(), i.into())]} /></label>
@@ -132,7 +132,7 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
                         </Field>
                     })}
                 </Tile>
-                <Tile classes={classes!("is-child")}>
+                <Tile classes={classes!("is-vertical", "mr-2")}>
                     {for (0..CHARACTER_CLASS_SKILL_MAX).map(|i| html! {
                         <Field>
                             <label class="label"><Text path={"character_skill"} args={vec![("id".into(), i.into())]} /></label>
@@ -144,10 +144,10 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
                         </Field>
                     })}
                 </Tile>
-                <Tile classes={classes!("is-child")}>
+                <Tile classes={classes!("is-vertical", "mr-2")}>
                     {"Gems"}
                 </Tile>
-                <Tile classes={classes!("is-child")}>
+                <Tile classes={classes!("is-vertical", "mr-2")}>
                     {"Accessories"}
                 </Tile>
             </Tile>

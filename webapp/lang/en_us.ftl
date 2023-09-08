@@ -179,7 +179,7 @@ quest_task_talk = Talk
 ## Character screen
 
 character_character = Character
-character_class = Class
+character_class = Edit Class
 character_level = Level
 character_exp = EXP
 character_bexp = Bonus EXP
