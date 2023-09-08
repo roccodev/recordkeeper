@@ -20,7 +20,7 @@ editor!(
 
 #[rustfmt::skip]
 editor!(
-    pub ArrivalLevelEditor,
+    ArrivalLevelEditor,
     u8,
     get |editor, save| save.characters[editor.char_idx].arrival_level,
     set |editor, save, new_value| save.characters[editor.char_idx].arrival_level = new_value,
@@ -29,7 +29,7 @@ editor!(
 
 #[rustfmt::skip]
 editor!(
-    pub ExpEditor,
+    ExpEditor,
     u32,
     get |editor, save| save.characters[editor.char_idx].exp,
     set |editor, save, new_value| save.characters[editor.char_idx].exp = new_value,
@@ -38,7 +38,7 @@ editor!(
 
 #[rustfmt::skip]
 editor!(
-    pub BonusExpEditor,
+    BonusExpEditor,
     u32,
     get |editor, save| save.characters[editor.char_idx].bonus_exp,
     set |editor, save, new_value| save.characters[editor.char_idx].bonus_exp = new_value,

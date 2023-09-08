@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    lang::{FilterEntry, FilterTable, Filterable},
+    lang::{FilterEntry, FilterTable, Filterable, Id},
     LanguageData,
 };
 use serde::{Deserialize, Serialize};
@@ -84,6 +84,14 @@ impl CharacterData {
     pub fn classes(&self) -> &[Class] {
         &self.classes
     }
+
+    pub fn arts(&self) -> &[Art] {
+        &self.arts
+    }
+
+    pub fn skills(&self) -> &[Skill] {
+        &self.skills
+    }
 }
 
 impl Filterable for Character {
@@ -107,5 +115,29 @@ impl Filterable for Skill {
 impl Filterable for Class {
     fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
         language.characters.classes.get(self.name_id)
+    }
+}
+
+impl Id for Art {
+    fn id(&self) -> usize {
+        self.id
+    }
+}
+
+impl Id for Skill {
+    fn id(&self) -> usize {
+        self.id
+    }
+}
+
+impl Id for Class {
+    fn id(&self) -> usize {
+        self.id
+    }
+}
+
+impl Id for Character {
+    fn id(&self) -> usize {
+        self.id
     }
 }

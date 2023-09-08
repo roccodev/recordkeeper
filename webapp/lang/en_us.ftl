@@ -16,6 +16,9 @@ nav_license = License
 -skills = Skills
 -class = Class
 
+# Objects without a registered name.
+# $id: the ID of the object
+unnamed = #{ $id } (No Name)
 
 # Data related to the base game (no DLC)
 menu_category_base = Base Game Data
@@ -190,3 +193,28 @@ character_arrival_level = Initial Level
 
 # Character clothes dirty level
 character_dirt = Dirtiness
+
+# $id: the art slot ID (0-6). 
+# 0 = talent art
+# 1-3 = Keves arts
+# 4-6 = Agnus arts
+character_art = 
+    { $id ->
+        [0] Talent Art
+        [4] Agnus Art 1
+        [5] Agnus Art 2
+        [6] Agnus Art 3
+       *[other] Keves Art { $id }
+    }
+# $id: the slot ID
+character_skill = 
+    { $id ->
+        [0] Class Skill 1
+        [1] Class Skill 2
+        [2] Class Skill 3
+        [3] Class Skill 4
+        [4] Inherited Skill 1
+        [5] Inherited Skill 2
+        [6] Inherited Skill 3
+        *[7] Unused Skill
+    }

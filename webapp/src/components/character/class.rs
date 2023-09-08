@@ -1,8 +1,16 @@
-use game_data::character::Class;
+use game_data::character::{Art, Class, Skill};
+use recordkeeper::character::{CHARACTER_CLASS_ART_MAX, CHARACTER_CLASS_SKILL_MAX};
 use ybc::{Control, Field, Tile};
 use yew::prelude::*;
 
-use crate::{components::character::Selector, data::Data, lang::Text};
+use crate::{
+    components::{
+        character::{slot::SlotInput, Selector},
+        edit::editor,
+    },
+    data::Data,
+    lang::Text,
+};
 
 use super::CharacterProps;
 
@@ -12,13 +20,48 @@ pub struct ClassProps {
     pub class_id: usize,
 }
 
+#[rustfmt::skip]
+editor!(
+    pub ArtEditor,
+    Option<u16>,
+    get |editor, save| save.characters[editor.char_idx].class_data(editor.class_id).art_slot(editor.slot_idx).get(),
+    set |editor, save, new| save.characters[editor.char_idx].class_data_mut(editor.class_id).art_slot_mut(editor.slot_idx).set(new),
+    capture char_idx: usize, class_id: usize, slot_idx: usize
+);
+
+#[rustfmt::skip]
+editor!(
+    pub GemEditor,
+    Option<u8>,
+    get |editor, save| save.characters[editor.char_idx].class_data(editor.class_id).gem_slot(editor.slot_idx).get(),
+    set |editor, save, new| save.characters[editor.char_idx].class_data_mut(editor.class_id).gem_slot_mut(editor.slot_idx).set(new),
+    capture char_idx: usize, class_id: usize, slot_idx: usize
+);
+
+#[rustfmt::skip]
+editor!(
+    pub SkillEditor,
+    Option<u16>,
+    get |editor, save| save.characters[editor.char_idx].class_data(editor.class_id).skill_slot(editor.slot_idx).get(),
+    set |editor, save, new| save.characters[editor.char_idx].class_data_mut(editor.class_id).skill_slot_mut(editor.slot_idx).set(new),
+    capture char_idx: usize, class_id: usize, slot_idx: usize
+);
+
 #[function_component]
 pub fn ClassEditor(props: &CharacterProps) -> Html {
     let data = use_context::<Data>().unwrap();
     let class_id = use_state(|| 1); // TODO use selected class
+    let char_idx = props.char_id.checked_sub(1).unwrap();
+
+    let arts = data.game().characters.arts();
+    let skills = data.game().characters.skills();
+
+    let art_mapper = Callback::from(art_to_id);
+    let skill_mapper = Callback::from(skill_to_id);
+
     html! {
         <>
-            <Tile>
+            <Tile classes={classes!("is-parent")}>
                 <Field>
                     <label class="label"><Text path="character_class" /></label>
                     <Control>
@@ -26,20 +69,46 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
                     </Control>
                 </Field>
             </Tile>
-            <Tile>
-                <Tile classes={classes!("is-parent")}>
-                    {"Arts"}
+            <Tile classes={classes!("is-parent")}>
+                <Tile classes={classes!("is-child")}>
+                    {for (0..CHARACTER_CLASS_ART_MAX).map(|i| html! {
+                        <Field>
+                            <label class="label"><Text path={"character_art"} args={vec![("id".into(), i.into())]} /></label>
+                            <SlotInput<ArtEditor, Art>
+                                editor={ArtEditor {char_idx: char_idx, class_id: *class_id, slot_idx: i}}
+                                possible_values={arts}
+                                id_mapper={art_mapper.clone()}
+                            />
+                        </Field>
+                    })}
                 </Tile>
-                <Tile classes={classes!("is-parent")}>
-                    {"Skills"}
+                <Tile classes={classes!("is-child")}>
+                    {for (0..CHARACTER_CLASS_SKILL_MAX).map(|i| html! {
+                        <Field>
+                            <label class="label"><Text path={"character_skill"} args={vec![("id".into(), i.into())]} /></label>
+                            <SlotInput<SkillEditor, Skill>
+                                editor={SkillEditor {char_idx: char_idx, class_id: *class_id, slot_idx: i}}
+                                possible_values={skills}
+                                id_mapper={skill_mapper.clone()}
+                            />
+                        </Field>
+                    })}
                 </Tile>
-                <Tile classes={classes!("is-parent")}>
+                <Tile classes={classes!("is-child")}>
                     {"Gems"}
                 </Tile>
-                <Tile classes={classes!("is-parent")}>
+                <Tile classes={classes!("is-child")}>
                     {"Accessories"}
                 </Tile>
             </Tile>
         </>
     }
+}
+
+fn art_to_id(art: &Art) -> Option<u16> {
+    Some(art.id.try_into().unwrap())
+}
+
+fn skill_to_id(skill: &Skill) -> Option<u16> {
+    Some(skill.id.try_into().unwrap())
 }

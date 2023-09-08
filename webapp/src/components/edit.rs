@@ -45,13 +45,13 @@ editor!(
 );
 
 macro_rules! editor {
-    ($vis:tt $name:ident, $value:tt, get $get_fn:expr, set $set_fn:expr) => {
+    ($vis:vis $name:ident, $value:ty, get $get_fn:expr, set $set_fn:expr) => {
         $crate::components::edit::editor!($vis $name, $value, get $get_fn, set $set_fn, assert |_, _| Ok(()), capture);
     };
-    ($vis:tt $name:ident, $value:tt, get $get_fn:expr, set $set_fn:expr, capture $($field: ident: $ty: ty),*) => {
+    ($vis:vis $name:ident, $value:ty, get $get_fn:expr, set $set_fn:expr, capture $($field: ident: $ty: ty),*) => {
         $crate::components::edit::editor!($vis $name, $value, get $get_fn, set $set_fn, assert |_, _| Ok(()), capture $($field: $ty),*);
     };
-    ($vis:tt $name:ident, $value:tt, get $get_fn:expr, set $set_fn:expr, assert $check_fn:expr, capture $($field: ident: $ty: ty),*) => {
+    ($vis:vis $name:ident, $value:ty, get $get_fn:expr, set $set_fn:expr, assert $check_fn:expr, capture $($field: ident: $ty: ty),*) => {
         #[derive(Copy, Clone, PartialEq)]
         $vis struct $name {
             $(pub $field: $ty),*

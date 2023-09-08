@@ -6,7 +6,7 @@ use ybc::*;
 use yew::prelude::*;
 use yew_feather::ChevronDown;
 
-use game_data::lang::{Filterable, Nameable};
+use game_data::lang::{Filterable, Id, Nameable};
 use game_data::LanguageData;
 
 use crate::lang::{Lang, LangManager};
@@ -179,7 +179,7 @@ where
         <Menu classes={classes!("card", "recordkeeper-dropdown")}>
             <MenuList classes={classes!("recordkeeper-dropdown-list")}>
                 {for props.visible_options.iter().map(|(index, item)| {
-                    html!(<li><a onclick={callback(*index)}>{item.get_name_html(&props.lang)}</a></li>)
+                    html!(<li><a onclick={callback(*index)} class="dropdown-item">{item.get_name_html(&props.lang)}</a></li>)
                 })}
             </MenuList>
         </Menu>
@@ -279,10 +279,15 @@ impl<O: Clone + 'static> PartialEq for DropdownProps<O> {
 
 impl<T> HtmlName for T
 where
-    T: Filterable,
+    T: Filterable + Id,
 {
     fn get_name_html(&self, language: &LanguageData) -> Html {
-        html!(<>{self.get_name_str(language)}</>)
+        html! {
+            <>
+                <span><small>{self.id()}{". "}</small></span>
+                <span>{self.get_name_str(language)}</span>
+            </>
+        }
     }
 
     fn get_search_query<'a, 'b: 'a>(
@@ -290,7 +295,7 @@ where
         language: &'b LanguageData,
         _: &'b LangManager,
     ) -> Option<Cow<'a, str>> {
-        self.get_filter(language).map(|t| t.text_lower().into())
+        self.get_filter(language).map(|t| t.text().into())
     }
 
     fn get_name_for_filter<'a, 'b: 'a>(
@@ -298,6 +303,6 @@ where
         language: &'b LanguageData,
         _: &'b LangManager,
     ) -> Option<Cow<'a, str>> {
-        self.get_name(language).map(|t| t.text().into())
+        self.get_filter(language).map(|t| t.text_lower().into())
     }
 }
