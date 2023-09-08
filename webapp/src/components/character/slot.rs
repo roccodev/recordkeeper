@@ -1,4 +1,6 @@
+use ybc::{Button, Control, Field, Icon};
 use yew::prelude::*;
+use yew_feather::X;
 
 use crate::{
     components::{
@@ -20,18 +22,18 @@ where
 }
 
 #[function_component]
-pub fn SlotInput<E, I>(props: &SlotProps<E, I>) -> Html
+pub fn SlotInput<E, I, N>(props: &SlotProps<E, I>) -> Html
 where
-    E: Editor + PartialEq,
+    N: PartialEq + 'static,
+    E: Editor<Target = Option<N>> + PartialEq,
     I: PartialEq + 'static + Clone + HtmlName,
-    E::Target: PartialEq,
 {
     let save_context = use_context::<SaveContext>().unwrap();
     let data = use_context::<Data>().unwrap();
     let lang = data.to_lang();
 
     let current = props.editor.get(save_context.get().get().save());
-    // TODO
+    // TODO: get_by_id callback
     let current = props
         .possible_values
         .iter()
@@ -53,12 +55,27 @@ where
         })
     };
 
+    let clear_callback = {
+        let editor = props.editor;
+        let save_context = save_context.clone();
+        Callback::from(move |_: MouseEvent| save_context.edit(move |save| editor.set(save, None)))
+    };
+
     html! {
-        <SearchSelect<I>
-            current={current}
-            options={options}
-            on_select={on_type_select}
-            lang={lang}
-        />
+        <Field classes={classes!("has-addons")}>
+            <Control>
+                <SearchSelect<I>
+                    current={current}
+                    options={options}
+                    on_select={on_type_select}
+                    lang={lang}
+                />
+            </Control>
+            <Control>
+                <Button onclick={clear_callback} disabled={current.is_none()}>
+                    <Icon><X /></Icon>
+                </Button>
+            </Control>
+        </Field>
     }
 }

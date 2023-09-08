@@ -124,7 +124,7 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
                     {for (0..CHARACTER_CLASS_ART_MAX).map(|i| html! {
                         <Field>
                             <label class="label"><Text path={"character_art"} args={vec![("id".into(), i.into())]} /></label>
-                            <SlotInput<ArtEditor, Art>
+                            <SlotInput<ArtEditor, Art, u16>
                                 editor={ArtEditor {char_idx: char_idx, class_id: *class_id, slot_idx: i}}
                                 possible_values={arts}
                                 id_mapper={art_mapper.clone()}
@@ -136,7 +136,7 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
                     {for (0..CHARACTER_CLASS_SKILL_MAX).map(|i| html! {
                         <Field>
                             <label class="label"><Text path={"character_skill"} args={vec![("id".into(), i.into())]} /></label>
-                            <SlotInput<SkillEditor, Skill>
+                            <SlotInput<SkillEditor, Skill, u16>
                                 editor={SkillEditor {char_idx: char_idx, class_id: *class_id, slot_idx: i}}
                                 possible_values={skills}
                                 id_mapper={skill_mapper.clone()}
