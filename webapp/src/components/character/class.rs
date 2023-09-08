@@ -6,7 +6,7 @@ use yew::prelude::*;
 use crate::{
     components::{
         character::{slot::SlotInput, Selector},
-        edit::editor,
+        edit::{editor, NumberInput},
     },
     data::Data,
     lang::Text,
@@ -19,6 +19,34 @@ pub struct ClassProps {
     pub char_id: usize,
     pub class_id: usize,
 }
+
+#[rustfmt::skip]
+editor!(
+    CpEditor,
+    u32,
+    get |editor, save| save.characters[editor.char_idx].class_data(editor.class_id).cp,
+    set |editor, save, new| save.characters[editor.char_idx].class_data_mut(editor.class_id).cp = new,
+    capture char_idx: usize, class_id: usize
+);
+
+#[rustfmt::skip]
+editor!(
+    UnlockPointsEditor,
+    u16,
+    get |editor, save| save.characters[editor.char_idx].class_data(editor.class_id).unlock_points,
+    set |editor, save, new| save.characters[editor.char_idx].class_data_mut(editor.class_id).unlock_points = new,
+    capture char_idx: usize, class_id: usize
+);
+
+#[rustfmt::skip]
+editor!(
+    RankEditor,
+    u8,
+    get |editor, save| save.characters[editor.char_idx].class_data(editor.class_id).level,
+    set |editor, save, new| save.characters[editor.char_idx].class_data_mut(editor.class_id).level = new,
+    assert |_, v| (1..=20).contains(v).then_some(()).ok_or_else(String::new),
+    capture char_idx: usize, class_id: usize
+);
 
 #[rustfmt::skip]
 editor!(
@@ -62,12 +90,34 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
     html! {
         <>
             <Tile classes={classes!("is-parent")}>
-                <Field>
-                    <label class="label"><Text path="character_class" /></label>
-                    <Control>
-                        <Selector<Class> state={class_id.clone()} values={data.game().characters.classes()} />
-                    </Control>
-                </Field>
+                <Tile>
+                    <Field>
+                        <label class="label"><Text path="character_class" /></label>
+                        <Control>
+                            <Selector<Class> state={class_id.clone()} values={data.game().characters.classes()} />
+                        </Control>
+                    </Field>
+                </Tile>
+                <Tile>
+                    <Field>
+                        <label class="label"><Text path="character_class_cp" /></label>
+                        <Control>
+                            <NumberInput<CpEditor> editor={CpEditor { char_idx: char_idx, class_id: *class_id }} />
+                        </Control>
+                    </Field>
+                    <Field>
+                        <label class="label"><Text path="character_class_unlock" /></label>
+                        <Control>
+                            <NumberInput<UnlockPointsEditor> editor={UnlockPointsEditor { char_idx: char_idx, class_id: *class_id }} />
+                        </Control>
+                    </Field>
+                    <Field>
+                        <label class="label"><Text path="character_class_rank" /></label>
+                        <Control>
+                            <NumberInput<RankEditor> editor={RankEditor { char_idx: char_idx, class_id: *class_id }} />
+                        </Control>
+                    </Field>
+                </Tile>
             </Tile>
             <Tile classes={classes!("is-parent")}>
                 <Tile classes={classes!("is-child")}>

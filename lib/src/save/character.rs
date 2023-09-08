@@ -49,9 +49,9 @@ pub struct Ouroboros {
 #[derive(SaveBin, Debug)]
 #[size(68)]
 pub struct CharacterClass {
-    cp: u32,
-    unlock_points: u16,
-    level: u8,
+    pub cp: u32,
+    pub unlock_points: u16,
+    pub level: u8,
 
     /// The raw value is `ITM_Gem.Category - 1`.
     /// Level can't be controlled.

@@ -218,3 +218,7 @@ character_skill =
         [6] Inherited Skill 3
         *[7] Unused Skill
     }
+
+character_class_cp = CP
+character_class_unlock = Unlock Points
+character_class_rank = Rank
