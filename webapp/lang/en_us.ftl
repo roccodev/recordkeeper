@@ -225,6 +225,13 @@ character_gem =
         [1] Gem Type 2
         *[2] Gem Type 3
     }
+# $id: the slot ID
+character_accessory =
+    { $id ->
+        [0] Accessory 1
+        [1] Accessory 2
+        *[2] Accessory 3
+    }
 
 character_class_cp = CP
 character_class_unlock = Unlock Points

@@ -2,13 +2,19 @@ use game_data::{
     character::{Art, Class, Skill},
     item::GemCategory,
 };
-use recordkeeper::character::{CHARACTER_CLASS_ART_MAX, CHARACTER_CLASS_SKILL_MAX};
+use recordkeeper::character::{
+    ClassAccessory, CHARACTER_CLASS_ACCESSORY_MAX, CHARACTER_CLASS_ART_MAX,
+    CHARACTER_CLASS_SKILL_MAX,
+};
 use ybc::{Control, Field, Tile};
 use yew::prelude::*;
 
 use crate::{
     components::{
-        character::{slot::SlotInput, Selector},
+        character::{
+            slot::{AccessoryInput, SlotInput},
+            Selector,
+        },
         edit::{editor, NumberInput},
     },
     data::Data,
@@ -162,7 +168,12 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
                     })}
                 </Tile>
                 <Tile classes={classes!("is-vertical", "mr-2")}>
-                    {"Accessories"}
+                    {for (0..CHARACTER_CLASS_ACCESSORY_MAX).map(|i| html! {
+                        <Field>
+                            <label class="label"><Text path={"character_accessory"} args={vec![("id".into(), i.into())]} /></label>
+                            <AccessoryInput char_idx={char_idx} class_id={*class_id} slot_idx={i} />
+                        </Field>
+                    })}
                 </Tile>
             </Tile>
         </>

@@ -34,7 +34,7 @@ pub struct Inventory {
 /// An item slot in the player's inventory.
 ///
 /// To edit item slots, use the [`edit::ItemEditor`] struct.
-#[derive(SaveBin, Debug)]
+#[derive(SaveBin, Debug, Clone, Copy)]
 #[size(16)]
 pub struct ItemSlot {
     item_id: u16,
@@ -112,6 +112,11 @@ impl Inventory {
 }
 
 impl ItemSlot {
+    /// Returns the slot's positional index.
+    pub fn index(&self) -> u16 {
+        self.slot_index
+    }
+
     /// Returns the slot's item ID.
     pub fn item_id(&self) -> u16 {
         self.item_id
