@@ -1,4 +1,7 @@
-use game_data::character::{Art, Class, Skill};
+use game_data::{
+    character::{Art, Class, Skill},
+    item::GemCategory,
+};
 use recordkeeper::character::{CHARACTER_CLASS_ART_MAX, CHARACTER_CLASS_SKILL_MAX};
 use ybc::{Control, Field, Tile};
 use yew::prelude::*;
@@ -83,9 +86,11 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
 
     let arts = data.game().characters.arts();
     let skills = data.game().characters.skills();
+    let gem_categories = data.game().items.gem_categories();
 
     let art_mapper = Callback::from(art_to_id);
     let skill_mapper = Callback::from(skill_to_id);
+    let gem_mapper = Callback::from(gem_category_to_id);
 
     html! {
         <>
@@ -133,7 +138,7 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
                     })}
                 </Tile>
                 <Tile classes={classes!("is-vertical", "mr-2")}>
-                    {for (0..CHARACTER_CLASS_SKILL_MAX).map(|i| html! {
+                    {for (0..CHARACTER_CLASS_SKILL_MAX-1).map(|i| html! {
                         <Field>
                             <label class="label"><Text path={"character_skill"} args={vec![("id".into(), i.into())]} /></label>
                             <SlotInput<SkillEditor, Skill, u16>
@@ -145,7 +150,16 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
                     })}
                 </Tile>
                 <Tile classes={classes!("is-vertical", "mr-2")}>
-                    {"Gems"}
+                    {for (0..3).map(|i| html! {
+                        <Field>
+                            <label class="label"><Text path={"character_gem"} args={vec![("id".into(), i.into())]} /></label>
+                            <SlotInput<GemEditor, GemCategory, u8>
+                                editor={GemEditor {char_idx: char_idx, class_id: *class_id, slot_idx: i}}
+                                possible_values={gem_categories}
+                                id_mapper={gem_mapper.clone()}
+                            />
+                        </Field>
+                    })}
                 </Tile>
                 <Tile classes={classes!("is-vertical", "mr-2")}>
                     {"Accessories"}
@@ -161,4 +175,8 @@ fn art_to_id(art: &Art) -> Option<u16> {
 
 fn skill_to_id(skill: &Skill) -> Option<u16> {
     Some(skill.id.try_into().unwrap())
+}
+
+fn gem_category_to_id(gem: &GemCategory) -> Option<u8> {
+    gem.id.try_into().ok().and_then(|id: u8| id.checked_sub(1))
 }

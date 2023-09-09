@@ -1,5 +1,6 @@
 use std::{borrow::Cow, rc::Rc};
 
+use fluent::{FluentArgs, FluentValue};
 use wasm_bindgen::JsCast;
 use web_sys::{Element, EventTarget, HtmlElement, HtmlInputElement};
 use ybc::*;
@@ -9,7 +10,7 @@ use yew_feather::ChevronDown;
 use game_data::lang::{Filterable, Id, Nameable};
 use game_data::LanguageData;
 
-use crate::lang::{Lang, LangManager};
+use crate::lang::{Lang, LangManager, Text};
 
 pub trait HtmlName {
     fn get_name_html(&self, language: &LanguageData) -> Html;
@@ -285,7 +286,11 @@ where
         html! {
             <>
                 <span><small>{self.id()}{". "}</small></span>
-                <span>{self.get_name_str(language)}</span>
+                <span>
+                    {self.get_name_str(language).map(Html::from).unwrap_or_else(|| html! {
+                        <Text path="unnamed" args={vec![("id".into(), self.id().into())]} />
+                    })}
+                </span>
             </>
         }
     }
@@ -293,16 +298,44 @@ where
     fn get_search_query<'a, 'b: 'a>(
         &'a self,
         language: &'b LanguageData,
-        _: &'b LangManager,
+        html_lang: &'b LangManager,
     ) -> Option<Cow<'a, str>> {
-        self.get_filter(language).map(|t| t.text().into())
+        Some(
+            self.get_filter(language)
+                .map(|t| t.text().into())
+                .unwrap_or_else(|| {
+                    let args = FluentArgs::from(
+                        [(Cow::from("id"), FluentValue::from(self.id()))]
+                            .into_iter()
+                            .collect(),
+                    );
+                    html_lang
+                        .translate_with_args("unnamed", Some(&args))
+                        .to_string()
+                        .into()
+                }),
+        )
     }
 
     fn get_name_for_filter<'a, 'b: 'a>(
         &'a self,
         language: &'b LanguageData,
-        _: &'b LangManager,
+        html_lang: &'b LangManager,
     ) -> Option<Cow<'a, str>> {
-        self.get_filter(language).map(|t| t.text_lower().into())
+        Some(
+            self.get_filter(language)
+                .map(|t| t.text_lower().into())
+                .unwrap_or_else(|| {
+                    let args = FluentArgs::from(
+                        [(Cow::from("id"), FluentValue::from(self.id()))]
+                            .into_iter()
+                            .collect(),
+                    );
+                    html_lang
+                        .translate_with_args("unnamed", Some(&args))
+                        .to_lowercase()
+                        .into()
+                }),
+        )
     }
 }

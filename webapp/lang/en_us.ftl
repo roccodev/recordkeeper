@@ -218,6 +218,13 @@ character_skill =
         [6] Inherited Skill 3
         *[7] Unused Skill
     }
+# $id: the slot ID
+character_gem =
+    { $id ->
+        [0] Gem Type 1
+        [1] Gem Type 2
+        *[2] Gem Type 3
+    }
 
 character_class_cp = CP
 character_class_unlock = Unlock Points

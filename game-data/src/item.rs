@@ -2,7 +2,7 @@
 
 use std::num::NonZeroUsize;
 
-use crate::lang::{FilterTable, Filterable};
+use crate::lang::{FilterTable, Filterable, Id};
 use enum_map::{Enum, EnumArray, EnumMap};
 use recordkeeper::item::ItemType;
 use serde::{Deserialize, Serialize};
@@ -12,6 +12,7 @@ use crate::LanguageData;
 #[derive(Serialize, Deserialize, Default)]
 pub struct ItemRegistry {
     items: EnumMap<Type, Vec<Item>>,
+    gem_categories: Vec<GemCategory>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy)]
@@ -21,6 +22,12 @@ pub struct Item {
     pub item_type: Type,
     pub amount_max: u32,
     pub rarity: Rarity,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Clone, Copy)]
+pub struct GemCategory {
+    pub id: u32,
+    pub name_id: usize,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy)]
@@ -59,8 +66,27 @@ impl ItemRegistry {
         items.insert(index, item);
     }
 
+    pub fn register_gem_category(&mut self, gem: GemCategory) {
+        let categories = &mut self.gem_categories;
+        let index = categories
+            .binary_search_by_key(&gem.id, |gem| gem.id)
+            .expect_err("duplicate gem category");
+        categories.insert(index, gem);
+    }
+
     pub fn items_by_type(&self, item_type: ItemType) -> &[Item] {
         &self.items[Type(item_type)]
+    }
+
+    pub fn gem_categories(&self) -> &[GemCategory] {
+        &self.gem_categories
+    }
+
+    pub fn gem_category_by_id(&self, id: u32) -> Option<&GemCategory> {
+        self.gem_categories
+            .binary_search_by_key(&id, |g| g.id)
+            .ok()
+            .map(|i| &self.gem_categories[i])
     }
 }
 
@@ -127,5 +153,17 @@ impl TryFrom<u32> for Type {
 
     fn try_from(value: u32) -> Result<Self, Self::Error> {
         ItemType::try_from(value).map(|t| Self(t))
+    }
+}
+
+impl Filterable for GemCategory {
+    fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l crate::lang::FilterEntry> {
+        language.items.tables[Type(ItemType::Gem)].get(self.name_id)
+    }
+}
+
+impl Id for GemCategory {
+    fn id(&self) -> usize {
+        self.id as usize
     }
 }

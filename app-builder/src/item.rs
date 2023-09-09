@@ -2,7 +2,7 @@ use std::num::NonZeroUsize;
 
 use bdat::{Label, RowRef};
 use enum_map::enum_map;
-use game_data::item::{Item, ItemLanguageRegistry, Rarity};
+use game_data::item::{GemCategory, Item, ItemLanguageRegistry, Rarity};
 use game_data::item::{ItemRegistry, Type};
 use recordkeeper::item::ItemType;
 
@@ -31,6 +31,25 @@ pub fn load_items(bdat: &BdatRegistry) -> ItemRegistry {
             .rows()
             .filter_map(|row| read_item(item_type, table.get_row(row.id()).unwrap()))
             .for_each(|item| registry.register_item(item));
+    }
+
+    let gems = bdat.table(&const_hash!("ITM_Gem"));
+    let mut registered = 0u64;
+    for row in gems.rows().map(|r| gems.row(r.id())) {
+        let category = row[const_hash!("Category")]
+            .as_single()
+            .unwrap()
+            .to_integer();
+        if registered & (1 << category) == 0 {
+            registered |= 1 << category;
+
+            let name_id = row[const_hash!("Name")].as_single().unwrap().to_integer() as usize;
+
+            registry.register_gem_category(GemCategory {
+                id: category,
+                name_id,
+            });
+        }
     }
 
     registry
