@@ -1,4 +1,5 @@
 use game_data::lang::{Filterable, Id};
+use web_sys::HtmlSelectElement;
 use ybc::{Notification, Select, Tile};
 use yew::prelude::*;
 
@@ -61,24 +62,53 @@ pub fn UpdateSelector<F: Filterable + PartialEq + Id + 'static>(
     props: &UpdateSelectorProps<F>,
 ) -> Html {
     let data = use_context::<Data>().unwrap();
+    let select_ref = use_node_ref();
+
     let update = {
         let update = props.update.clone();
-        Callback::from(move |s: String| update.emit(s.parse::<usize>().unwrap()))
+        Callback::from(move |s: String| {
+            update.emit(s.parse::<usize>().unwrap());
+        })
+        .reform(|ev: web_sys::Event| {
+            let select: HtmlSelectElement = ev
+                .target_dyn_into()
+                .expect("event target should be a select");
+            select.value()
+        })
     };
 
+    let selected_index = props
+        .values
+        .iter()
+        .position(|c| c.id() == props.current)
+        .unwrap_or_default();
+
+    // Firefox workaround. For some reason, sometimes the
+    // select element fails to update its selectedIndex property
+    // when the DOM is refreshed
+    {
+        let select_ref = select_ref.clone();
+        use_effect(move || {
+            let select: HtmlSelectElement = select_ref.cast().unwrap();
+            select.set_selected_index(selected_index.try_into().unwrap());
+        });
+    }
+
     html! {
-        <Select name="class" update={update} value={props.current.to_string()}>
-            {for props.values.iter().map(|c| {
-                let entry = c.get_filter(data.lang());
-                html! {
-                    <option value={c.id().to_string()} selected={c.id() == props.current}>
-                        {match entry {
-                            Some(entry) => entry.text().into(),
-                            None => html!(<Text path="unnamed" args={vec![("id".into(), c.id().into())]} />)
-                        }}
-                    </option>
-                }
-            })}
-        </Select>
+        <div class="select">
+            <select ref={select_ref} name="selector" onchange={update} value={props.current.to_string()}>
+                {for props.values.iter().enumerate().map(|(i, c)| {
+                    let entry = c.get_filter(data.lang());
+                    html! {
+                        <option value={c.id().to_string()} selected={i == selected_index}>
+                            {match entry {
+                                Some(entry) => entry.text().into(),
+                                None => html!(<Text path="unnamed" args={vec![("id".into(), c.id().into())]} />)
+                            }}
+                        </option>
+                    }
+                })}
+            </select>
+        </div>
     }
 }
