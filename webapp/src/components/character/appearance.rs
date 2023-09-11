@@ -1,13 +1,11 @@
 use std::fmt::Debug;
 
-use game_data::{
-    character::{Attachment, Costume},
-    lang::Id,
-};
+use game_data::character::{Attachment, Costume};
 use recordkeeper::character::CharacterFlag;
 use strum::IntoEnumIterator;
-use ybc::{Control, Field, Tile};
+use ybc::{Button, Control, Field, Icon, Tile};
 use yew::prelude::*;
+use yew_feather::X;
 
 use crate::{
     components::{
@@ -123,7 +121,8 @@ pub fn Appearance(props: &AppearanceProps) -> Html {
 /// Select component with a button to empty the field, as well as
 /// searchable options.
 ///
-/// Note: only works when the option index = option ID - 1
+/// Note: only works when the option index = option ID - 1, and when the
+/// "None" value is 0.
 #[function_component]
 fn EditorSelect<E, I>(props: &EditorSelectProps<E, I>) -> Html
 where
@@ -156,13 +155,30 @@ where
         })
     };
 
+    let clear_callback = {
+        let editor = props.editor;
+        let save_context = save_context.clone();
+        Callback::from(move |_: MouseEvent| {
+            save_context.edit(move |save| editor.set(save, 0usize.try_into().unwrap()))
+        })
+    };
+
     html! {
-        <SearchSelect<I>
-            current={current}
-            options={props.options.clone()}
-            on_select={update}
-            lang={lang}
-        />
+        <Field classes={classes!("has-addons")}>
+            <Control>
+                <SearchSelect<I>
+                    current={current}
+                    options={props.options.clone()}
+                    on_select={update}
+                    lang={lang}
+                />
+            </Control>
+            <Control>
+                <Button onclick={clear_callback} disabled={current.is_none()}>
+                    <Icon><X /></Icon>
+                </Button>
+            </Control>
+        </Field>
     }
 }
 
