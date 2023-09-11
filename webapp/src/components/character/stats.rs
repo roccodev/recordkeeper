@@ -80,8 +80,8 @@ pub fn CharacterStats(props: &CharacterProps) -> Html {
     };
 
     html! {
-        <div>
-            <Tile classes={classes!("is-parent")}>
+        <Tile classes={classes!("is-parent")}>
+            <div>
                 <Field classes={classes!("mr-2")}>
                     <label class="label"><Text path="character_level" /></label>
                     <Control>
@@ -89,9 +89,9 @@ pub fn CharacterStats(props: &CharacterProps) -> Html {
                     </Control>
                 </Field>
                 <Field classes={classes!("mr-2")}>
-                    <label class="label"><Text path="character_exp" /></label>
+                    <label class="label"><Text path="character_bexp" /></label>
                     <Control>
-                        <NumberInput<ExpEditor> editor={ExpEditor { char_idx }} />
+                        <NumberInput<BonusExpEditor> editor={BonusExpEditor { char_idx }} />
                     </Control>
                 </Field>
                 <Field>
@@ -100,12 +100,12 @@ pub fn CharacterStats(props: &CharacterProps) -> Html {
                         <UpdateSelector<Class> update={update_selected_class} current={selected_class} values={data.game().characters.classes()} />
                     </Control>
                 </Field>
-            </Tile>
-            <Tile classes={classes!("is-parent")}>
+            </div>
+            <div>
                 <Field classes={classes!("mr-2")}>
-                    <label class="label"><Text path="character_bexp" /></label>
+                    <label class="label"><Text path="character_exp" /></label>
                     <Control>
-                        <NumberInput<BonusExpEditor> editor={BonusExpEditor { char_idx }} />
+                        <NumberInput<ExpEditor> editor={ExpEditor { char_idx }} />
                     </Control>
                 </Field>
                 <Field>
@@ -114,7 +114,7 @@ pub fn CharacterStats(props: &CharacterProps) -> Html {
                         <NumberInput<ArrivalLevelEditor> editor={ArrivalLevelEditor { char_idx }} />
                     </Control>
                 </Field>
-            </Tile>
-        </div>
+            </div>
+        </Tile>
     }
 }

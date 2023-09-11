@@ -3,11 +3,12 @@ use ybc::{Notification, Select, Tile};
 use yew::prelude::*;
 
 use crate::{
-    components::character::{class::ClassEditor, stats::CharacterStats},
+    components::character::{appearance::Appearance, class::ClassEditor, stats::CharacterStats},
     data::Data,
     lang::Text,
 };
 
+mod appearance;
 mod class;
 mod slot;
 mod stats;
@@ -37,9 +38,7 @@ pub fn CharacterEditor(props: &CharacterProps) -> Html {
         <>
             <Tile classes={classes!("notification")}>
                 <CharacterStats ..*props />
-                <Tile classes={classes!("is-parent")}>
-                    {"Appearance"}
-                </Tile>
+                <Appearance char_idx={props.char_id.checked_sub(1).unwrap()} />
             </Tile>
             <Notification>
                 <ClassEditor char_id={props.char_id} />

@@ -194,6 +194,9 @@ character_arrival_level = Initial Level
 # Character clothes dirty level
 character_dirt = Dirtiness
 
+# Weapon decoration/eyepatch
+character_attachment = Attachment
+
 # $id: the art slot ID (0-6). 
 # 0 = talent art
 # 1-3 = Keves arts
@@ -236,3 +239,14 @@ character_accessory =
 character_class_cp = CP
 character_class_unlock = Unlock Points
 character_class_rank = Rank
+
+character_flag_unload_dlc_costume = DLC Costume Unloaded
+character_flag_eyepatch = Show Eyepatch
+character_flag_dlc4_ma_1 = Master Art 1 Unlock (FR)
+character_flag_dlc4_ma_2 = Master Art 2 Unlock (FR)
+character_flag_dlc4_ma_3 = Master Art 3 Unlock (FR)
+character_flag_dlc4_gem_1 = Gem 1 Unlock (FR)
+character_flag_dlc4_gem_2 = Gem 2 Unlock (FR)
+character_flag_dlc4_gem_3 = Gem 3 Unlock (FR)
+character_flag_dlc4_acc_2 = Accessory 2 Unlock (FR)
+character_flag_dlc4_acc_3 = Accessory 3 Unlock (FR)

@@ -1,6 +1,6 @@
 use recordkeeper_macros::SaveBin;
 
-use crate::character::{ClassAccessory, CHARACTER_MAX};
+use crate::character::{class::ClassAccessory, CHARACTER_MAX};
 
 pub const DLC4_ENEMYPEDIA_MAX_EACH: usize = 200;
 

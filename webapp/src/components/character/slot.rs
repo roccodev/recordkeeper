@@ -1,6 +1,6 @@
-use game_data::{item::Item, LanguageData};
+use game_data::LanguageData;
 use recordkeeper::{
-    character::{ClassAccessory, EmptySlotMut, Slot, SlotMut},
+    character::class::{ClassAccessory, EmptySlotMut, Slot, SlotMut},
     item::ItemType,
     SaveData,
 };

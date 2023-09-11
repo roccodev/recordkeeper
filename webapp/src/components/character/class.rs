@@ -2,9 +2,8 @@ use game_data::{
     character::{Art, Class, Skill},
     item::GemCategory,
 };
-use recordkeeper::character::{
-    ClassAccessory, CHARACTER_CLASS_ACCESSORY_MAX, CHARACTER_CLASS_ART_MAX,
-    CHARACTER_CLASS_SKILL_MAX,
+use recordkeeper::character::class::{
+    CHARACTER_CLASS_ACCESSORY_MAX, CHARACTER_CLASS_ART_MAX, CHARACTER_CLASS_SKILL_MAX,
 };
 use ybc::{Control, Field, Tile};
 use yew::prelude::*;
