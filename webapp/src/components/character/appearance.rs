@@ -1,11 +1,22 @@
+use std::fmt::Debug;
+
+use game_data::{
+    character::{Attachment, Costume},
+    lang::Id,
+};
 use recordkeeper::character::CharacterFlag;
 use strum::IntoEnumIterator;
 use ybc::{Control, Field, Tile};
 use yew::prelude::*;
 
 use crate::{
-    components::edit::{editor, CheckboxInput, NumberInput},
+    components::{
+        edit::{editor, CheckboxInput, Editor, NumberInput},
+        select::{HtmlName, Options, SearchSelect},
+    },
+    data::Data,
     lang::Text,
+    save::SaveContext,
 };
 
 #[rustfmt::skip]
@@ -49,6 +60,12 @@ pub struct AppearanceProps {
     pub char_idx: usize,
 }
 
+#[derive(Properties, PartialEq)]
+struct EditorSelectProps<E: PartialEq, I: PartialEq + 'static> {
+    pub editor: E,
+    pub options: Options<I>,
+}
+
 trait FlagBox {
     fn lang_id(&self) -> String;
     fn is_dlc4(&self) -> bool;
@@ -56,6 +73,8 @@ trait FlagBox {
 
 #[function_component]
 pub fn Appearance(props: &AppearanceProps) -> Html {
+    let data = use_context::<Data>().unwrap();
+
     html! {
         <Tile classes={classes!("is-parent", "is-vertical")}>
             <Tile>
@@ -68,13 +87,19 @@ pub fn Appearance(props: &AppearanceProps) -> Html {
                 <Field classes={classes!("mr-2")}>
                     <label class="label"><Text path="character_costume" /></label>
                     <Control>
-                        <NumberInput<CostumeEditor> editor={CostumeEditor { char_idx: props.char_idx }} />
+                        <EditorSelect<CostumeEditor, Costume>
+                            editor={CostumeEditor { char_idx: props.char_idx }}
+                            options={Options::from(data.game().characters.costumes(props.char_idx.checked_add(1).unwrap()))}
+                        />
                     </Control>
                 </Field>
                 <Field classes={classes!("mr-2")}>
                     <label class="label"><Text path="character_attachment" /></label>
                     <Control>
-                        <NumberInput<AttachmentEditor> editor={AttachmentEditor { char_idx: props.char_idx }} />
+                        <EditorSelect<AttachmentEditor, Attachment>
+                            editor={AttachmentEditor { char_idx: props.char_idx }}
+                            options={Options::from(data.game().characters.attachments())}
+                        />
                     </Control>
                 </Field>
             </Tile>
@@ -92,6 +117,52 @@ pub fn Appearance(props: &AppearanceProps) -> Html {
                 </Field>
             </Tile>
         </Tile>
+    }
+}
+
+/// Select component with a button to empty the field, as well as
+/// searchable options.
+///
+/// Note: only works when the option index = option ID - 1
+#[function_component]
+fn EditorSelect<E, I>(props: &EditorSelectProps<E, I>) -> Html
+where
+    E: Editor + PartialEq,
+    E::Target: TryInto<usize> + TryFrom<usize>,
+    <E::Target as TryInto<usize>>::Error: Debug,
+    <E::Target as TryFrom<usize>>::Error: Debug,
+    I: Clone + HtmlName + PartialEq + 'static,
+{
+    let save_context = use_context::<SaveContext>().unwrap();
+    let data = use_context::<Data>().unwrap();
+    let lang = data.to_lang();
+
+    let save = save_context.get();
+
+    // Conveniently, this is None when the value is 0
+    let current = props
+        .editor
+        .get(save.get().save())
+        .try_into()
+        .unwrap()
+        .checked_sub(1);
+
+    let update = {
+        let editor = props.editor;
+        let save_context = save_context.clone();
+        Callback::from(move |new: usize| {
+            save_context
+                .edit(move |save| editor.set(save, new.checked_add(1).unwrap().try_into().unwrap()))
+        })
+    };
+
+    html! {
+        <SearchSelect<I>
+            current={current}
+            options={props.options.clone()}
+            on_select={update}
+            lang={lang}
+        />
     }
 }
 

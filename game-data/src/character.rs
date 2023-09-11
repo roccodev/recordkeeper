@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use crate::{
     lang::{FilterEntry, FilterTable, Filterable, Id},
     LanguageData,
@@ -8,10 +6,12 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct CharacterData {
-    characters: Rc<[Character]>,
-    arts: Rc<[Art]>,
-    skills: Rc<[Skill]>,
-    classes: Rc<[Class]>,
+    characters: Box<[Character]>,
+    arts: Box<[Art]>,
+    skills: Box<[Skill]>,
+    classes: Box<[Class]>,
+    attachments: Box<[Attachment]>,
+    costumes: [Vec<Costume>; 6],
 }
 
 #[derive(Serialize, Deserialize)]
@@ -20,6 +20,7 @@ pub struct CharacterLang {
     pub arts: FilterTable,
     pub skills: FilterTable,
     pub classes: FilterTable,
+    pub misc: FilterTable,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
@@ -46,18 +47,34 @@ pub struct Class {
     pub name_id: usize,
 }
 
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+pub struct Attachment {
+    pub id: usize,
+    pub name_id: usize,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+pub struct Costume {
+    pub id: usize,
+    pub name_id: usize,
+}
+
 impl CharacterData {
     pub fn new(
         characters: impl IntoIterator<Item = Character>,
         arts: impl IntoIterator<Item = Art>,
         skills: impl IntoIterator<Item = Skill>,
         classes: impl IntoIterator<Item = Class>,
+        attachments: impl IntoIterator<Item = Attachment>,
+        costumes: [Vec<Costume>; 6],
     ) -> Self {
         Self {
             characters: characters.into_iter().collect(),
             arts: arts.into_iter().collect(),
             skills: skills.into_iter().collect(),
             classes: classes.into_iter().collect(),
+            attachments: attachments.into_iter().collect(),
+            costumes,
         }
     }
 
@@ -92,6 +109,17 @@ impl CharacterData {
     pub fn skills(&self) -> &[Skill] {
         &self.skills
     }
+
+    pub fn attachments(&self) -> &[Attachment] {
+        &self.attachments
+    }
+
+    pub fn costumes(&self, char_id: usize) -> &[Costume] {
+        char_id
+            .checked_sub(1)
+            .and_then(|i| self.costumes.get(i))
+            .unwrap_or_else(|| &self.costumes[0])
+    }
 }
 
 impl Filterable for Character {
@@ -118,6 +146,18 @@ impl Filterable for Class {
     }
 }
 
+impl Filterable for Attachment {
+    fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
+        language.characters.misc.get(self.name_id)
+    }
+}
+
+impl Filterable for Costume {
+    fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
+        language.characters.misc.get(self.name_id)
+    }
+}
+
 impl Id for Art {
     fn id(&self) -> usize {
         self.id
@@ -137,6 +177,18 @@ impl Id for Class {
 }
 
 impl Id for Character {
+    fn id(&self) -> usize {
+        self.id
+    }
+}
+
+impl Id for Attachment {
+    fn id(&self) -> usize {
+        self.id
+    }
+}
+
+impl Id for Costume {
     fn id(&self) -> usize {
         self.id
     }

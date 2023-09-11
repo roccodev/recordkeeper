@@ -105,7 +105,7 @@ impl<'b> LangBdatRegistry<'b> {
         let mut all_tables = HashMap::default();
         let base_path = base_path.as_ref();
 
-        for file in ["field", "quest", "battle", "system", "dlc"] {
+        for file in ["field", "quest", "battle", "system", "dlc", "menu"] {
             let reader = BufReader::new(
                 File::open(base_path.join(format!("{lang_id}/game/{file}.bdat"))).unwrap(),
             );
