@@ -10,6 +10,7 @@ use crate::{
 
 mod appearance;
 mod class;
+pub mod party;
 mod slot;
 mod stats;
 

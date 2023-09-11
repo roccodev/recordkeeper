@@ -3,7 +3,7 @@ use ybc::{Container, Control, Field, Tile};
 use yew::prelude::*;
 
 use crate::{
-    components::character::{CharacterEditor, Selector},
+    components::character::{party::PartyEditor, CharacterEditor, Selector},
     data::Data,
     lang::Text,
 };
@@ -15,13 +15,22 @@ pub fn Characters() -> Html {
 
     html! {
         <Container>
-            <Field>
-                <label class="label"><Text path="character_character" /></label>
-                <Control>
-                    <Selector<Character> state={char_id.clone()} values={data.game().characters.characters()} />
-                </Control>
-            </Field>
-            <CharacterEditor char_id={*char_id} />
+            <Tile classes={classes!("mb-2")}>
+                <Tile>
+                    <Field>
+                        <label class="label"><Text path="character_character" /></label>
+                        <Control>
+                            <Selector<Character> state={char_id.clone()} values={data.game().characters.characters()} />
+                        </Control>
+                    </Field>
+                </Tile>
+                <Tile classes={classes!("is-10", "is-justify-content-right")}>
+                    <PartyEditor />
+                </Tile>
+            </Tile>
+            <div>
+                <CharacterEditor char_id={*char_id} />
+            </div>
         </Container>
     }
 }

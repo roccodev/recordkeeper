@@ -179,6 +179,7 @@ quest_task_talk = Talk
 ## Character screen
 
 character_character = Character
+character_party = Party Setup
 character_class = Edit Class
 character_level = Level
 character_exp = EXP

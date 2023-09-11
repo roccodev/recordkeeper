@@ -1,4 +1,5 @@
 $dropdown-max-height: 12rem;
+$party-max-width: 8rem;
 
 .recordkeeper-dropdown {
   position: absolute;
@@ -9,4 +10,8 @@ $dropdown-max-height: 12rem;
 .recordkeeper-dropdown-list {
   max-height: $dropdown-max-height;
   overflow: scroll;
+}
+
+.recordkeeper-party-select {
+  max-width: $party-max-width;
 }
