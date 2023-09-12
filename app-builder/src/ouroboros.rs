@@ -44,7 +44,7 @@ pub fn read_ouroboros(bdat: &BdatRegistry) -> OuroborosRegistry {
 
 fn read_ouro_tree(bdat: &BdatRegistry, i: usize) -> Box<[OuroTreeNode]> {
     let table = bdat.table(&TABLES[i]);
-    table
+    let mut tree: Box<[OuroTreeNode]> = table
         .rows()
         .map(|r| table.row(r.id()))
         .map(|row| {
@@ -59,5 +59,7 @@ fn read_ouro_tree(bdat: &BdatRegistry, i: usize) -> Box<[OuroTreeNode]> {
                 n => panic!("unknown node type {n}"),
             })(param)
         })
-        .collect()
+        .collect();
+    tree.sort_unstable();
+    tree
 }

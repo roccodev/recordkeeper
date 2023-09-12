@@ -270,3 +270,8 @@ ouroboros_skill =
        *[1] Linked Skill 2
     }
 ouroboros_share_slot = Linked Skill 2 Unlocked
+
+ouroboros_tree_skill_unlock = Unlock Skill
+ouroboros_tree_art_unlock = Unlock Art
+ouroboros_tree_skill_upgrade = Upgrade Skill
+ouroboros_tree_art_upgrade = Upgrade Art

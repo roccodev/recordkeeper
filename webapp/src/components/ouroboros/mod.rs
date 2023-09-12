@@ -13,12 +13,15 @@ use crate::{
             slot::SlotInput,
         },
         edit::{CheckboxInput, FlagEditor, NumberInput, ToBool},
+        ouroboros::tree::OuroTree,
     },
     data::Data,
     lang::Text,
 };
 
 use super::{character::CharacterProps, edit::editor};
+
+mod tree;
 
 #[rustfmt::skip]
 editor!(
@@ -107,7 +110,7 @@ pub fn OuroborosEditor(props: &CharacterProps) -> Html {
                 </Tile>
             </Tile>
             <Notification>
-                {"Skill Tree"}
+                <OuroTree ouroboros={ouroboros} />
             </Notification>
         </>
     }

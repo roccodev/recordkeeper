@@ -136,3 +136,13 @@ impl Ouroboros {
         SlotMut(&mut self.linked_skills[index])
     }
 }
+
+impl OuroborosTree {
+    pub fn get(&self, index: usize) -> bool {
+        self.raw.get(index).expect("index out of bounds") != 0
+    }
+
+    pub fn set(&mut self, index: usize, val: bool) {
+        self.raw.set(index, u8::from(val).into())
+    }
+}

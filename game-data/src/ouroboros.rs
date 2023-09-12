@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::lang::{Filterable, Id};
+use crate::{
+    lang::{Filterable, Id},
+    GameData, LanguageData,
+};
 
 #[derive(Serialize, Deserialize, Clone, PartialEq)]
 pub struct OuroborosRegistry {
@@ -16,7 +19,7 @@ pub struct Ouroboros {
     pub tree_nodes: Box<[OuroTreeNode]>,
 }
 
-#[derive(Serialize, Deserialize, Clone, PartialEq, Copy)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Copy, PartialOrd, Eq, Ord)]
 pub enum OuroTreeNode {
     UnlockArt(usize),
     UnlockSkill(usize),
@@ -43,6 +46,22 @@ impl OuroborosRegistry {
 impl Ouroboros {
     pub fn tree_nodes(&self) -> impl Iterator<Item = (usize, OuroTreeNode)> + '_ {
         self.tree_nodes.iter().enumerate().map(|(i, n)| (i + 1, *n))
+    }
+}
+
+impl OuroTreeNode {
+    pub fn get_param_name<'l>(&self, game: &GameData, lang: &'l LanguageData) -> Option<&'l str> {
+        match self {
+            OuroTreeNode::UnlockArt(id) | Self::UpgradeArt(id) => game
+                .characters
+                .get_art(*id)
+                .and_then(|a| a.get_filter(lang)),
+            OuroTreeNode::UnlockSkill(id) | OuroTreeNode::UpgradeSkill(id) => game
+                .characters
+                .get_skill(*id)
+                .and_then(|s| s.get_filter(lang)),
+        }
+        .map(|t| t.text())
     }
 }
 
