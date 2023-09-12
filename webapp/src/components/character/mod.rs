@@ -1,6 +1,6 @@
 use game_data::lang::{Filterable, Id};
 use web_sys::HtmlSelectElement;
-use ybc::{Notification, Select, Tile};
+use ybc::{Notification, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -10,9 +10,9 @@ use crate::{
 };
 
 mod appearance;
-mod class;
+pub mod class;
 pub mod party;
-mod slot;
+pub mod slot;
 mod stats;
 
 #[derive(Properties, PartialEq, Clone, Copy)]

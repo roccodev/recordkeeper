@@ -9,4 +9,5 @@ pub mod character;
 pub mod dlc;
 pub mod item;
 pub mod meta;
+pub mod ouroboros;
 pub mod quest;

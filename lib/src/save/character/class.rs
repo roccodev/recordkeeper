@@ -2,6 +2,8 @@ use recordkeeper_macros::SaveBin;
 
 use crate::item::{ItemSlot, ItemType};
 
+use super::slot::{EmptySlot, EmptySlotMut, Slot, SlotMut};
+
 pub const CHARACTER_CLASS_ART_MAX: usize = 7;
 pub const CHARACTER_CLASS_SKILL_MAX: usize = 8;
 pub const CHARACTER_CLASS_GEM_MAX: usize = 10;
@@ -33,18 +35,6 @@ pub struct ClassAccessory {
     bdat_id: u16,
     slot_index: u16,
     item_type: u16,
-}
-
-pub struct Slot<N>(N);
-
-pub struct SlotMut<'a, N>(&'a mut N);
-
-pub trait EmptySlot {
-    fn is_empty(&self) -> bool;
-}
-
-pub trait EmptySlotMut: EmptySlot {
-    fn set_empty(&mut self);
 }
 
 impl CharacterClass {
@@ -124,37 +114,6 @@ impl ClassAccessory {
 
     pub fn slot_index(&self) -> u16 {
         self.slot_index
-    }
-}
-
-impl<N> Slot<N>
-where
-    Self: EmptySlot,
-    N: Copy,
-{
-    /// Returns the current value, or [`None`] if the slot is empty.
-    pub fn get(&self) -> Option<N> {
-        (!self.is_empty()).then(|| self.0)
-    }
-}
-
-impl<'a, N> SlotMut<'a, N>
-where
-    Self: EmptySlotMut,
-    N: Copy,
-{
-    /// Returns the current value, or [`None`] if the slot is empty.
-    pub fn get(&self) -> Option<N> {
-        (!self.is_empty()).then(|| *self.0)
-    }
-
-    /// Updates the current value. Accepts [`Some`] for a valid entry
-    /// and [`None`] for an empty slot.
-    pub fn set(&mut self, value: Option<N>) {
-        match value {
-            Some(n) => *self.0 = n,
-            None => self.set_empty(),
-        }
     }
 }
 

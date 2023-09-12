@@ -179,7 +179,7 @@ pub fn ClassEditor(props: &CharacterProps) -> Html {
     }
 }
 
-fn art_to_id(art: &Art) -> Option<u16> {
+pub fn art_to_id(art: &Art) -> Option<u16> {
     Some(art.id.try_into().unwrap())
 }
 

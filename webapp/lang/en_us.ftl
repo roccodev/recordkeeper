@@ -251,3 +251,16 @@ character_flag_dlc4_gem_2 = Gem 2 Unlock (FR)
 character_flag_dlc4_gem_3 = Gem 3 Unlock (FR)
 character_flag_dlc4_acc_2 = Accessory 2 Unlock (FR)
 character_flag_dlc4_acc_3 = Accessory 3 Unlock (FR)
+
+
+## Ouroboros screen
+
+ouroboros_character = Character
+# $id: the art slot ID (0-4). 
+ouroboros_art = 
+    { $id ->
+        [0] Talent Art
+        [4] Extra Talent Art
+       *[1] Art { $id }
+    }
+ouroboros_share_slot = Linked Skill Unlocked

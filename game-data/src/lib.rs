@@ -5,6 +5,7 @@ use dlc::{DlcData, DlcLang};
 use enhance::{EnhanceLang, EnhanceRegistry};
 use item::{ItemLanguageRegistry, ItemRegistry};
 use manual::ManualData;
+use ouroboros::OuroborosRegistry;
 use quest::{QuestLang, QuestRegistry};
 use scenario::ScenarioRanges;
 use serde::{Deserialize, Serialize};
@@ -16,6 +17,7 @@ pub mod enhance;
 pub mod item;
 pub mod lang;
 pub mod manual;
+pub mod ouroboros;
 pub mod quest;
 pub mod scenario;
 
@@ -27,6 +29,7 @@ pub struct GameData {
     pub events: ScenarioRanges,
     pub quests: QuestRegistry,
     pub characters: CharacterData,
+    pub ouroboros: OuroborosRegistry,
 
     /// Manually inputted data, that can't be read
     /// from game files.

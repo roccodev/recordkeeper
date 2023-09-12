@@ -3,6 +3,7 @@ use recordkeeper_macros::SaveBin;
 use crate::{flags::BitFlags, util::FixVec};
 
 use class::CharacterClass;
+use slot::{Slot, SlotMut};
 
 pub const PARTY_MAX: usize = 16;
 pub const PARTY_GUEST_MAX: usize = 8;
@@ -13,6 +14,7 @@ pub const PARTY_FORMATION_MAX: usize = 15;
 const CHARACTER_CLASS_MAX: usize = 64;
 
 pub mod class;
+pub mod slot;
 
 #[derive(SaveBin, Debug)]
 #[size(4444)]
@@ -65,7 +67,7 @@ pub enum CharacterFlag {
 
 #[derive(SaveBin, Debug)]
 pub struct OuroborosTree {
-    raw: u64,
+    raw: BitFlags<1, 2>,
 }
 
 #[derive(SaveBin, Debug)]
@@ -111,5 +113,15 @@ impl Character {
 
     pub fn set_flag(&mut self, flag: CharacterFlag, value: bool) {
         self.flags.set(flag as usize, u8::from(value).into())
+    }
+}
+
+impl Ouroboros {
+    pub fn art_slot(&self, index: usize) -> Slot<u16> {
+        Slot(self.art_ids[index])
+    }
+
+    pub fn art_slot_mut(&mut self, index: usize) -> SlotMut<u16> {
+        SlotMut(&mut self.art_ids[index])
     }
 }

@@ -8,6 +8,7 @@ mod enhance;
 mod item;
 mod lang;
 mod manual;
+mod ouroboros;
 mod quest;
 mod scenario;
 
@@ -62,6 +63,7 @@ fn read_game_data(bdat: &BdatRegistry) -> GameData {
         events: scenario::read_scenario_events(bdat),
         quests: quest::read_quests(bdat),
         characters: character::read_data(bdat),
+        ouroboros: ouroboros::read_ouroboros(bdat),
     }
 }
 

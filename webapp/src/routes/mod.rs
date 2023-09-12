@@ -6,6 +6,7 @@ mod character;
 mod flags;
 mod item;
 mod meta;
+mod ouroboros;
 mod quest;
 
 #[derive(Routable, Clone, PartialEq, Copy)]
@@ -52,7 +53,7 @@ pub fn render(route: Route) -> Html {
         Route::About => html!(<about::About />),
         Route::Meta => html!(<meta::SaveMeta />),
         Route::Characters => html!(<character::Characters />),
-        Route::Ouroboros => html!(),
+        Route::Ouroboros => html!(<ouroboros::OuroborosPage />),
         Route::Items => html!(<item::ItemInventory />),
         Route::Field => html!(),
         Route::Quests => html!(<quest::Quests />),
