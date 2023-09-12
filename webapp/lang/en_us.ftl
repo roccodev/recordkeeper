@@ -21,7 +21,7 @@ nav_license = License
 unnamed = #{ $id } (No Name)
 
 # Data related to the base game (no DLC)
-menu_category_base = Base Game Data
+menu_category_base = Game Data
 
 # Data related to DLCs 1-3
 menu_category_dlc = DLC Data

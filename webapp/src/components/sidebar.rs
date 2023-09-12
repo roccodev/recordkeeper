@@ -31,33 +31,47 @@ pub fn Sidebar() -> Html {
 
     let is_dlc4 = save.is_loaded() && save.get().save().is_dlc4();
 
+    let mut base_menu = vec![
+        Tab("base_characters", html!(<Users />), Route::Characters),
+        // Ouroboros here if not DLC4
+        Tab("base_items", html!(<ShoppingBag />), Route::Items),
+        Tab("base_field", html!(<Map />), Route::Field),
+        Tab("base_quests", html!(<HelpCircle />), Route::Quests),
+        Tab("base_ums", html!(<Crosshair />), Route::Uniques),
+        // Party formations if not DLC4
+    ];
+
+    if !is_dlc4 {
+        base_menu.insert(
+            1,
+            Tab("base_ouroboros", html!(<Target />), Route::Ouroboros),
+        );
+        base_menu.push(Tab(
+            "base_formations",
+            html!(<Triangle />),
+            Route::Formations,
+        ));
+    }
+
     let menu = [
         MenuItem::Category(Category("meta")),
         MenuItem::Tabs(vec![Tab("meta_meta", html!(<Info />), Route::Meta)]),
         MenuItem::Category(Category("base")),
-        MenuItem::Tabs(vec![
-            Tab("base_characters", html!(<Users />), Route::Characters),
-            Tab("base_ouroboros", html!(<Target />), Route::Ouroboros),
-            Tab("base_items", html!(<ShoppingBag />), Route::Items),
-            Tab("base_field", html!(<Map />), Route::Field),
-            Tab("base_quests", html!(<HelpCircle />), Route::Quests),
-            Tab("base_ums", html!(<Crosshair />), Route::Uniques),
-            Tab("base_formations", html!(<Triangle />), Route::Formations),
-        ]),
-        MenuItem::Category(Category("dlc")),
-        MenuItem::Tabs(vec![
-            Tab(
-                if is_dlc4 {
-                    "dlc4_growth"
-                } else {
-                    "dlc_powaugment"
-                },
-                html!(<TrendingUp />),
-                Route::PowAugment,
-            ),
-            Tab("dlc_challenge", html!(<Watch />), Route::ChallengeBattle),
-            Tab("dlc_gauntlet", html!(<LifeBuoy />), Route::Gauntlet),
-        ]),
+        MenuItem::Tabs(base_menu),
+        if !is_dlc4 {
+            MenuItem::Category(Category("dlc"))
+        } else {
+            MenuItem::None
+        },
+        if !is_dlc4 {
+            MenuItem::Tabs(vec![
+                Tab("dlc_powaugment", html!(<TrendingUp />), Route::PowAugment),
+                Tab("dlc_challenge", html!(<Watch />), Route::ChallengeBattle),
+                Tab("dlc_gauntlet", html!(<LifeBuoy />), Route::Gauntlet),
+            ])
+        } else {
+            MenuItem::None
+        },
         if is_dlc4 {
             MenuItem::Category(Category("dlc4"))
         } else {
@@ -65,6 +79,7 @@ pub fn Sidebar() -> Html {
         },
         if is_dlc4 {
             MenuItem::Tabs(vec![
+                Tab("dlc4_growth", html!(<TrendingUp />), Route::PowAugment),
                 Tab(
                     "dlc4_collepedia",
                     html!(<BookOpen />),
