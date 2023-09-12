@@ -183,7 +183,7 @@ pub fn art_to_id(art: &Art) -> Option<u16> {
     Some(art.id.try_into().unwrap())
 }
 
-fn skill_to_id(skill: &Skill) -> Option<u16> {
+pub fn skill_to_id(skill: &Skill) -> Option<u16> {
     Some(skill.id.try_into().unwrap())
 }
 

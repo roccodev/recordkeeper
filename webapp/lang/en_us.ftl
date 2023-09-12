@@ -263,4 +263,10 @@ ouroboros_art =
         [4] Extra Talent Art
        *[1] Art { $id }
     }
-ouroboros_share_slot = Linked Skill Unlocked
+# $id: the linked skill slot ID (0-1). 
+ouroboros_skill = 
+    { $id ->
+        [0] Linked Skill 1
+       *[1] Linked Skill 2
+    }
+ouroboros_share_slot = Linked Skill 2 Unlocked

@@ -13,6 +13,9 @@ pub const PARTY_FORMATION_MAX: usize = 15;
 
 const CHARACTER_CLASS_MAX: usize = 64;
 
+pub const OUROBOROS_ART_MAX: usize = 5;
+pub const OUROBOROS_SKILL_MAX: usize = 2;
+
 pub mod class;
 pub mod slot;
 
@@ -123,5 +126,13 @@ impl Ouroboros {
 
     pub fn art_slot_mut(&mut self, index: usize) -> SlotMut<u16> {
         SlotMut(&mut self.art_ids[index])
+    }
+
+    pub fn linked_skill_slot(&self, index: usize) -> Slot<u16> {
+        Slot(self.linked_skills[index])
+    }
+
+    pub fn linked_skill_slot_mut(&mut self, index: usize) -> SlotMut<u16> {
+        SlotMut(&mut self.linked_skills[index])
     }
 }
