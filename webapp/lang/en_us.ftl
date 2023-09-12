@@ -246,7 +246,6 @@ character_flag_eyepatch = Show Eyepatch
 character_flag_dlc4_ma_1 = Master Art 1 Unlock (FR)
 character_flag_dlc4_ma_2 = Master Art 2 Unlock (FR)
 character_flag_dlc4_ma_3 = Master Art 3 Unlock (FR)
-character_flag_dlc4_gem_1 = Gem 1 Unlock (FR)
 character_flag_dlc4_gem_2 = Gem 2 Unlock (FR)
 character_flag_dlc4_gem_3 = Gem 3 Unlock (FR)
 character_flag_dlc4_acc_2 = Accessory 2 Unlock (FR)

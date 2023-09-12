@@ -61,11 +61,10 @@ pub enum CharacterFlag {
     Dlc4MasterArt1 = 2,
     Dlc4MasterArt2 = 3,
     Dlc4MasterArt3 = 4,
-    Dlc4Gem1 = 5,
-    Dlc4Gem2 = 6,
-    Dlc4Gem3 = 7,
-    Dlc4Accessory2 = 8,
-    Dlc4Accessory3 = 9,
+    Dlc4Gem2 = 5,
+    Dlc4Gem3 = 6,
+    Dlc4Accessory2 = 7,
+    Dlc4Accessory3 = 8,
 }
 
 #[derive(SaveBin, Debug)]

@@ -192,7 +192,6 @@ impl FlagBox for CharacterFlag {
                 CharacterFlag::Dlc4MasterArt1 => "dlc4_ma_1",
                 CharacterFlag::Dlc4MasterArt2 => "dlc4_ma_2",
                 CharacterFlag::Dlc4MasterArt3 => "dlc4_ma_3",
-                CharacterFlag::Dlc4Gem1 => "dlc4_gem_1",
                 CharacterFlag::Dlc4Gem2 => "dlc4_gem_2",
                 CharacterFlag::Dlc4Gem3 => "dlc4_gem_3",
                 CharacterFlag::Dlc4Accessory2 => "dlc4_acc_2",
