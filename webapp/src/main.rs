@@ -9,7 +9,7 @@ pub mod routes;
 pub mod save;
 
 pub const BRAND_NAME: &str = "Recordkeeper";
-pub const BRAND_DISPLAY: &str = concat!("Recordkeeper", " v. ", env!("CARGO_PKG_VERSION"));
+pub const GIT_SHA: &str = git_version::git_version!();
 
 pub const GITHUB_URL: &str = "https://github.com/RoccoDev/recordkeeper";
 pub const LICENSE_URL: &str = "https://github.com/RoccoDev/recordkeeper/blob/master/COPYING";

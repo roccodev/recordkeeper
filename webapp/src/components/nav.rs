@@ -3,7 +3,7 @@ use yew::prelude::*;
 use yew_feather::{Github, Info, Key};
 use yew_router::prelude::Link;
 
-use crate::{lang::Text, routes::Route, BRAND_DISPLAY, GITHUB_URL, LICENSE_URL};
+use crate::{lang::Text, routes::Route, BRAND_NAME, GITHUB_URL, GIT_SHA, LICENSE_URL};
 
 #[derive(Properties, PartialEq)]
 struct IconTextProps {
@@ -28,7 +28,7 @@ pub fn Navbar() -> Html {
 fn Brand() -> Html {
     html! {
         <NavbarItem>
-            <NavbarDropdown navlink={html!(BRAND_DISPLAY)}>
+            <NavbarDropdown navlink={html!(<>{BRAND_NAME}{" "}{GIT_SHA}</>)}>
                 <Link<Route> classes={classes!("navbar-item")} to={Route::About}>
                     <IconText icon={html!(<Info />)} name={html!(<Text path="nav_about" />)} />
                 </Link<Route>>
