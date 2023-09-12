@@ -10,5 +10,13 @@
     "scenario": {
         "bits": 16,
         "index": 1
+    },
+    "ouro_enable_noah": {
+        "bits": 1,
+        "index": 21557
+    },
+    "ouro_enable": {
+        "bits": 1,
+        "index": 21574
     }
 }

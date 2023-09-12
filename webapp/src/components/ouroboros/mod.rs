@@ -1,4 +1,8 @@
-use game_data::character::{Art, Skill};
+use game_data::{
+    character::{Art, Skill},
+    ouroboros::Ouroboros,
+    GameData,
+};
 use recordkeeper::{
     character::{OUROBOROS_ART_MAX, OUROBOROS_SKILL_MAX},
     flags::FlagType,
@@ -69,18 +73,25 @@ pub fn OuroborosEditor(props: &CharacterProps) -> Html {
     html! {
         <>
             <Tile classes={classes!("notification", "is-vertical")}>
-                <Tile classes={classes!("is-align-items-center")}>
-                    <Field classes={classes!("mr-2")}>
-                        <label class="label"><Text path="ouroboros_sp" /></label>
+                <Tile  classes={classes!("is-align-items-center")}>
+                    <Field classes={classes!("mr-2", "is-grouped", "is-grouped-multiline")}>
                         <Control>
-                            <NumberInput<SpEditor> editor={SpEditor { char_idx }} />
+                            <CheckboxInput<ToBool<FlagEditor>> editor={ToBool(get_enable_flag(data.game(), ouroboros))}>
+                                {" "}<Text path="ouroboros_enable" />
+                            </CheckboxInput<ToBool<FlagEditor>>>
                         </Control>
-                    </Field>
-                    <Field classes={classes!("mr-2")}>
                         <Control>
                             <CheckboxInput<ToBool<FlagEditor>> editor={share_slot_flag}>
                                 {" "}<Text path="ouroboros_share_slot" />
                             </CheckboxInput<ToBool<FlagEditor>>>
+                        </Control>
+                    </Field>
+                </Tile>
+                <Tile>
+                    <Field classes={classes!("mr-2")}>
+                        <label class="label"><Text path="ouroboros_sp" /></label>
+                        <Control>
+                            <NumberInput<SpEditor> editor={SpEditor { char_idx }} />
                         </Control>
                     </Field>
                 </Tile>
@@ -114,4 +125,15 @@ pub fn OuroborosEditor(props: &CharacterProps) -> Html {
             </Notification>
         </>
     }
+}
+
+fn get_enable_flag(data: &GameData, ouroboros: &Ouroboros) -> FlagEditor {
+    if ouroboros.id == 1 {
+        return data.manual.flags.ouro_enable_noah.into();
+    }
+    let flag = data.manual.flags.ouro_enable;
+    return FlagEditor {
+        flag_type: FlagType::from_bits(flag.bits),
+        flag_index: flag.index + ouroboros.id - 2,
+    };
 }

@@ -255,6 +255,7 @@ character_flag_dlc4_acc_3 = Accessory 3 Unlock (FR)
 
 ## Ouroboros screen
 
+ouroboros_enable = Enable Interlink
 ouroboros_character = Character
 # $id: the art slot ID (0-4). 
 ouroboros_art = 
@@ -269,6 +270,7 @@ ouroboros_skill =
         [0] Linked Skill 1
        *[1] Linked Skill 2
     }
+
 ouroboros_share_slot = Linked Skill 2 Unlocked
 
 ouroboros_tree_skill_unlock = Unlock Skill
