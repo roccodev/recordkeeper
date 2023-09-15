@@ -276,3 +276,12 @@ ouroboros_tree_skill_unlock = Unlock Skill
 ouroboros_tree_art_unlock = Unlock Art
 ouroboros_tree_skill_upgrade = Upgrade Skill
 ouroboros_tree_art_upgrade = Upgrade Art
+
+
+## Field screen
+
+field_player_pos = Player Position
+
+x = X
+y = Y
+z = Z

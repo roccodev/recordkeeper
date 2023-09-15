@@ -1,8 +1,11 @@
 use yew::prelude::*;
 use yew_router::Routable;
 
+use self::field::FieldTab;
+
 mod about;
 mod character;
+mod field;
 mod flags;
 mod item;
 mod meta;
@@ -55,7 +58,7 @@ pub fn render(route: Route) -> Html {
         Route::Characters => html!(<character::Characters />),
         Route::Ouroboros => html!(<ouroboros::OuroborosPage />),
         Route::Items => html!(<item::ItemInventory />),
-        Route::Field => html!(),
+        Route::Field => html!(<field::FieldPage />),
         Route::Quests => html!(<quest::Quests />),
         Route::Uniques => html!(),
         Route::Formations => html!(),

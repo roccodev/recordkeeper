@@ -104,7 +104,7 @@ where
 }
 
 #[derive(Properties, PartialEq, Clone, Copy)]
-pub struct EnumEditorProps<E: Editor + PartialEq>
+pub struct EditorProps<E: Editor + PartialEq>
 where
     <E as Editor>::Target: PartialEq,
 {
@@ -169,7 +169,7 @@ where
 
 /// Select dropdown for enum-like types
 #[function_component]
-pub fn EnumInput<E: Editor + PartialEq>(props: &EnumEditorProps<E>) -> Html
+pub fn EnumInput<E: Editor + PartialEq>(props: &EditorProps<E>) -> Html
 where
     <E as Editor>::Target: PartialEq + IntoEnumIterator + ToHtml,
 {
@@ -214,6 +214,50 @@ pub fn CheckboxInput<E: Editor<Target = bool> + PartialEq>(props: &CheckboxInput
         <Checkbox name="ngp" checked={checked} update={update}>
             {for props.children.clone()}
         </Checkbox>
+    }
+}
+
+/// Checkbox field for boolean editors
+#[function_component]
+pub fn StringInput<T, E>(props: &EditorProps<E>) -> Html
+where
+    T: ToString + FromStr + PartialEq + 'static,
+    E: Editor<Target = T> + PartialEq,
+{
+    let save_context = use_context::<SaveContext>().unwrap();
+    let current_value = {
+        let save = save_context.get();
+        props.editor.get(save.get().save())
+    };
+    let value_display = current_value.to_string();
+    let editor = props.editor;
+
+    let change_listener = Callback::from(move |e: Event| {
+        let target: Option<EventTarget> = e.target();
+        let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+        if let Some(input) = input {
+            match <E as Editor>::Target::from_str(&input.value())
+                .map_err(|_| ())
+                .and_then(|v| editor.validate(&v).map_err(|_| ()).map(|_| v))
+                .ok()
+            {
+                Some(v) => {
+                    save_context.edit(move |save| editor.set(save, v));
+                }
+                None => {
+                    e.prevent_default();
+                    input.set_value(&value_display);
+                }
+            }
+        }
+    });
+
+    html! {
+        <input
+            class="input"
+            value={current_value.to_string()}
+            oninput={change_listener.reform(|e: InputEvent| e.dyn_into().unwrap())}
+        />
     }
 }
 
