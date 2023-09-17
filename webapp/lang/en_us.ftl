@@ -282,6 +282,7 @@ ouroboros_tree_art_upgrade = Upgrade Art
 
 field_player_pos = Player Position
 
+field_map = Map
 x = X
 y = Y
 z = Z

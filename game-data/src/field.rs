@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    lang::{FilterEntry, FilterTable, Filterable},
+    lang::{FilterEntry, FilterTable, Filterable, Id},
     LanguageData,
 };
 
@@ -53,11 +53,21 @@ impl FieldRegistry {
             maps: maps.into_iter().collect(),
         }
     }
+
+    pub fn maps(&self) -> &[Map] {
+        &self.maps
+    }
 }
 
 impl Filterable for MapId {
     fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
         language.field.locations.get(self.name_id)
+    }
+}
+
+impl Id for MapId {
+    fn id(&self) -> usize {
+        self.id
     }
 }
 
@@ -67,8 +77,20 @@ impl Filterable for Map {
     }
 }
 
+impl Id for Map {
+    fn id(&self) -> usize {
+        self.id.id()
+    }
+}
+
 impl Filterable for Location {
     fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
         language.field.locations.get(self.name_id)
+    }
+}
+
+impl Id for Location {
+    fn id(&self) -> usize {
+        self.id
     }
 }

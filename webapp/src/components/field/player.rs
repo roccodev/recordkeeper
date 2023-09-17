@@ -1,11 +1,25 @@
+use game_data::field::Map;
 use recordkeeper::SaveData;
 use ybc::{Control, Field, Tile, Title};
 use yew::prelude::*;
 
 use crate::{
-    components::edit::{editor, StringInput},
+    components::{
+        character::UpdateSelector,
+        edit::{editor, Editor, StringInput},
+    },
+    data::Data,
     lang::Text,
+    save::SaveContext,
 };
+
+#[rustfmt::skip]
+editor!(
+    MapIdEditor,
+    u16,
+    get |_, save| save.map_id,
+    set |_, save, new| save.map_id = new
+);
 
 #[rustfmt::skip]
 editor!(
@@ -31,9 +45,29 @@ enum Loc {
 
 #[function_component]
 pub fn PlayerLoc() -> Html {
+    let data = use_context::<Data>().unwrap();
+    let save_context = use_context::<SaveContext>().unwrap();
+    let maps = data.game().field.maps();
+
+    let save = save_context.get();
+    let map_id_editor = MapIdEditor {};
+    let update_map_id = {
+        let save_context = save_context.clone();
+        Callback::from(move |new: usize| {
+            save_context.edit(move |save| map_id_editor.set(save, new.try_into().unwrap()))
+        })
+    };
+
     html! {
         <Tile classes={classes!("is-child", "notification")}>
             <Title><Text path="field_player_pos" /></Title>
+
+            <Field>
+                <label class="label"><Text path="field_map" /></label>
+                <Control>
+                    <UpdateSelector<Map> current={map_id_editor.get(save.get().save()) as usize} values={maps} update={update_map_id} />
+                </Control>
+            </Field>
 
             <Field>
                 <label class="label"><Text path="x" /></label>

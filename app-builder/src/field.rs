@@ -40,12 +40,15 @@ fn read_map(bdat: &BdatRegistry, map: RowRef, resource: RowRef) -> Option<Map> {
         .as_str();
     let location_map = bdat.get_table(&Label::Hash(murmur3_str(&format!(
         "{bdat_prefix}_GMK_Location"
-    ))))?;
+    ))));
 
-    let locations = location_map
-        .rows()
-        .map(|row| read_location(location_map.row(row.id())))
-        .collect();
+    let locations = match location_map {
+        Some(table) => table
+            .rows()
+            .map(|row| read_location(table.row(row.id())))
+            .collect(),
+        None => std::iter::empty().collect(),
+    };
 
     Some(Map { id, locations })
 }

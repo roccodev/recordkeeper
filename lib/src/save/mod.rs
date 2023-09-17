@@ -50,8 +50,8 @@ pub struct SaveData {
     saved_event_flow: u32,
 
     #[loc(0x68c)]
-    map_id: u16,
-    map_time: MapTime,
+    pub map_id: u16,
+    pub map_time: MapTime,
 
     #[loc(0x6a0)]
     pub player_pos: Pos,
