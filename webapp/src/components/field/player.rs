@@ -93,6 +93,36 @@ pub fn PlayerLoc() -> Html {
     }
 }
 
+#[function_component]
+pub fn ShipLoc() -> Html {
+    html! {
+        <Tile classes={classes!("is-child", "notification")}>
+            <Title><Text path="field_ship_pos" /></Title>
+
+            <Field>
+                <label class="label"><Text path="x" /></label>
+                <Control>
+                    <StringInput<f32, CoordEditor> editor={CoordEditor { loc: Loc::Ship, coord: Coord::X }} />
+                </Control>
+            </Field>
+
+            <Field>
+                <label class="label"><Text path="y" /></label>
+                <Control>
+                    <StringInput<f32, CoordEditor> editor={CoordEditor { loc: Loc::Ship, coord: Coord::Y }} />
+                </Control>
+            </Field>
+
+            <Field>
+                <label class="label"><Text path="z" /></label>
+                <Control>
+                    <StringInput<f32, CoordEditor> editor={CoordEditor { loc: Loc::Ship, coord: Coord::Z }} />
+                </Control>
+            </Field>
+        </Tile>
+    }
+}
+
 fn coord(save: &SaveData, editor: CoordEditor) -> f32 {
     let pos = match editor.loc {
         Loc::Player => &save.player_pos,

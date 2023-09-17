@@ -281,6 +281,7 @@ ouroboros_tree_art_upgrade = Upgrade Art
 ## Field screen
 
 field_player_pos = Player Position
+field_ship_pos = Ship Position
 
 field_map = Map
 x = X
