@@ -1,7 +1,10 @@
 use ybc::{Container, Tile};
 use yew::prelude::*;
 
-use crate::components::field::player::{PlayerLoc, ShipLoc};
+use crate::components::field::{
+    env::Environment,
+    player::{PlayerLoc, ShipLoc},
+};
 
 #[derive(Clone, PartialEq, Copy)]
 pub enum FieldTab {
@@ -36,6 +39,9 @@ fn TabPlayer() -> Html {
                 </Tile>
             </Tile>
             <Tile>
+                <Tile classes={classes!("is-parent")}>
+                    <Environment />
+                </Tile>
             </Tile>
         </Container>
     }

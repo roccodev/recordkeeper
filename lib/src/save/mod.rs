@@ -133,7 +133,7 @@ pub struct MapTime {
     pub minute: u16,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum SaveFlag {
     TimeLocked = 0,
     WeatherLocked = 1,

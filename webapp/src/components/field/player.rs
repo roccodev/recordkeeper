@@ -1,12 +1,13 @@
 use game_data::field::Map;
-use recordkeeper::SaveData;
+use recordkeeper::{SaveData, SaveFlag};
 use ybc::{Control, Field, Tile, Title};
 use yew::prelude::*;
 
+use super::MetaFlagEditor;
 use crate::{
     components::{
         character::UpdateSelector,
-        edit::{editor, Editor, StringInput},
+        edit::{editor, CheckboxInput, Editor, StringInput},
     },
     data::Data,
     lang::Text,
@@ -117,6 +118,14 @@ pub fn ShipLoc() -> Html {
                 <label class="label"><Text path="z" /></label>
                 <Control>
                     <StringInput<f32, CoordEditor> editor={CoordEditor { loc: Loc::Ship, coord: Coord::Z }} />
+                </Control>
+            </Field>
+
+            <Field>
+                <Control>
+                    <CheckboxInput<MetaFlagEditor> editor={MetaFlagEditor { flag: SaveFlag::AboardShip }}>
+                        {" "}<Text path="field_aboard_ship" />
+                    </CheckboxInput<MetaFlagEditor>>
                 </Control>
             </Field>
         </Tile>
