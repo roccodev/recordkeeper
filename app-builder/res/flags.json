@@ -22,5 +22,9 @@
     "location": {
         "bits": 1,
         "index": 17720
+    },
+    "game_clear": {
+        "bits": 1,
+        "index": 6879
     }
 }

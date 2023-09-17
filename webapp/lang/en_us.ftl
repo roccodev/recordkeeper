@@ -81,6 +81,7 @@ meta_savetime = Save Time
 meta_scenario_flag = Scenario Flag
 meta_ngp = New Game Plus
 meta_settings = Settings
+meta_clear = Game Cleared
 
 ## Ouroboros translations
 

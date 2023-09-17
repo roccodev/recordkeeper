@@ -19,6 +19,7 @@ pub struct Flags {
     /// Location unlocked base flag.
     /// Flag ID = Base + (ma*a_GMK_Location row ID - 1)
     pub location: Flag,
+    pub game_clear: Flag,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]

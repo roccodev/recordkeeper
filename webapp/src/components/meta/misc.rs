@@ -26,6 +26,7 @@ pub fn Settings() -> Html {
     let flags = &data.game().manual.flags;
 
     let ngp_editor = ToBool(flags.new_game_plus.into());
+    let game_clear_editor = ToBool(flags.game_clear.into());
     let difficulty_editor = DifficultyEditor(flags.difficulty.into());
 
     html! {
@@ -43,6 +44,14 @@ pub fn Settings() -> Html {
                 <Control>
                     <CheckboxInput<ToBool<FlagEditor>> editor={ngp_editor}>
                         {" "}<Text path="meta_ngp" />
+                    </CheckboxInput<ToBool<FlagEditor>>>
+                </Control>
+            </Field>
+
+            <Field>
+                <Control>
+                    <CheckboxInput<ToBool<FlagEditor>> editor={game_clear_editor}>
+                        {" "}<Text path="meta_clear" />
                     </CheckboxInput<ToBool<FlagEditor>>>
                 </Control>
             </Field>

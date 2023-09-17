@@ -11,6 +11,8 @@ use recordkeeper_macros::SaveBin;
 
 use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
 
+use self::flags::BitFlags;
+
 pub mod character;
 pub mod dlc;
 pub mod enemy;
@@ -45,18 +47,28 @@ pub struct SaveData {
     #[loc(0x4c)]
     pub seen_colonies: u32,
 
+    #[loc(0x664)]
+    save_flags: BitFlags<1, 1>,
+
     /// Saved event flow ID for end-of-chapter saves
     #[loc(0x684)]
-    saved_event_flow: u32,
+    pub saved_event_flow: u32,
 
     #[loc(0x68c)]
     pub map_id: u16,
     pub map_time: MapTime,
 
+    /// ID for `RSC_WeatherSet`. The game only consider this if
+    /// [`SaveFlag::WeatherLocked`] is set.
+    pub weather: u16,
+
     #[loc(0x6a0)]
     pub player_pos: Pos,
     #[loc(0x6c0)]
     pub ship_pos: Pos,
+
+    /// Starts at 0, index for `party_characters`
+    pub controlled_character_idx: u32,
 
     #[loc(0x710)]
     pub flags: AllFlags,
@@ -112,19 +124,43 @@ pub struct Pos {
     pub x: f32,
     pub y: f32,
     pub z: f32,
+    pub rotation: f32,
 }
 
 #[derive(SaveBin, Debug)]
 pub struct MapTime {
-    hour: u16,
-    minute: u16,
+    pub hour: u16,
+    pub minute: u16,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum SaveFlag {
+    TimeLocked = 0,
+    WeatherLocked = 1,
+    AboardShip = 2,
+    /// Saved when prompted to by the game, for example
+    /// on chapter end or before the final fight.
+    Intermission = 3,
+    Dlc4 = 4,
+    /// Mid-run data from the gauntlet exists.
+    Gauntlet = 5,
 }
 
 impl SaveData {
-    /// Attempts to determine whether the save file is a Future Redeemed file.
+    pub fn is_flag_set(&self, flag: SaveFlag) -> bool {
+        self.save_flags
+            .get(flag as usize)
+            .map(|v| v != 0)
+            .expect("invalid flag index")
+    }
+
+    pub fn set_flag(&mut self, flag: SaveFlag, value: bool) {
+        self.save_flags.set(flag as usize, u8::from(value).into())
+    }
+
+    /// Returns whether the save file is a Future Redeemed file.
     pub fn is_dlc4(&self) -> bool {
-        // Current method: check if any party character has a FR ID
-        self.party_characters.iter().any(|&c| c >= 36)
+        self.is_flag_set(SaveFlag::Dlc4)
     }
 }
 
