@@ -18,5 +18,9 @@
     "ouro_enable": {
         "bits": 1,
         "index": 21574
+    },
+    "location": {
+        "bits": 1,
+        "index": 17720
     }
 }

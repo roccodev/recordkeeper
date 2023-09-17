@@ -5,6 +5,7 @@ use bdat::{Label, SwitchEndian, Table};
 mod character;
 mod dlc;
 mod enhance;
+mod field;
 mod item;
 mod lang;
 mod manual;
@@ -64,6 +65,7 @@ fn read_game_data(bdat: &BdatRegistry) -> GameData {
         quests: quest::read_quests(bdat),
         characters: character::read_data(bdat),
         ouroboros: ouroboros::read_ouroboros(bdat),
+        field: field::read_data(bdat),
     }
 }
 
@@ -74,6 +76,7 @@ fn read_lang_data(bdat: &LangBdatRegistry) -> LanguageData {
         dlc: dlc::read_dlc_lang(bdat),
         quests: quest::read_quest_lang(bdat),
         characters: character::read_lang(bdat),
+        field: field::read_lang(bdat),
     }
 }
 
@@ -82,7 +85,7 @@ impl<'b> BdatRegistry<'b> {
         let mut game_tables = HashMap::default();
         let base_path = base_path.as_ref();
 
-        for file in ["fld", "qst", "btl", "sys", "dlc", "mnu"] {
+        for file in ["fld", "qst", "btl", "sys", "dlc", "mnu", "map"] {
             let reader =
                 BufReader::new(File::open(base_path.join(format!("{file}.bdat"))).unwrap());
             let tables = bdat::modern::from_reader::<_, SwitchEndian>(reader)
@@ -97,8 +100,12 @@ impl<'b> BdatRegistry<'b> {
         Self { game_tables }
     }
 
+    pub fn get_table(&self, label: &Label) -> Option<&Table<'b>> {
+        self.game_tables.get(label)
+    }
+
     pub fn table(&self, label: &Label) -> &Table<'b> {
-        &self.game_tables[label]
+        self.get_table(label).expect("table not found")
     }
 }
 

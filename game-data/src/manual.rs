@@ -16,6 +16,9 @@ pub struct Flags {
     ///
     /// Note: the base flag refers to Mio
     pub ouro_enable: Flag,
+    /// Location unlocked base flag.
+    /// Flag ID = Base + (ma*a_GMK_Location row ID - 1)
+    pub location: Flag,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
