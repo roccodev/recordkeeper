@@ -42,10 +42,20 @@ pub struct SaveData {
     #[loc(0x18)]
     pub timestamp: SaveTimestamp,
     pub gold: u32,
+    /// 0-100: at 100 a new cylinder is generated when harvesting ether.
+    pub ether_cylinder_progress: u16,
+
+    /// ID for `SYS_MapJumpList`
+    pub respawn_point: u16,
 
     /// Updated by the game on load.
     #[loc(0x4c)]
     pub seen_colonies: u32,
+
+    /// For Ino's DX cylinders. (DLC2)
+    ///
+    /// 0-100: at 100 a new cylinder is generated when harvesting ether.
+    pub ether_cylinder_dx_progress: u16,
 
     #[loc(0x664)]
     save_flags: BitFlags<1, 1>,

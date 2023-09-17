@@ -304,3 +304,5 @@ field_weather_lock = Lock Weather (Required for changes to take effect.)
 field_stats = Player
 field_gold = Gold
 field_respawn_point = Respawn Point
+field_ether_progress = Ether Cylinder Progress%
+field_ether_progress_dx = DX Ether Cylinder Progress%

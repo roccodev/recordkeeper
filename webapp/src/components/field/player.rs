@@ -39,6 +39,30 @@ editor!(
     set |_, save, new| save.gold = new
 );
 
+#[rustfmt::skip]
+editor!(
+    CylinderEditor,
+    u16,
+    get |_, save| save.ether_cylinder_progress,
+    set |_, save, new| save.ether_cylinder_progress = new
+);
+
+#[rustfmt::skip]
+editor!(
+    CylinderDxEditor,
+    u16,
+    get |_, save| save.ether_cylinder_dx_progress,
+    set |_, save, new| save.ether_cylinder_dx_progress = new
+);
+
+#[rustfmt::skip]
+editor!(
+    MapJumpEditor,
+    u16,
+    get |_, save| save.respawn_point,
+    set |_, save, new| save.respawn_point = new
+);
+
 #[derive(Copy, Clone, PartialEq)]
 enum Coord {
     X,
@@ -156,6 +180,21 @@ pub fn FieldStats() -> Html {
             <Field>
                 <label class="label"><Text path="field_respawn_point" /></label>
                 <Control>
+                    <NumberInput<MapJumpEditor> editor={MapJumpEditor {}} />
+                </Control>
+            </Field>
+
+            <Field>
+                <label class="label"><Text path="field_ether_progress" /></label>
+                <Control>
+                    <NumberInput<CylinderEditor> editor={CylinderEditor {}} max={100} />
+                </Control>
+            </Field>
+
+            <Field>
+                <label class="label"><Text path="field_ether_progress_dx" /></label>
+                <Control>
+                    <NumberInput<CylinderDxEditor> editor={CylinderDxEditor {}} max={100} />
                 </Control>
             </Field>
         </Tile>
