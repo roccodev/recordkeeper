@@ -1,0 +1,17 @@
+$size-base: 1rem;
+$default-padding: $size-base * 1.5;
+$aside-width: $size-base * 20;
+$aside-mobile-width: $size-base * 15;
+$aside-icon-width: $size-base * 3;
+$aside-submenu-font-size: $size-base * .95;
+$aside-box-shadow: none;
+$aside-background-color: #d9d1d0;
+$aside-tools-background-color: darken($aside-background-color, 10%);
+$aside-tools-color: #575656;
+$sidebar-height: 3.25rem;
+$navbar-height: 2.3rem;
+
+@import "bulma/bulma.sass";
+@import "sidebar.scss";
+@import "select.scss";
+@import "modal.scss";

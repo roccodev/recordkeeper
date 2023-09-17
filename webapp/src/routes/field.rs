@@ -1,12 +1,16 @@
-use ybc::{Container, Tile};
+use strum::{EnumIter, IntoEnumIterator};
+use ybc::{Container, Tabs, Tile};
 use yew::prelude::*;
 
-use crate::components::field::{
-    env::Environment,
-    player::{PlayerLoc, ShipLoc},
+use crate::{
+    components::field::{
+        env::Environment,
+        player::{FieldStats, PlayerLoc, ShipLoc},
+    },
+    lang::Text,
 };
 
-#[derive(Clone, PartialEq, Copy)]
+#[derive(Clone, PartialEq, Copy, EnumIter)]
 pub enum FieldTab {
     Player,
     Locations,
@@ -17,12 +21,28 @@ pub enum FieldTab {
 pub fn FieldPage() -> Html {
     let tab = use_state(|| FieldTab::Player);
 
+    let update_tab = |t| {
+        let tab_state = tab.clone();
+        Callback::from(move |_: MouseEvent| {
+            tab_state.set(t);
+        })
+    };
+
     html! {
-        {match *tab {
-            FieldTab::Player => html!(<TabPlayer />),
-            FieldTab::Locations => html!(),
-            FieldTab::Colonies => html!(),
-        }}
+        <>
+            <Tabs classes={classes!("is-boxed", "is-centered")}>
+                {for FieldTab::iter().map(|t| {
+                    let classes = if t == *tab { classes!("is-active") } else { classes!() };
+                    html!(<li class={classes}><a onclick={update_tab(t)}><Text path={t.lang()} /></a></li>)
+                })}
+            </Tabs>
+
+            {match *tab {
+                FieldTab::Player => html!(<TabPlayer />),
+                FieldTab::Locations => html!(),
+                FieldTab::Colonies => html!(),
+            }}
+        </>
     }
 }
 
@@ -40,9 +60,23 @@ fn TabPlayer() -> Html {
             </Tile>
             <Tile>
                 <Tile classes={classes!("is-parent")}>
+                    <FieldStats />
+                </Tile>
+                <Tile classes={classes!("is-parent")}>
                     <Environment />
                 </Tile>
             </Tile>
         </Container>
+    }
+}
+
+impl FieldTab {
+    fn lang(&self) -> String {
+        let id = match self {
+            FieldTab::Player => "player",
+            FieldTab::Locations => "locations",
+            FieldTab::Colonies => "colonies",
+        };
+        format!("field_tab_{id}")
     }
 }

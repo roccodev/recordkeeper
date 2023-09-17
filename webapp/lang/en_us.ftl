@@ -281,6 +281,10 @@ ouroboros_tree_art_upgrade = Upgrade Art
 
 ## Field screen
 
+field_tab_player = Player
+field_tab_locations = Locations
+field_tab_colonies = Colonies
+
 field_player_pos = Player Position
 field_ship_pos = Ship Position
 field_aboard_ship = Aboard Ship
@@ -296,3 +300,7 @@ field_time_minute = Map Time (Minutes)
 field_weather = Map Weather
 field_time_lock = Lock Time
 field_weather_lock = Lock Weather (Required for changes to take effect.)
+
+field_stats = Player
+field_gold = Gold
+field_respawn_point = Respawn Point

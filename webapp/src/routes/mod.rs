@@ -1,8 +1,6 @@
 use yew::prelude::*;
 use yew_router::Routable;
 
-use self::field::FieldTab;
-
 mod about;
 mod character;
 mod field;

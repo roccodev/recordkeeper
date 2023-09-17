@@ -7,7 +7,7 @@ use super::MetaFlagEditor;
 use crate::{
     components::{
         character::UpdateSelector,
-        edit::{editor, CheckboxInput, Editor, StringInput},
+        edit::{editor, CheckboxInput, Editor, NumberInput, StringInput},
     },
     data::Data,
     lang::Text,
@@ -29,6 +29,14 @@ editor!(
     get |editor, save| coord(save, *editor),
     set |editor, save, new| *coord_mut(save, *editor) = new,
     capture loc: Loc, coord: Coord
+);
+
+#[rustfmt::skip]
+editor!(
+    GoldEditor,
+    u32,
+    get |_, save| save.gold,
+    set |_, save, new| save.gold = new
 );
 
 #[derive(Copy, Clone, PartialEq)]
@@ -126,6 +134,28 @@ pub fn ShipLoc() -> Html {
                     <CheckboxInput<MetaFlagEditor> editor={MetaFlagEditor { flag: SaveFlag::AboardShip }}>
                         {" "}<Text path="field_aboard_ship" />
                     </CheckboxInput<MetaFlagEditor>>
+                </Control>
+            </Field>
+        </Tile>
+    }
+}
+
+#[function_component]
+pub fn FieldStats() -> Html {
+    html! {
+        <Tile classes={classes!("is-child", "notification")}>
+            <Title><Text path="field_stats" /></Title>
+
+            <Field>
+                <label class="label"><Text path="field_gold" /></label>
+                <Control>
+                    <NumberInput<GoldEditor> editor={GoldEditor {}} />
+                </Control>
+            </Field>
+
+            <Field>
+                <label class="label"><Text path="field_respawn_point" /></label>
+                <Control>
                 </Control>
             </Field>
         </Tile>
