@@ -3,6 +3,7 @@ use recordkeeper::SaveFlag;
 use super::edit::editor;
 
 pub mod env;
+pub mod location;
 pub mod player;
 
 #[rustfmt::skip]

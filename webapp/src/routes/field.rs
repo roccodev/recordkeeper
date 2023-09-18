@@ -5,6 +5,7 @@ use yew::prelude::*;
 use crate::{
     components::field::{
         env::Environment,
+        location::LocationsPage,
         player::{FieldStats, PlayerLoc, ShipLoc},
     },
     lang::Text,
@@ -39,7 +40,7 @@ pub fn FieldPage() -> Html {
 
             {match *tab {
                 FieldTab::Player => html!(<TabPlayer />),
-                FieldTab::Locations => html!(),
+                FieldTab::Locations => html!(<LocationsPage />),
                 FieldTab::Colonies => html!(),
             }}
         </>

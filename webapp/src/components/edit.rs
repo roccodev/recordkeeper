@@ -117,6 +117,7 @@ where
     <E as Editor>::Target: PartialEq,
 {
     pub editor: E,
+    #[prop_or_default]
     pub children: Children,
 }
 

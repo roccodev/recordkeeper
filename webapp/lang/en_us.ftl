@@ -306,3 +306,16 @@ field_gold = Gold
 field_respawn_point = Respawn Point
 field_ether_progress = Ether Cylinder Progress%
 field_ether_progress_dx = DX Ether Cylinder Progress%
+
+field_location_visited = Visited
+field_location_id = ID
+field_location_type = Type
+field_location_name = Name
+
+field_location_type_region = Region
+field_location_type_location = Location
+field_location_type_landmark = Landmark
+field_location_type_secret = Secret Area
+field_location_type_colony = Colony
+field_location_type_camp = Rest Spot
+field_location_type_respawn = Respawn Point

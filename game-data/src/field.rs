@@ -54,6 +54,10 @@ impl FieldRegistry {
         }
     }
 
+    pub fn get_map_by_id(&self, id: usize) -> Option<&Map> {
+        id.checked_sub(1).and_then(|i| self.maps.get(i))
+    }
+
     pub fn maps(&self) -> &[Map] {
         &self.maps
     }
