@@ -311,6 +311,8 @@ field_location_visited = Visited
 field_location_id = ID
 field_location_type = Type
 field_location_name = Name
+field_location_all_on = All On
+field_location_all_off = All Off
 
 field_location_type_region = Region
 field_location_type_location = Location
