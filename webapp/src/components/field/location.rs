@@ -170,7 +170,11 @@ fn location_to_flag(data: &GameData, location: &Location) -> ToBool<FlagEditor> 
     let base_flag = FlagEditor::from(data.manual.flags.location);
     ToBool(FlagEditor {
         flag_type: base_flag.flag_type,
-        flag_index: base_flag.flag_index.checked_add(location.id).unwrap(),
+        flag_index: location
+            .id
+            .checked_sub(1)
+            .and_then(|id| base_flag.flag_index.checked_add(id))
+            .unwrap(),
     })
 }
 
