@@ -216,7 +216,7 @@ where
     };
 
     let input = use_state(|| String::new());
-    let valid = use_state(|| true);
+    let valid = use_state_eq(|| true);
     {
         let input = input.clone();
         let valid = valid.clone();
@@ -251,6 +251,7 @@ where
                     }) {
                     Some(v) => {
                         save_context.edit(move |save| editor.set(save, v));
+                        valid_state.set(true);
                     }
                     None => {
                         e.prevent_default();
