@@ -16,7 +16,7 @@ use crate::{
 
 #[rustfmt::skip]
 editor!(
-    MapIdEditor,
+    pub MapIdEditor,
     u16,
     get |_, save| save.map_id,
     set |_, save, new| save.map_id = new
@@ -24,7 +24,7 @@ editor!(
 
 #[rustfmt::skip]
 editor!(
-    CoordEditor,
+    pub CoordEditor,
     f32,
     get |editor, save| coord(save, *editor),
     set |editor, save, new| *coord_mut(save, *editor) = new,
@@ -57,21 +57,21 @@ editor!(
 
 #[rustfmt::skip]
 editor!(
-    MapJumpEditor,
+    pub MapJumpEditor,
     u16,
     get |_, save| save.respawn_point,
     set |_, save, new| save.respawn_point = new
 );
 
 #[derive(Copy, Clone, PartialEq)]
-enum Coord {
+pub enum Coord {
     X,
     Y,
     Z,
 }
 
 #[derive(Copy, Clone, PartialEq)]
-enum Loc {
+pub enum Loc {
     Player,
     Ship,
 }

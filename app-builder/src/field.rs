@@ -1,3 +1,5 @@
+use std::num::NonZeroU16;
+
 use bdat::{hash::murmur3_str, Label, RowRef};
 use game_data::field::{FieldLang, FieldRegistry, Location, LocationType, Map, MapId};
 
@@ -62,6 +64,12 @@ fn read_location(row: RowRef) -> Location {
         .as_single()
         .unwrap()
         .to_integer() as usize;
+    let map_jump = row[const_hash!("MapJumpID")]
+        .as_single()
+        .unwrap()
+        .to_integer()
+        .try_into()
+        .unwrap();
 
     let location_type = match category {
         0 => LocationType::RestSpot,
@@ -78,5 +86,7 @@ fn read_location(row: RowRef) -> Location {
         id: row.id(),
         name_id,
         location_type,
+        map_jump: NonZeroU16::new(map_jump),
+        map_point: None, // TODO
     }
 }

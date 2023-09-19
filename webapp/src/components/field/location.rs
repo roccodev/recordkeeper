@@ -3,13 +3,14 @@ use game_data::{
     lang::Nameable,
     GameData,
 };
-use ybc::{Button, Container, Control, Field, Table};
+use ybc::{Button, Buttons, Container, Control, Field, Table};
 use yew::prelude::*;
 
 use crate::{
     components::{
         character::Selector,
         edit::{CheckboxInput, Editor, FlagEditor, ToBool},
+        field::player::{Coord, CoordEditor, Loc, MapIdEditor, MapJumpEditor},
     },
     data::Data,
     lang::Text,
@@ -19,6 +20,7 @@ use crate::{
 #[derive(Properties, PartialEq)]
 struct LocationProps {
     location: Location,
+    map_id: usize,
 }
 
 #[function_component]
@@ -35,6 +37,7 @@ pub fn LocationsPage() -> Html {
         }
     });
 
+    let map_id = *map_state;
     let map = data
         .game()
         .field
@@ -79,11 +82,12 @@ pub fn LocationsPage() -> Html {
                         <th><Text path="field_location_visited" /></th>
                         <th><Text path="field_location_type" /></th>
                         <th><Text path="field_location_name" /></th>
+                        <th><Text path="field_location_actions" /></th>
                     </tr>
                 </thead>
                 <tbody>
                     {for map.locations.iter().map(|location| {
-                        html!(<LocationRow location={*location} />)
+                        html!(<LocationRow location={*location} map_id={map_id} />)
                     })}
                 </tbody>
             </Table>
@@ -94,16 +98,70 @@ pub fn LocationsPage() -> Html {
 #[function_component]
 fn LocationRow(props: &LocationProps) -> Html {
     let data = use_context::<Data>().unwrap();
-    let location = &props.location;
+    let save_context = use_context::<SaveContext>().unwrap();
+
+    let location = props.location;
+    let save = save_context.get();
+
+    let spawn_editor = MapJumpEditor {};
+
+    let spawn_callback = |id: u16| {
+        let save_context = save_context.clone();
+        Callback::from(move |_: MouseEvent| {
+            save_context.edit(move |save| spawn_editor.set(save, id))
+        })
+    };
+
+    let teleport_callback = {
+        let save_context = save_context.clone();
+        let map = MapIdEditor {};
+        let map_id = props.map_id;
+        let x = CoordEditor {
+            loc: Loc::Player,
+            coord: Coord::X,
+        };
+        let y = CoordEditor {
+            loc: Loc::Player,
+            coord: Coord::Y,
+        };
+        let z = CoordEditor {
+            loc: Loc::Player,
+            coord: Coord::Z,
+        };
+        location.map_point.map(|point| {
+            Callback::from(move |_: MouseEvent| {
+                save_context.edit(move |save| {
+                    map.set(save, map_id.try_into().unwrap());
+                    x.set(save, point.x);
+                    y.set(save, point.y);
+                    z.set(save, point.z);
+                })
+            })
+        })
+    };
 
     html! {
         <tr>
             <th>{location.id}</th>
             <td>
-                <CheckboxInput<ToBool<FlagEditor>> editor={location_to_flag(data.game(), location)} />
+                <CheckboxInput<ToBool<FlagEditor>> editor={location_to_flag(data.game(), &location)} />
             </td>
             <td><Text path={location_type_lang(location.location_type)}/></td>
             <td>{location.get_name_str(data.lang())}</td>
+            <td>
+                <Buttons classes={classes!("are-small")}>
+                    {teleport_callback.map(|callback| html! {
+                        <Button onclick={callback}>
+                            <Text path="field_location_teleport" />
+                        </Button>
+                    })}
+                    {location.map_jump.map(|map_jump| html! {
+                        <Button disabled={spawn_editor.get(save.get().save()) == map_jump.get()} onclick={spawn_callback(map_jump.get())}>
+                            <Text path="field_location_respawn" />
+                        </Button>
+                    })}
+                </Buttons>
+            </td>
         </tr>
     }
 }

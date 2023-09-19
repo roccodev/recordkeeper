@@ -313,6 +313,9 @@ field_location_type = Type
 field_location_name = Name
 field_location_all_on = All On
 field_location_all_off = All Off
+field_location_actions = Actions
+field_location_respawn = Set as respawn point
+field_location_teleport = Teleport here
 
 field_location_type_region = Region
 field_location_type_location = Location

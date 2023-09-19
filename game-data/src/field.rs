@@ -1,3 +1,5 @@
+use std::num::NonZeroU16;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -32,6 +34,15 @@ pub struct Location {
     pub id: usize,
     pub name_id: usize,
     pub location_type: LocationType,
+    pub map_jump: Option<NonZeroU16>,
+    pub map_point: Option<MapPoint>,
+}
+
+#[derive(Serialize, Deserialize, Copy, Clone, PartialEq)]
+pub struct MapPoint {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
 #[derive(Serialize, Deserialize, Copy, Clone, PartialEq)]
