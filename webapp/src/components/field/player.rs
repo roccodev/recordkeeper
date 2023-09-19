@@ -12,6 +12,7 @@ use crate::{
     data::Data,
     lang::Text,
     save::SaveContext,
+    util::FiniteF32,
 };
 
 #[rustfmt::skip]
@@ -25,9 +26,9 @@ editor!(
 #[rustfmt::skip]
 editor!(
     pub CoordEditor,
-    f32,
+    FiniteF32,
     get |editor, save| coord(save, *editor),
-    set |editor, save, new| *coord_mut(save, *editor) = new,
+    set |editor, save, new| *coord_mut(save, *editor) = new.into(),
     capture loc: Loc, coord: Coord
 );
 
@@ -105,21 +106,21 @@ pub fn PlayerLoc() -> Html {
             <Field>
                 <label class="label"><Text path="x" /></label>
                 <Control>
-                    <StringInput<f32, CoordEditor> editor={CoordEditor { loc: Loc::Player, coord: Coord::X }} />
+                    <StringInput<FiniteF32, CoordEditor> editor={CoordEditor { loc: Loc::Player, coord: Coord::X }} />
                 </Control>
             </Field>
 
             <Field>
                 <label class="label"><Text path="y" /></label>
                 <Control>
-                    <StringInput<f32, CoordEditor> editor={CoordEditor { loc: Loc::Player, coord: Coord::Y }} />
+                    <StringInput<FiniteF32, CoordEditor> editor={CoordEditor { loc: Loc::Player, coord: Coord::Y }} />
                 </Control>
             </Field>
 
             <Field>
                 <label class="label"><Text path="z" /></label>
                 <Control>
-                    <StringInput<f32, CoordEditor> editor={CoordEditor { loc: Loc::Player, coord: Coord::Z }} />
+                    <StringInput<FiniteF32, CoordEditor> editor={CoordEditor { loc: Loc::Player, coord: Coord::Z }} />
                 </Control>
             </Field>
         </Tile>
@@ -135,21 +136,21 @@ pub fn ShipLoc() -> Html {
             <Field>
                 <label class="label"><Text path="x" /></label>
                 <Control>
-                    <StringInput<f32, CoordEditor> editor={CoordEditor { loc: Loc::Ship, coord: Coord::X }} />
+                    <StringInput<FiniteF32, CoordEditor> editor={CoordEditor { loc: Loc::Ship, coord: Coord::X }} />
                 </Control>
             </Field>
 
             <Field>
                 <label class="label"><Text path="y" /></label>
                 <Control>
-                    <StringInput<f32, CoordEditor> editor={CoordEditor { loc: Loc::Ship, coord: Coord::Y }} />
+                    <StringInput<FiniteF32, CoordEditor> editor={CoordEditor { loc: Loc::Ship, coord: Coord::Y }} />
                 </Control>
             </Field>
 
             <Field>
                 <label class="label"><Text path="z" /></label>
                 <Control>
-                    <StringInput<f32, CoordEditor> editor={CoordEditor { loc: Loc::Ship, coord: Coord::Z }} />
+                    <StringInput<FiniteF32, CoordEditor> editor={CoordEditor { loc: Loc::Ship, coord: Coord::Z }} />
                 </Control>
             </Field>
 
@@ -201,7 +202,7 @@ pub fn FieldStats() -> Html {
     }
 }
 
-fn coord(save: &SaveData, editor: CoordEditor) -> f32 {
+fn coord(save: &SaveData, editor: CoordEditor) -> FiniteF32 {
     let pos = match editor.loc {
         Loc::Player => &save.player_pos,
         Loc::Ship => &save.ship_pos,
@@ -211,6 +212,8 @@ fn coord(save: &SaveData, editor: CoordEditor) -> f32 {
         Coord::Y => pos.y,
         Coord::Z => pos.z,
     }
+    .try_into()
+    .expect("non-finite coordinate")
 }
 
 fn coord_mut(save: &mut SaveData, editor: CoordEditor) -> &mut f32 {

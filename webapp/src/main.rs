@@ -7,6 +7,7 @@ pub mod dialog;
 pub mod lang;
 pub mod routes;
 pub mod save;
+pub mod util;
 
 pub const BRAND_NAME: &str = "Recordkeeper";
 pub const GIT_SHA: &str = git_version::git_version!();

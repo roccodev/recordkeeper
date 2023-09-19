@@ -153,9 +153,9 @@ fn LocationRow(props: &LocationProps) -> Html {
             Callback::from(move |_: MouseEvent| {
                 save_context.edit(move |save| {
                     map.set(save, map_id.try_into().unwrap());
-                    x.set(save, point.x);
-                    y.set(save, point.y);
-                    z.set(save, point.z);
+                    x.set(save, point.x.try_into().unwrap());
+                    y.set(save, point.y.try_into().unwrap());
+                    z.set(save, point.z.try_into().unwrap());
                 })
             })
         })

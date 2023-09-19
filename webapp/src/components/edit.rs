@@ -112,6 +112,18 @@ where
 }
 
 #[derive(Properties, PartialEq, Clone)]
+pub struct StringInputProps<E: Editor + PartialEq>
+where
+    <E as Editor>::Target: PartialEq,
+{
+    pub editor: E,
+    #[prop_or_default]
+    pub input_type: AttrValue,
+    #[prop_or_default]
+    pub filter: Option<Callback<E::Target, bool>>,
+}
+
+#[derive(Properties, PartialEq, Clone)]
 pub struct CheckboxInputProps<E: Editor + PartialEq>
 where
     <E as Editor>::Target: PartialEq,
@@ -126,44 +138,16 @@ where
 #[function_component]
 pub fn NumberInput<E: Editor + PartialEq>(props: &NumberEditorProps<E>) -> Html
 where
-    <E as Editor>::Target: PartialEq + PartialOrd + Display + FromStr + Copy,
+    <E as Editor>::Target: Eq + Ord + Display + FromStr + Copy,
 {
-    let save_context = use_context::<SaveContext>().unwrap();
-    let current_value = {
-        let save = save_context.get();
-        props.editor.get(save.get().save())
-    };
-    let value_display = current_value.to_string();
+    let props = *props;
     let editor = props.editor;
 
-    let props = *props;
-    let change_listener = Callback::from(move |e: Event| {
-        let target: Option<EventTarget> = e.target();
-        let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-        if let Some(input) = input {
-            match <E as Editor>::Target::from_str(&input.value())
-                .map_err(|_| ())
-                .and_then(|v| editor.validate(&v).map_err(|_| ()).map(|_| v))
-                .ok()
-                .and_then(|v| props.check_range(v).then_some(v))
-            {
-                Some(v) => {
-                    save_context.edit(move |save| editor.set(save, v));
-                }
-                None => {
-                    // Invalid number, out of range, etc.
-                    e.prevent_default();
-                    input.set_value(&value_display);
-                }
-            }
-        }
-    });
-
     html! {
-        <input
-            class="input" type="number"
-            value={current_value.to_string()}
-            oninput={change_listener.reform(|e: InputEvent| e.dyn_into().unwrap())}
+        <StringInput<E::Target, E>
+            editor={editor}
+            input_type="number"
+            filter={Callback::from(move |v| props.check_range(v))}
         />
     }
 }
@@ -220,9 +204,9 @@ pub fn CheckboxInput<E: Editor<Target = bool> + PartialEq>(props: &CheckboxInput
 
 /// Checkbox field for boolean editors
 #[function_component]
-pub fn StringInput<T, E>(props: &EditorProps<E>) -> Html
+pub fn StringInput<T, E>(props: &StringInputProps<E>) -> Html
 where
-    T: ToString + FromStr + PartialEq + 'static,
+    T: ToString + FromStr + Eq + Clone + 'static,
     E: Editor<Target = T> + PartialEq,
 {
     let save_context = use_context::<SaveContext>().unwrap();
@@ -230,33 +214,65 @@ where
         let save = save_context.get();
         props.editor.get(save.get().save())
     };
-    let value_display = current_value.to_string();
+
+    let input = use_state(|| String::new());
+    let valid = use_state(|| true);
+    {
+        let input = input.clone();
+        let valid = valid.clone();
+        use_effect_with_deps(
+            move |v| {
+                input.set(v.to_string());
+                valid.set(true);
+            },
+            current_value,
+        );
+    }
+
     let editor = props.editor;
 
-    let change_listener = Callback::from(move |e: Event| {
-        let target: Option<EventTarget> = e.target();
-        let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
-        if let Some(input) = input {
-            match <E as Editor>::Target::from_str(&input.value())
-                .map_err(|_| ())
-                .and_then(|v| editor.validate(&v).map_err(|_| ()).map(|_| v))
-                .ok()
-            {
-                Some(v) => {
-                    save_context.edit(move |save| editor.set(save, v));
-                }
-                None => {
-                    e.prevent_default();
-                    input.set_value(&value_display);
-                }
+    let change_listener = {
+        let input_state = input.clone();
+        let valid_state = valid.clone();
+        let filter = props.filter.clone();
+
+        Callback::from(move |e: Event| {
+            let target: Option<EventTarget> = e.target();
+            let input = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok());
+            if let Some(input) = input {
+                let value = input.value();
+                match <E as Editor>::Target::from_str(&value)
+                    .map_err(|_| ())
+                    .and_then(|v| editor.validate(&v).map_err(|_| ()).map(|_| v))
+                    .ok()
+                    .and_then(|v| match &filter {
+                        Some(filter) => filter.emit(v.clone()).then_some(v),
+                        None => Some(v),
+                    }) {
+                    Some(v) => {
+                        save_context.edit(move |save| editor.set(save, v));
+                    }
+                    None => {
+                        e.prevent_default();
+                        valid_state.set(false);
+                    }
+                };
+                input_state.set(value)
             }
-        }
-    });
+        })
+    };
+
+    let classes = if *valid {
+        classes!("input")
+    } else {
+        classes!("input", "is-danger")
+    };
 
     html! {
         <input
-            class="input"
-            value={current_value.to_string()}
+            class={classes}
+            type={props.input_type.clone()}
+            value={input.to_string()}
             oninput={change_listener.reform(|e: InputEvent| e.dyn_into().unwrap())}
         />
     }
