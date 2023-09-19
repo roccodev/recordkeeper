@@ -26,5 +26,13 @@
     "game_clear": {
         "bits": 1,
         "index": 6879
+    },
+    "landmark_count": {
+        "bits": 16,
+        "index": 1945
+    },
+    "secret_count": {
+        "bits": 16,
+        "index": 1944
     }
 }

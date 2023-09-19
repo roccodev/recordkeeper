@@ -3,6 +3,7 @@ use game_data::{
     lang::Nameable,
     GameData,
 };
+use recordkeeper::SaveData;
 use ybc::{Button, Buttons, Container, Control, Field, Table};
 use yew::prelude::*;
 
@@ -21,6 +22,16 @@ use crate::{
 struct LocationProps {
     location: Location,
     map_id: usize,
+    landmark_count: FlagEditor,
+    secret_count: FlagEditor,
+}
+
+#[derive(Clone, Copy, PartialEq)]
+struct LocationVisitEditor {
+    location_type: LocationType,
+    visited: ToBool<FlagEditor>,
+    landmark_count_editor: FlagEditor,
+    secret_count_editor: FlagEditor,
 }
 
 #[function_component]
@@ -44,13 +55,22 @@ pub fn LocationsPage() -> Html {
         .get_map_by_id(*map_state)
         .expect("map not found");
 
+    let landmark_count_editor = FlagEditor::from(data.game().manual.flags.landmark_count);
+    let secret_area_count_editor = FlagEditor::from(data.game().manual.flags.secret_count);
+
     let set_all = |val: bool| {
         let save_context = save_context.clone();
         let game = data.game();
+
         Callback::from(move |_: MouseEvent| {
             save_context.edit(move |save| {
                 for loc in map.locations.iter() {
-                    let flag = location_to_flag(game, loc);
+                    let flag = LocationVisitEditor::new(
+                        game,
+                        loc,
+                        landmark_count_editor,
+                        secret_area_count_editor,
+                    );
                     flag.set(save, val);
                 }
             })
@@ -87,7 +107,14 @@ pub fn LocationsPage() -> Html {
                 </thead>
                 <tbody>
                     {for map.locations.iter().map(|location| {
-                        html!(<LocationRow location={*location} map_id={map_id} />)
+                        html! {
+                            <LocationRow
+                                location={*location}
+                                map_id={map_id}
+                                landmark_count={landmark_count_editor}
+                                secret_count={secret_area_count_editor}
+                            />
+                        }
                     })}
                 </tbody>
             </Table>
@@ -144,7 +171,7 @@ fn LocationRow(props: &LocationProps) -> Html {
         <tr>
             <th>{location.id}</th>
             <td>
-                <CheckboxInput<ToBool<FlagEditor>> editor={location_to_flag(data.game(), &location)} />
+                <CheckboxInput<LocationVisitEditor> editor={LocationVisitEditor::new(data.game(), &location, props.landmark_count, props.secret_count)} />
             </td>
             <td><Text path={location_type_lang(location.location_type)}/></td>
             <td>{location.get_name_str(data.lang())}</td>
@@ -166,18 +193,6 @@ fn LocationRow(props: &LocationProps) -> Html {
     }
 }
 
-fn location_to_flag(data: &GameData, location: &Location) -> ToBool<FlagEditor> {
-    let base_flag = FlagEditor::from(data.manual.flags.location);
-    ToBool(FlagEditor {
-        flag_type: base_flag.flag_type,
-        flag_index: location
-            .id
-            .checked_sub(1)
-            .and_then(|id| base_flag.flag_index.checked_add(id))
-            .unwrap(),
-    })
-}
-
 fn location_type_lang(ty: LocationType) -> String {
     let id = match ty {
         LocationType::Region => "region",
@@ -189,4 +204,61 @@ fn location_type_lang(ty: LocationType) -> String {
         LocationType::RespawnPoint => "respawn",
     };
     format!("field_location_type_{id}")
+}
+
+impl LocationVisitEditor {
+    pub fn new(
+        game: &GameData,
+        location: &Location,
+        landmark_count: FlagEditor,
+        secret_count: FlagEditor,
+    ) -> Self {
+        let base_flag = FlagEditor::from(game.manual.flags.location);
+        let editor = ToBool(FlagEditor {
+            flag_type: base_flag.flag_type,
+            flag_index: location
+                .id
+                .checked_sub(1)
+                .and_then(|id| base_flag.flag_index.checked_add(id))
+                .unwrap(),
+        });
+        Self {
+            location_type: location.location_type,
+            visited: editor,
+            landmark_count_editor: landmark_count,
+            secret_count_editor: secret_count,
+        }
+    }
+}
+
+impl Editor for LocationVisitEditor {
+    type Target = bool;
+
+    fn get(&self, save: &SaveData) -> Self::Target {
+        self.visited.get(save)
+    }
+
+    fn set(&self, save: &mut SaveData, new: Self::Target) {
+        let current = self.get(save);
+        self.visited.set(save, new);
+
+        if current == new {
+            return;
+        }
+
+        let editor = match self.location_type {
+            LocationType::Landmark => &self.landmark_count_editor,
+            LocationType::SecretArea => &self.secret_count_editor,
+            _ => return,
+        };
+        let count = editor.get(save);
+        editor.set(
+            save,
+            if new {
+                count.saturating_add(1)
+            } else {
+                count.saturating_sub(1)
+            },
+        );
+    }
 }
