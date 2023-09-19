@@ -39,14 +39,8 @@ pub fn LocationsPage() -> Html {
     let data = use_context::<Data>().unwrap();
     let save_context = use_context::<SaveContext>().unwrap();
 
-    // Cent-Omnia / Aetia
-    let map_state = use_state(|| {
-        if save_context.get().get().save().is_dlc4() {
-            79
-        } else {
-            18
-        }
-    });
+    // Use save map as default
+    let map_state = use_state(|| MapIdEditor {}.get(save_context.get().get().save()) as usize);
 
     let map_id = *map_state;
     let map = data
