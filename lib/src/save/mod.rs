@@ -11,11 +11,13 @@ use recordkeeper_macros::SaveBin;
 
 use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
 
+use self::field::MapBitmaps;
 use self::flags::BitFlags;
 
 pub mod character;
 pub mod dlc;
 pub mod enemy;
+pub mod field;
 pub mod flags;
 pub mod item;
 pub mod menu;
@@ -95,6 +97,9 @@ pub struct SaveData {
 
     #[loc(0x53c78)]
     pub inventory: Inventory,
+
+    #[loc(0x7e000)]
+    pub map_visibility: MapBitmaps,
 
     #[loc(0x181c80)]
     pub menu_data: MenuData,
