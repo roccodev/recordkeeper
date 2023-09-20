@@ -4,6 +4,7 @@ mod save;
 pub mod util;
 
 use crate::error::SaveError;
+use std::alloc::Layout;
 use std::any::{Any, TypeId};
 use std::io::Cursor;
 use std::mem::MaybeUninit;
@@ -27,7 +28,19 @@ impl SaveFile {
 
         // Allocate directly on the heap. The `SaveData` struct is *big*. I encountered
         // stack overflow problems in tests.
-        let mut save: Box<MaybeUninit<SaveData>> = Box::new(MaybeUninit::uninit());
+        let mut save: Box<MaybeUninit<SaveData>> = {
+            let layout = Layout::new::<MaybeUninit<SaveData>>();
+            assert_ne!(0, layout.size());
+
+            // SAFETY: size > 0
+            let ptr = unsafe { std::alloc::alloc(layout) };
+            if ptr.is_null() {
+                std::alloc::handle_alloc_error(layout);
+            }
+
+            // SAFETY: same behavior as Box::try_new_uninit_in
+            unsafe { Box::from_raw(ptr.cast()) }
+        };
 
         // SAFETY: SaveBin::read_into needs to hold the invariant to never read or drop
         // the output pointer.
