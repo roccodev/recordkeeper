@@ -1,11 +1,8 @@
-use proc_macro2::{Span, TokenStream};
+use proc_macro2::TokenStream;
 
 use quote::{quote, ToTokens};
-use syn::parse::ParseStream;
 use syn::punctuated::Punctuated;
-use syn::{
-    parse_macro_input, parse_quote, Attribute, Data, DeriveInput, Expr, Field, Ident, Meta, Token,
-};
+use syn::{parse_macro_input, parse_quote, Data, DeriveInput, Expr, Field, Meta, Token};
 
 struct FieldVisitor<'ast> {
     field: &'ast Field,
@@ -23,10 +20,13 @@ impl<'ast> FieldVisitor<'ast> {
             quote! {
                 {
                     let loc: u64 = #loc.try_into().expect("new #[loc] too large");
-                    let current = __IN_BYTES.position();
-                    if loc < current {
-                        panic!("New location 0x{:x} is lower than current location 0x{:x} for field {}",
-                            loc, current, stringify!(#var_name));
+                    #[cfg(debug_assertions)]
+                    {
+                        let current = __IN_BYTES.position();
+                        if loc < current {
+                            panic!("New location 0x{:x} is lower than current location 0x{:x} for field {}",
+                                loc, current, stringify!(#var_name));
+                        }
                     }
                     __IN_BYTES.set_position(loc);
                 }
@@ -90,6 +90,7 @@ impl<'ast> FieldVisitor<'ast> {
 
         match &self.location {
             Some(loc) => quote! {
+                #[cfg(debug_assertions)]
                 if #loc < current_loc {
                     panic!("New location 0x{:x} is lower than current location 0x{:x} for field {}",
                         #loc, current_loc, stringify!(#field_name));
@@ -187,6 +188,7 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
 
     let extra_size = expected_size.map(|size| {
         quote! {
+            #[cfg(debug_assertions)]
             if size > #size {
                 panic!("Struct {} too large, can't add padding. Expected max {} bytes, found {}.",
                     stringify!(#name), #size, size);
@@ -205,7 +207,13 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
 
                 // Set up relative positions for start of struct
                 let __POS = usize::try_from(__IN_BYTES.position()).expect("position too large");
-                __IN_BYTES = std::io::Cursor::new(&__IN_BYTES.into_inner()[__POS..]);
+                {
+                    let __INNER = &__IN_BYTES.into_inner()[__POS..];
+                    if __INNER.len() < Self::size() {
+                        return Err(crate::error::SaveError::UnexpectedEof);
+                    }
+                    __IN_BYTES = std::io::Cursor::new(__INNER);
+                }
 
                 #parsers
 

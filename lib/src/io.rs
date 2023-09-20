@@ -198,18 +198,23 @@ impl<'src, T> SaveBin<'src> for PhantomData<T> {
 impl<'src, T, const N: usize> SaveBin<'src> for [T; N]
 where
     T: SaveBin<'src>,
+    T::ReadError: Into<SaveError>,
 {
-    type ReadError = T::ReadError;
+    type ReadError = SaveError;
     type WriteError = T::WriteError;
 
     unsafe fn read_into(
         mut bytes: Cursor<&'src [u8]>,
         out: *mut Self,
     ) -> Result<(), Self::ReadError> {
+        let size = T::size();
+        if bytes.get_ref().len() < size {
+            return Err(SaveError::UnexpectedEof);
+        }
         let mut out: *mut T = out.cast();
-        let size: u64 = T::size().try_into().expect("size too large");
+        let size: u64 = size.try_into().expect("size too large");
         for _ in 0..N {
-            T::read_into(bytes.clone(), out)?;
+            T::read_into(bytes.clone(), out).map_err(Into::into)?;
             bytes.set_position(bytes.position() + size);
             out = out.add(1);
         }
