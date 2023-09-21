@@ -4,6 +4,7 @@ use bdat::{Label, SwitchEndian, Table};
 
 mod character;
 mod dlc;
+mod enemy;
 mod enhance;
 mod field;
 mod item;
@@ -66,6 +67,7 @@ fn read_game_data(bdat: &BdatRegistry) -> GameData {
         characters: character::read_data(bdat),
         ouroboros: ouroboros::read_ouroboros(bdat),
         field: field::read_data(bdat),
+        enemies: enemy::read_data(bdat),
     }
 }
 
@@ -77,6 +79,7 @@ fn read_lang_data(bdat: &LangBdatRegistry) -> LanguageData {
         quests: quest::read_quest_lang(bdat),
         characters: character::read_lang(bdat),
         field: field::read_lang(bdat),
+        enemies: enemy::read_lang(bdat),
     }
 }
 

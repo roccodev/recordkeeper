@@ -2,6 +2,7 @@ use std::io::{Read, Write};
 
 use character::{CharacterData, CharacterLang};
 use dlc::{DlcData, DlcLang};
+use enemy::{EnemyLang, EnemyRegistry};
 use enhance::{EnhanceLang, EnhanceRegistry};
 use field::{FieldLang, FieldRegistry};
 use item::{ItemLanguageRegistry, ItemRegistry};
@@ -14,6 +15,7 @@ use std::error::Error;
 
 pub mod character;
 pub mod dlc;
+pub mod enemy;
 pub mod enhance;
 pub mod field;
 pub mod item;
@@ -33,6 +35,7 @@ pub struct GameData {
     pub characters: CharacterData,
     pub ouroboros: OuroborosRegistry,
     pub field: FieldRegistry,
+    pub enemies: EnemyRegistry,
 
     /// Manually inputted data, that can't be read
     /// from game files.
@@ -47,6 +50,7 @@ pub struct LanguageData {
     pub quests: QuestLang,
     pub characters: CharacterLang,
     pub field: FieldLang,
+    pub enemies: EnemyLang,
 }
 
 pub fn save_game_data(data: &GameData, mut writer: impl Write) -> Result<(), Box<dyn Error>> {

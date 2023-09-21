@@ -15,7 +15,7 @@ use crate::{
 pub enum FieldTab {
     Player,
     Locations,
-    Colonies,
+    Maps,
 }
 
 #[function_component]
@@ -41,7 +41,7 @@ pub fn FieldPage() -> Html {
             {match *tab {
                 FieldTab::Player => html!(<TabPlayer />),
                 FieldTab::Locations => html!(<LocationsPage />),
-                FieldTab::Colonies => html!(),
+                FieldTab::Maps => html!(),
             }}
         </>
     }
@@ -76,7 +76,7 @@ impl FieldTab {
         let id = match self {
             FieldTab::Player => "player",
             FieldTab::Locations => "locations",
-            FieldTab::Colonies => "colonies",
+            FieldTab::Maps => "maps",
         };
         format!("field_tab_{id}")
     }
