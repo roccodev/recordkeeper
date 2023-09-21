@@ -19,3 +19,13 @@ pub struct TombstoneTime {
     best_time: u16,
     best_time_highest_level: u16,
 }
+
+#[derive(Clone, Copy, PartialEq)]
+#[cfg_attr(feature = "strum", derive(strum::EnumIter, strum::FromRepr))]
+#[repr(u32)]
+pub enum Difficulty {
+    Easy = 1,
+    Normal = 0,
+    Hard = 2,
+    VeryHard = 3,
+}

@@ -324,3 +324,13 @@ field_location_type_secret = Secret Area
 field_location_type_colony = Colony
 field_location_type_camp = Rest Spot
 field_location_type_respawn = Respawn Point
+
+
+## Unique Monsters screen
+
+enemy_id = ID
+enemy_name = Name
+enemy_defeat = Defeated
+enemy_rematch = Superboss Level
+enemy_time = Best Time
+enemy_rematch_time = Best Time (Superboss)

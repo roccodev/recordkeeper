@@ -7,6 +7,7 @@ pub mod upload;
 
 pub mod character;
 pub mod dlc;
+pub mod enemy;
 pub mod field;
 pub mod item;
 pub mod meta;

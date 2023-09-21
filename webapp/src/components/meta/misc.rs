@@ -1,4 +1,4 @@
-use recordkeeper::flags::FlagType;
+use recordkeeper::enemy::Difficulty;
 use strum::{EnumIter, FromRepr};
 use ybc::{Control, Field, Tile, Title};
 use yew::prelude::*;
@@ -7,15 +7,6 @@ use crate::components::edit::{CheckboxInput, Editor, EnumInput, FlagEditor, ToBo
 use crate::data::Data;
 use crate::lang::Text;
 use crate::ToHtml;
-
-#[derive(EnumIter, FromRepr, Clone, Copy, PartialEq)]
-#[repr(u32)]
-enum Difficulty {
-    Easy = 1,
-    Normal = 0,
-    Hard = 2,
-    VeryHard = 3,
-}
 
 #[derive(Clone, Copy, PartialEq)]
 struct DifficultyEditor(FlagEditor);
