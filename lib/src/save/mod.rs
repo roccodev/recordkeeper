@@ -9,10 +9,8 @@ use crate::menu::MenuData;
 use crate::util::FixVec;
 use recordkeeper_macros::SaveBin;
 
-use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
-
-use self::field::map::MapBitmaps;
 use self::flags::BitFlags;
+use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
 
 pub mod character;
 pub mod dlc;
@@ -98,8 +96,9 @@ pub struct SaveData {
     #[loc(0x53c78)]
     pub inventory: Inventory,
 
+    #[cfg(feature = "map-bitmaps")]
     #[loc(0x7e000)]
-    pub map_visibility: MapBitmaps,
+    pub map_visibility: field::map::MapBitmaps,
 
     #[loc(0x181c80)]
     pub menu_data: MenuData,

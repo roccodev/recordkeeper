@@ -7,6 +7,9 @@ edition = "2021"
 
 [features]
 strum = ["dep:strum"]
+# Enables serialization of map bitmaps (used for the fog-of-war mechanic).
+# This adds an extra ~1MB to the save structure size in memory.
+map-bitmaps = []
 
 [dependencies]
 recordkeeper-macros = { path = "../macros" }
