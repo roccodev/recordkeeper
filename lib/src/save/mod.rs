@@ -11,7 +11,7 @@ use recordkeeper_macros::SaveBin;
 
 use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
 
-use self::field::MapBitmaps;
+use self::field::map::MapBitmaps;
 use self::flags::BitFlags;
 
 pub mod character;
