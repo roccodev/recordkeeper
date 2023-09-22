@@ -22,7 +22,12 @@ pub fn PageControls<const PER_VIEW: usize>(props: &PageProps<PER_VIEW>) -> Html 
     let change_page_callback = |new_page: usize| {
         let page = props.state.clone();
         Callback::from(move |_: MouseEvent| {
-            page.set((new_page - 1) * PER_VIEW);
+            if new_page > last_page {
+                return;
+            }
+            if let Some(new_page) = new_page.checked_sub(1) {
+                page.set(new_page * PER_VIEW);
+            }
         })
     };
 
