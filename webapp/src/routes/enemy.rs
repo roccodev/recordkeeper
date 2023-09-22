@@ -68,6 +68,7 @@ fn TablePage(props: &TableProps) -> Html {
                 <tr>
                     <th><Text path="enemy_id" /></th>
                     <th><Text path="enemy_name" /></th>
+                    <th><Text path="enemy_seen" /></th>
                     <th><Text path="enemy_defeat" /></th>
                     <th><Text path="enemy_rematch" /></th>
                     <th><Text path="enemy_time" /></th>

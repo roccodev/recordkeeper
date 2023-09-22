@@ -330,7 +330,8 @@ field_location_type_respawn = Respawn Point
 
 enemy_id = ID
 enemy_name = Name
+enemy_seen = Seen
 enemy_defeat = Defeated
-enemy_rematch = Superboss Level
+enemy_rematch = Rematch Level
 enemy_time = Best Time
-enemy_rematch_time = Best Time (Superboss)
+enemy_rematch_time = Best Time (Max Level)
