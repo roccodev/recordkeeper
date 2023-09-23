@@ -1,6 +1,6 @@
 [package]
 name = "recordkeeper"
-version = "0.2.0"
+version = "0.2.0-alpha"
 description = "Xenoblade Chronicles 3 save editing library"
 authors = ["RoccoDev <hey@rocco.dev>"]
 license = "LGPL-3.0-only"
