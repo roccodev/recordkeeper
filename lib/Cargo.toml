@@ -1,18 +1,24 @@
 [package]
 name = "recordkeeper"
+version = "0.2.0"
+description = "Xenoblade Chronicles 3 save editing library"
 authors = ["RoccoDev <hey@rocco.dev>"]
 license = "LGPL-3.0-only"
-version = "0.1.0"
 edition = "2021"
+categories = ["parsing", "parser-implementations"]
+keywords = ["xenoblade", "save-edit", "monolithsoft"]
+readme = "../README.md"
+repository = "https://github.com/RoccoDev/recordkeeper/tree/master/lib"
 
 [features]
+# Enables utility traits on exported enums, thanks to the `strum` crate.
 strum = ["dep:strum"]
 # Enables serialization of map bitmaps (used for the fog-of-war mechanic).
 # This adds an extra ~1MB to the save structure size in memory.
 map-bitmaps = []
 
 [dependencies]
-recordkeeper-macros = { path = "../macros" }
+recordkeeper-macros = { version = "=0.1.0", path = "../macros" }
 byteorder = "1.4.3"
 thiserror = "1.0.44"
 paste = "1.0.14"
