@@ -13,7 +13,7 @@ pub const BRAND_NAME: &str = "Recordkeeper";
 pub const GIT_SHA: &str = git_version::git_version!();
 
 pub const GITHUB_URL: &str = "https://github.com/RoccoDev/recordkeeper";
-pub const LICENSE_URL: &str = "https://github.com/RoccoDev/recordkeeper/blob/master/COPYING";
+pub const LICENSE_URL: &str = "https://github.com/RoccoDev/recordkeeper/blob/master/COPYING-GPL";
 
 pub trait ToHtml {
     fn to_html(&self) -> Html;
