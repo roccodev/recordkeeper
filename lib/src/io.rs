@@ -84,7 +84,7 @@ pub trait SaveBin<'src>: Sized {
     /// [`OwnedSaveBin`] trait may be used instead.
     ///
     /// [`read`]: OwnedSaveBin::read
-    unsafe fn read_into(bytes: Cursor<&'src [u8]>, out: *mut Self) -> Result<(), Self::ReadError>;
+    unsafe fn read_into(bytes: &'src [u8], out: *mut Self) -> Result<(), Self::ReadError>;
 
     /// Writes the type to a byte buffer.
     ///
@@ -101,10 +101,7 @@ pub trait SaveBin<'src>: Sized {
 
 pub trait OwnedSaveBin<'src>: SaveBin<'src> {
     /// Reads the type from a byte buffer.
-    ///
-    /// The cursor's internal marker will be modified after the call,
-    /// even if the read fails.
-    fn read(bytes: Cursor<&'src [u8]>) -> Result<Self, Self::ReadError>;
+    fn read(bytes: &'src [u8]) -> Result<Self, Self::ReadError>;
 }
 
 macro_rules! byteorder_impl {
@@ -114,7 +111,7 @@ macro_rules! byteorder_impl {
                 type ReadError = std::io::Error;
                 type WriteError = std::convert::Infallible;
 
-                unsafe fn read_into(mut bytes: Cursor<&'src [u8]>, out: *mut Self) -> Result<(), Self::ReadError> {
+                unsafe fn read_into(mut bytes: &'src [u8], out: *mut Self) -> Result<(), Self::ReadError> {
                     // Integer types don't implement Drop, so no need for ptr::write
                     *out = paste::paste! { bytes.[<read_ $types >]::<LittleEndian>()? };
                     Ok(())
@@ -135,10 +132,7 @@ impl<'src> SaveBin<'src> for u8 {
     type ReadError = std::io::Error;
     type WriteError = SaveError;
 
-    unsafe fn read_into(
-        mut bytes: Cursor<&'src [u8]>,
-        out: *mut Self,
-    ) -> Result<(), Self::ReadError> {
+    unsafe fn read_into(mut bytes: &'src [u8], out: *mut Self) -> Result<(), Self::ReadError> {
         // Integer types don't implement Drop, so no need for ptr::write
         *out = bytes.read_u8()?;
         Ok(())
@@ -155,10 +149,7 @@ impl<'src> SaveBin<'src> for i8 {
     type ReadError = std::io::Error;
     type WriteError = SaveError;
 
-    unsafe fn read_into(
-        mut bytes: Cursor<&'src [u8]>,
-        out: *mut Self,
-    ) -> Result<(), Self::ReadError> {
+    unsafe fn read_into(mut bytes: &'src [u8], out: *mut Self) -> Result<(), Self::ReadError> {
         *out = bytes.read_i8()?;
         Ok(())
     }
@@ -172,7 +163,7 @@ impl<'src> SaveBin<'src> for bool {
     type ReadError = std::io::Error;
     type WriteError = SaveError;
 
-    unsafe fn read_into(bytes: Cursor<&'src [u8]>, out: *mut Self) -> Result<(), Self::ReadError> {
+    unsafe fn read_into(bytes: &'src [u8], out: *mut Self) -> Result<(), Self::ReadError> {
         *out = <u8 as OwnedSaveBin>::read(bytes)? != 0;
         Ok(())
     }
@@ -186,7 +177,7 @@ impl<'src, T> SaveBin<'src> for PhantomData<T> {
     type ReadError = Infallible;
     type WriteError = Infallible;
 
-    unsafe fn read_into(_: Cursor<&'src [u8]>, _: *mut Self) -> Result<(), Self::ReadError> {
+    unsafe fn read_into(_: &'src [u8], _: *mut Self) -> Result<(), Self::ReadError> {
         Ok(())
     }
 
@@ -203,19 +194,17 @@ where
     type ReadError = SaveError;
     type WriteError = T::WriteError;
 
-    unsafe fn read_into(
-        mut bytes: Cursor<&'src [u8]>,
-        out: *mut Self,
-    ) -> Result<(), Self::ReadError> {
+    unsafe fn read_into(bytes: &'src [u8], out: *mut Self) -> Result<(), Self::ReadError> {
         let size = T::size();
-        if bytes.get_ref().len() < size {
+        if size == 0 {
+            return Ok(());
+        }
+        if bytes.len() < size {
             return Err(SaveError::UnexpectedEof);
         }
         let mut out: *mut T = out.cast();
-        let size: u64 = size.try_into().expect("size too large");
-        for _ in 0..N {
-            T::read_into(bytes.clone(), out).map_err(Into::into)?;
-            bytes.set_position(bytes.position() + size);
+        for i in (0..N * size).step_by(size) {
+            T::read_into(&bytes[i..i + size], out).map_err(Into::into)?;
             out = out.add(1);
         }
         Ok(())
@@ -243,7 +232,7 @@ impl<'src, T> OwnedSaveBin<'src> for T
 where
     T: SaveBin<'src> + Default + Copy,
 {
-    fn read(bytes: Cursor<&'src [u8]>) -> Result<Self, Self::ReadError> {
+    fn read(bytes: &'src [u8]) -> Result<Self, Self::ReadError> {
         let mut out = Self::default();
         // SAFETY: the previous value is perfectly valid, and does not implement Drop
         unsafe {

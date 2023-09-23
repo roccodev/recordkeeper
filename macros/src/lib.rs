@@ -19,16 +19,15 @@ impl<'ast> FieldVisitor<'ast> {
         let loc_code = self.location.as_ref().map(|loc| {
             quote! {
                 {
-                    let loc: u64 = #loc.try_into().expect("new #[loc] too large");
                     #[cfg(debug_assertions)]
                     {
-                        let current = __IN_BYTES.position();
-                        if loc < current {
+                        let current = __POS;
+                        if #loc < current {
                             panic!("New location 0x{:x} is lower than current location 0x{:x} for field {}",
-                                loc, current, stringify!(#var_name));
+                                #loc, current, stringify!(#var_name));
                         }
                     }
-                    __IN_BYTES.set_position(loc);
+                    __POS = #loc;
                 }
             }
         });
@@ -56,13 +55,11 @@ impl<'ast> FieldVisitor<'ast> {
             #loc_code
             {
                 let __OUT_PTR = addr_of_mut!((*__BUILDING). #var_name);
-                <#type_ident as crate::io::SaveBin>::read_into(__IN_BYTES.clone(), __OUT_PTR)?;
+                <#type_ident as crate::io::SaveBin>::read_into(&__IN_BYTES[__POS..], __OUT_PTR)?;
                 #assert_code
             }
-            let __SIZE: u64 = <#type_ident as crate::io::SaveBin>::size()
-                .try_into()
-                .expect("size too large");
-            __IN_BYTES.set_position(__IN_BYTES.position() + __SIZE);
+            let __SIZE = <#type_ident as crate::io::SaveBin>::size();
+            __POS += __SIZE;
         }
     }
 
@@ -202,21 +199,16 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
             type ReadError = crate::error::SaveError;
             type WriteError = crate::error::SaveError;
 
-            unsafe fn read_into(mut __IN_BYTES: std::io::Cursor<&'__SRC [u8]>, __BUILDING: *mut Self) -> Result<(), Self::ReadError> {
+            unsafe fn read_into(mut __IN_BYTES: &'__SRC [u8], __BUILDING: *mut Self) -> Result<(), Self::ReadError> {
                 use std::ptr::addr_of_mut;
 
                 // Set up relative positions for start of struct
-                let __POS = usize::try_from(__IN_BYTES.position()).expect("position too large");
-                {
-                    let __INNER = &__IN_BYTES.into_inner()[__POS..];
-                    if __INNER.len() < Self::size() {
-                        return Err(crate::error::SaveError::UnexpectedEof);
-                    }
-                    __IN_BYTES = std::io::Cursor::new(__INNER);
+                if __IN_BYTES.len() < Self::size() {
+                    return Err(crate::error::SaveError::UnexpectedEof);
                 }
 
+                let mut __POS = 0;
                 #parsers
-
                 Ok(())
             }
 
@@ -226,7 +218,7 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
                 Ok(())
             }
 
-            fn size() -> usize {
+            fn size() -> usize { // TODO: const?
                 let mut current_loc: usize = 0;
                 let mut size: usize = 0;
 
