@@ -43,6 +43,19 @@ pub struct Character {
 }
 
 #[derive(SaveBin, Debug)]
+pub struct CharacterSets {
+    /// Characters that can be added to the party.
+    /// Bit index = Character ID - 1
+    pub selectable_characters: BitFlags<1, 2>,
+    /// Characters that are fully unlocked.  
+    /// Bit index = Character ID - 1
+    pub permanent_characters: BitFlags<1, 2>,
+    /// Characters that can only join the party temporarily.  
+    /// Bit index = Character ID - 1
+    pub temporary_characters: BitFlags<1, 2>,
+}
+
+#[derive(SaveBin, Debug)]
 pub struct Ouroboros {
     pub art_ids: [u16; 5],
     pub exp: u16, // ???

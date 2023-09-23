@@ -9,6 +9,8 @@ use crate::menu::MenuData;
 use crate::util::FixVec;
 use recordkeeper_macros::SaveBin;
 
+use self::character::CharacterSets;
+use self::field::FieldConfig;
 use self::flags::BitFlags;
 use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
 
@@ -83,18 +85,29 @@ pub struct SaveData {
     #[loc(0x710)]
     pub flags: AllFlags,
 
+    /// Character IDs in the active party
     #[loc(0xe330)]
     pub party_characters: FixVec<u16, PARTY_MAX>,
-    /// Guest IDs from FLD_NpcList
+    /// Guest IDs from `FLD_NpcList`
     #[loc(0xe358)]
     pub party_guests: FixVec<u16, PARTY_GUEST_MAX>,
+
+    #[loc(0xe370)]
+    pub character_sets: CharacterSets,
 
     #[loc(0xe3a0)]
     pub characters: [Character; CHARACTER_MAX],
     pub ouroboros: [Ouroboros; OUROBOROS_MAX],
 
+    /// ID for `BTL_Pair`
+    #[loc(0x53c38)]
+    dlc4_pairs: [u8; 3],
+
     #[loc(0x53c78)]
     pub inventory: Inventory,
+
+    #[loc(0x7d000)]
+    pub field_config: FieldConfig,
 
     #[cfg(feature = "map-bitmaps")]
     #[loc(0x7e000)]
