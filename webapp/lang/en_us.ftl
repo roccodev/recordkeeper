@@ -187,6 +187,10 @@ character_exp = EXP
 character_bexp = Bonus EXP
 character_selected_class = Selected {-class}
 
+character_set_selectable = Selectable
+character_set_permanent = Permanent
+character_set_temp = Temporary
+
 # The character's selected costume
 character_costume = Costume
 

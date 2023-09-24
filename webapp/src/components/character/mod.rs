@@ -1,10 +1,13 @@
 use game_data::lang::{Filterable, Id};
+use recordkeeper::{flags::BitFlags, SaveData};
+use strum::{EnumIter, IntoEnumIterator};
 use web_sys::HtmlSelectElement;
-use ybc::{Notification, Tile};
+use ybc::{Control, Field, Notification, Tile};
 use yew::prelude::*;
 
 use crate::{
     components::character::{appearance::Appearance, class::ClassEditor, stats::CharacterStats},
+    components::edit::{editor, CheckboxInput},
     data::Data,
     lang::Text,
 };
@@ -14,6 +17,15 @@ pub mod class;
 pub mod party;
 pub mod slot;
 mod stats;
+
+#[rustfmt::skip]
+editor!(
+    CharacterSetEditor, 
+    bool,
+    get |editor, save| editor.set.get(&save).get(editor.char_idx).unwrap() != 0,
+    set |editor, save, new| editor.set.get_mut(save).set(editor.char_idx, u8::from(new).into()),
+    capture set: CharacterSet, char_idx: usize
+);
 
 #[derive(Properties, PartialEq, Clone, Copy)]
 pub struct CharacterProps {
@@ -34,14 +46,34 @@ pub struct UpdateSelectorProps<F: Filterable + PartialEq + Id + 'static> {
     pub update: Callback<usize>,
 }
 
+#[derive(EnumIter, Clone, Copy, PartialEq)]
+enum CharacterSet {
+    Selectable,
+    Permanent,
+    Temporary,
+}
+
 #[function_component]
 pub fn CharacterEditor(props: &CharacterProps) -> Html {
+    let char_idx = props.char_id.checked_sub(1).unwrap();
+
     html! {
         <>
-            <Tile classes={classes!("notification")}>
-                <CharacterStats ..*props />
-                <Appearance char_idx={props.char_id.checked_sub(1).unwrap()} />
-            </Tile>
+            <Notification>
+                <Field classes={classes!("is-grouped")}>
+                    {for CharacterSet::iter().map(|set| html! {
+                        <Control>
+                            <CheckboxInput<CharacterSetEditor> editor={CharacterSetEditor { set, char_idx }}>
+                                {" "}{set.lang()}
+                            </CheckboxInput<CharacterSetEditor>>
+                        </Control>
+                    })}
+                </Field>
+                <Tile classes={classes!("notification")}>
+                    <CharacterStats ..*props />
+                    <Appearance char_idx={char_idx} />
+                </Tile>
+            </Notification>
             <Notification>
                 <ClassEditor char_id={props.char_id} />
             </Notification>
@@ -110,5 +142,32 @@ pub fn UpdateSelector<F: Filterable + PartialEq + Id + 'static>(
                 })}
             </select>
         </div>
+    }
+}
+
+impl CharacterSet {
+    fn get<'s>(&self, save: &'s SaveData) -> &'s BitFlags<1, 2> {
+        match self {
+            CharacterSet::Selectable => &save.character_sets.selectable_characters,
+            CharacterSet::Permanent => &save.character_sets.permanent_characters,
+            CharacterSet::Temporary => &save.character_sets.temporary_characters,
+        }
+    }
+
+    fn get_mut<'s>(&self, save: &'s mut SaveData) -> &'s mut BitFlags<1, 2> {
+        match self {
+            CharacterSet::Selectable => &mut save.character_sets.selectable_characters,
+            CharacterSet::Permanent => &mut save.character_sets.permanent_characters,
+            CharacterSet::Temporary => &mut save.character_sets.temporary_characters,
+        }
+    }
+
+    fn lang(&self) -> Html {
+        let id = match self {
+            CharacterSet::Selectable => "selectable",
+            CharacterSet::Permanent => "permanent",
+            CharacterSet::Temporary => "temp",
+        };
+        html!(<Text path={format!("character_set_{id}")} />)
     }
 }
