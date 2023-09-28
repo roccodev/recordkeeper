@@ -27,7 +27,6 @@ editor!(
     set |editor, save, new_value| {
         ItemEditor::new(save, editor.item_type, editor.index).set_amount(new_value)
     },
-    assert |editor, value| { Ok(()) },
     capture item_type: ItemType, index: usize
 );
 

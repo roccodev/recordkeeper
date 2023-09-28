@@ -56,7 +56,6 @@ editor!(
             .unwrap()
             .level = new_value
     },
-    assert |editor, value| { Ok(()) },
     capture item_slot: usize
 );
 
@@ -77,7 +76,6 @@ editor!(
             .stat_boosts[editor.boost]
             .stat = new_value as u16
     },
-    assert |editor, value| { Ok(()) },
     capture item_slot: usize, boost: usize
 );
 
@@ -98,7 +96,6 @@ editor!(
             .stat_boosts[editor.boost]
             .amount = new_value
     },
-    assert |editor, value| { Ok(()) },
     capture item_slot: usize, boost: usize
 );
 
