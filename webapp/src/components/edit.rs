@@ -121,6 +121,8 @@ where
     pub input_type: AttrValue,
     #[prop_or_default]
     pub filter: Option<Callback<E::Target, bool>>,
+    #[prop_or_default]
+    pub disabled: Option<Callback<E::Target, bool>>,
 }
 
 #[derive(Properties, PartialEq, Clone)]
@@ -225,7 +227,7 @@ where
                 input.set(v.to_string());
                 valid.set(true);
             },
-            current_value,
+            current_value.clone(),
         );
     }
 
@@ -269,8 +271,15 @@ where
         classes!("input", "is-danger")
     };
 
+    let disabled = props
+        .disabled
+        .as_ref()
+        .map(|c| c.emit(current_value))
+        .unwrap_or_default();
+
     html! {
         <input
+            disabled={disabled}
             class={classes}
             type={props.input_type.clone()}
             value={input.to_string()}

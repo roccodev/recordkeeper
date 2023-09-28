@@ -59,7 +59,7 @@ pub fn render(route: Route) -> Html {
         Route::Items => html!(<item::ItemInventory />),
         Route::Field => html!(<field::FieldPage />),
         Route::Quests => html!(<quest::Quests />),
-        Route::Uniques => html!(<enemy::UniqueMonsters />),
+        Route::Uniques => html!(<enemy::EnemyPage />),
         Route::Formations => html!(),
         Route::PowAugment => html!(),
         Route::ChallengeBattle => html!(),

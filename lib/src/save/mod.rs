@@ -10,6 +10,7 @@ use crate::util::FixVec;
 use recordkeeper_macros::SaveBin;
 
 use self::character::CharacterSets;
+use self::enemy::SoulHackAchievements;
 use self::field::FieldConfig;
 use self::flags::BitFlags;
 use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
@@ -105,6 +106,9 @@ pub struct SaveData {
 
     #[loc(0x53c78)]
     pub inventory: Inventory,
+
+    #[loc(0x7c760)]
+    pub soul_hack_achievements: SoulHackAchievements,
 
     #[loc(0x7d000)]
     pub field_config: FieldConfig,

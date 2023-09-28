@@ -339,3 +339,13 @@ enemy_defeat = Defeated
 enemy_rematch = Rematch Level
 enemy_time = Best Time
 enemy_rematch_time = Best Time (Max Level)
+
+enemy_tab_records = Records
+enemy_tab_soulhack_arts = Soulhacker Arts
+enemy_tab_soulhack_skills = Soulhacker Skills
+
+enemy_soul_hack_id = ID
+enemy_soul_hack_name = Name
+enemy_soul_hack_unlocked = Unlocked
+enemy_soul_hack_progress = Upgrade Progress
+enemy_soul_hack_upgraded = Upgraded

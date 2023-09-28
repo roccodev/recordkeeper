@@ -1,6 +1,8 @@
-use bdat::{Label, Table};
+use std::num::NonZeroUsize;
+
+use bdat::{Label, RowRef, Table};
 use game_data::character::{
-    Art, Attachment, Character, CharacterData, CharacterLang, Class, Costume, Skill,
+    Art, Attachment, Character, CharacterData, CharacterLang, Class, Costume, Skill, SoulHack,
 };
 
 use crate::const_hash;
@@ -26,8 +28,24 @@ pub fn read_data(bdat: &BdatRegistry) -> CharacterData {
 
     let characters =
         read_id_name_pairs(characters).map(|(id, name)| Character { id, name_id: name });
-    let arts = read_id_name_pairs(arts).map(|(id, name)| Art { id, name_id: name });
-    let skills = read_id_name_pairs(skills).map(|(id, name)| Skill { id, name_id: name });
+    let arts = read_id_name_pairs(arts).map(|(id, name)| Art {
+        id,
+        name_id: name,
+        soul_hack: read_soul_hack(
+            &arts.row(id),
+            Label::Hash(0xA2275574),
+            const_hash!("EnArtsAchieve"),
+        ),
+    });
+    let skills = read_id_name_pairs(skills).map(|(id, name)| Skill {
+        id,
+        name_id: name,
+        soul_hack: read_soul_hack(
+            &skills.row(id),
+            Label::Hash(0xA6E42F10),
+            const_hash!("EnSkillAchieve"),
+        ),
+    });
     let classes = read_id_name_pairs(classes).map(|(id, name)| Class { id, name_id: name });
     let attachments =
         read_id_name_pairs(attachments).map(|(id, name)| Attachment { id, name_id: name });
@@ -73,4 +91,17 @@ fn read_costume(table: &Table, char_id: usize, out: &mut Vec<Costume>) {
             .to_integer() as usize;
         out.push(Costume { id, name_id })
     }
+}
+
+fn read_soul_hack(row: &RowRef, status_hash: Label, achievement_hash: Label) -> Option<SoulHack> {
+    let status = row[status_hash].as_single().unwrap().to_integer() as usize;
+    let status = NonZeroUsize::new(status)?;
+
+    let achievement = row[achievement_hash].as_single().unwrap().to_integer() as usize;
+    let achievement = NonZeroUsize::new(achievement)?;
+
+    Some(SoulHack {
+        status_flag: status,
+        achievement_flag: achievement,
+    })
 }

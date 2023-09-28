@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
+    character::SoulHack,
     lang::{Nameable, TextEntry, TextTable},
     LanguageData,
 };
@@ -22,6 +23,10 @@ pub struct UniqueMonster {
     pub map_id: usize,
     pub name_id: usize,
     pub group_name: Option<usize>,
+}
+
+pub trait SoulLearnable {
+    fn get_soul_hack(&self) -> Option<SoulHack>;
 }
 
 impl Nameable for UniqueMonster {

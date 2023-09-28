@@ -1,11 +1,12 @@
+use game_data::character::{Art, Skill};
 use recordkeeper::enemy::Difficulty;
-use strum::IntoEnumIterator;
-use ybc::{Container, Control, Field, Select, Table, Tile};
+use strum::{EnumIter, IntoEnumIterator};
+use ybc::{Container, Control, Field, Select, Table, Tabs, Tile};
 use yew::prelude::*;
 
 use crate::{
     components::{
-        enemy::UniqueMonsterRow,
+        enemy::{records::UniqueMonsterRow, soul_hack::SoulHackTable},
         page::{PageControls, PageOrganizer},
     },
     data::Data,
@@ -26,6 +27,43 @@ struct TableProps {
 #[derive(Properties, PartialEq)]
 struct DifficultyProps {
     state: UseStateHandle<Difficulty>,
+}
+
+#[derive(Clone, PartialEq, Copy, EnumIter)]
+pub enum EnemyTab {
+    Records,
+    SoulHackArts,
+    SoulHackSkills,
+}
+
+#[function_component]
+pub fn EnemyPage() -> Html {
+    let tab = use_state(|| EnemyTab::Records);
+    let data = use_context::<Data>().unwrap();
+
+    let update_tab = |t| {
+        let tab_state = tab.clone();
+        Callback::from(move |_: MouseEvent| {
+            tab_state.set(t);
+        })
+    };
+
+    html! {
+        <>
+            <Tabs classes={classes!("is-boxed", "is-centered")}>
+                {for EnemyTab::iter().map(|t| {
+                    let classes = if t == *tab { classes!("is-active") } else { classes!() };
+                    html!(<li class={classes}><a onclick={update_tab(t)}><Text path={t.lang()} /></a></li>)
+                })}
+            </Tabs>
+
+            {match *tab {
+                EnemyTab::Records => html!(<UniqueMonsters />),
+                EnemyTab::SoulHackArts => html!(<SoulHackTable<Art> values={data.game().characters.arts()} />),
+                EnemyTab::SoulHackSkills => html!(<SoulHackTable<Skill> values={data.game().characters.skills()} />),
+            }}
+        </>
+    }
 }
 
 #[function_component]
@@ -105,5 +143,16 @@ fn DifficultySelector(props: &DifficultyProps) -> Html {
                 }
             })}
         </Select>
+    }
+}
+
+impl EnemyTab {
+    fn lang(&self) -> String {
+        let id = match self {
+            EnemyTab::Records => "records",
+            EnemyTab::SoulHackArts => "soulhack_arts",
+            EnemyTab::SoulHackSkills => "soulhack_skills",
+        };
+        format!("enemy_tab_{id}")
     }
 }

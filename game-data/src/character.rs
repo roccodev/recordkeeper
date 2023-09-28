@@ -1,4 +1,7 @@
+use std::num::NonZeroUsize;
+
 use crate::{
+    enemy::SoulLearnable,
     lang::{FilterEntry, FilterTable, Filterable, Id},
     LanguageData,
 };
@@ -33,12 +36,20 @@ pub struct Character {
 pub struct Art {
     pub id: usize,
     pub name_id: usize,
+    pub soul_hack: Option<SoulHack>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct Skill {
     pub id: usize,
     pub name_id: usize,
+    pub soul_hack: Option<SoulHack>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+pub struct SoulHack {
+    pub status_flag: NonZeroUsize,
+    pub achievement_flag: NonZeroUsize,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
@@ -191,5 +202,17 @@ impl Id for Attachment {
 impl Id for Costume {
     fn id(&self) -> usize {
         self.id
+    }
+}
+
+impl SoulLearnable for Art {
+    fn get_soul_hack(&self) -> Option<SoulHack> {
+        self.soul_hack
+    }
+}
+
+impl SoulLearnable for Skill {
+    fn get_soul_hack(&self) -> Option<SoulHack> {
+        self.soul_hack
     }
 }
