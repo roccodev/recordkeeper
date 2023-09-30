@@ -1,4 +1,7 @@
-use crate::character::{PartyFormation, PARTY_FORMATION_MAX, PARTY_GUEST_MAX, PARTY_MAX};
+use crate::character::{
+    formation::{PartyFormation, PARTY_FORMATION_MAX},
+    PARTY_GUEST_MAX, PARTY_MAX,
+};
 use crate::error::SaveError;
 use crate::item::Inventory;
 use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX};
@@ -51,9 +54,10 @@ pub struct SaveData {
     /// ID for `SYS_MapJumpList`
     pub respawn_point: u16,
 
-    /// Updated by the game on load.
+    /// Updated by the game on load (only adding new entries, removing none).  
+    /// Also recomputed from colony IconFlags when creating a NG+ file.
     #[loc(0x4c)]
-    pub seen_colonies: u32,
+    pub liberated_colonies: BitFlags<1, 1>,
 
     /// For Ino's DX cylinders. (DLC2)
     ///

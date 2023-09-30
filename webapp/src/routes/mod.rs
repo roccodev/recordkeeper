@@ -6,6 +6,7 @@ mod character;
 mod enemy;
 mod field;
 mod flags;
+pub mod formation;
 mod item;
 mod meta;
 mod ouroboros;
@@ -60,7 +61,7 @@ pub fn render(route: Route) -> Html {
         Route::Field => html!(<field::FieldPage />),
         Route::Quests => html!(<quest::Quests />),
         Route::Uniques => html!(<enemy::EnemyPage />),
-        Route::Formations => html!(),
+        Route::Formations => html!(<formation::Formations />),
         Route::PowAugment => html!(),
         Route::ChallengeBattle => html!(),
         Route::Gauntlet => html!(),

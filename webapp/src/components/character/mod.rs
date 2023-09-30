@@ -14,6 +14,7 @@ use crate::{
 
 mod appearance;
 pub mod class;
+pub mod formation;
 pub mod party;
 pub mod slot;
 mod stats;
