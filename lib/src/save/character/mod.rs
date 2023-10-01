@@ -19,7 +19,7 @@ pub mod class;
 pub mod formation;
 pub mod slot;
 
-#[derive(SaveBin, Debug)]
+#[derive(SaveBin, Debug, Clone, Copy)]
 #[size(4444)]
 pub struct Character {
     pub level: u32,

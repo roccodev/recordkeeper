@@ -17,7 +17,7 @@ pub struct FixStr<const MAX: usize> {
 }
 
 /// Dynamic array with fixed capacity.
-#[derive(SaveBin, Debug)]
+#[derive(SaveBin, Debug, Clone, Copy)]
 pub struct FixVec<T, const MAX: usize>
 where
     for<'a> T: SaveBin<'a>,

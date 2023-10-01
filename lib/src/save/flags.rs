@@ -32,7 +32,7 @@ pub struct AllFlags {
     flags_32b: ByteFlags<u32, FLAG_32_BIT_COUNT>,
 }
 
-#[derive(SaveBin, Debug)]
+#[derive(SaveBin, Debug, Clone, Copy)]
 #[size(WORDS * 4)]
 pub struct BitFlags<const BITS: usize, const WORDS: usize> {
     words: [u32; WORDS],

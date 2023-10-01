@@ -1,11 +1,12 @@
 use recordkeeper_macros::SaveBin;
 
-use crate::util::FixVec;
+use crate::{util::FixVec, SaveData};
 
 use super::{
     class::CharacterClass,
     slot::{Slot, SlotMut},
-    CHARACTER_MAX, OUROBOROS_ART_MAX, OUROBOROS_MAX, OUROBOROS_SKILL_MAX, PARTY_MAX,
+    Character, Ouroboros, CHARACTER_MAX, OUROBOROS_ART_MAX, OUROBOROS_MAX, OUROBOROS_SKILL_MAX,
+    PARTY_MAX,
 };
 
 pub const PARTY_FORMATION_MAX: usize = 15;
@@ -13,11 +14,22 @@ pub const PARTY_FORMATION_MAX: usize = 15;
 #[derive(SaveBin, Debug)]
 #[size(9360)]
 pub struct PartyFormation {
-    name_id: u64, // unsure
+    pub name: FormationName,
+    #[loc(0x8)]
     pub party: FixVec<u16, PARTY_MAX>,
     /// Indexed by character ID
     pub characters: [CharacterFormation; CHARACTER_MAX],
     pub ouroboros: [OuroborosFormation; OUROBOROS_MAX],
+}
+
+#[derive(SaveBin, Debug)]
+pub struct FormationName {
+    /// ID for `33F137E8`
+    pub name_id: u16,
+    /// Discriminator, can be set in-game
+    pub number: u16,
+    /// Color ID, 0-14
+    pub color_id: u16,
 }
 
 #[derive(SaveBin, Debug)]
@@ -39,6 +51,34 @@ pub struct OuroborosFormation {
 }
 
 impl PartyFormation {
+    /// Creates a new party formation from the current state of the save file.
+    pub fn from_save(save: &SaveData, name: FormationName) -> Self {
+        Self {
+            name,
+            party: save.party_characters,
+            characters: save
+                .characters
+                .iter()
+                .enumerate()
+                .map(|(i, c)| {
+                    CharacterFormation::from_save(c, i.checked_add(1).unwrap().try_into().unwrap())
+                })
+                .collect::<Vec<_>>()
+                .try_into()
+                .unwrap(),
+            ouroboros: save
+                .ouroboros
+                .iter()
+                .enumerate()
+                .map(|(i, o)| {
+                    OuroborosFormation::from_save(o, i.checked_add(1).unwrap().try_into().unwrap())
+                })
+                .collect::<Vec<_>>()
+                .try_into()
+                .unwrap(),
+        }
+    }
+
     /// Returns the character formation slot for the given character ID. (starts at 1)
     pub fn character(&self, char_id: u16) -> Option<&CharacterFormation> {
         self.characters.iter().find(|o| o.character_id == char_id)
@@ -98,7 +138,30 @@ impl PartyFormation {
     }
 }
 
+impl CharacterFormation {
+    /// Creates a new character formation from the current state of the save file.
+    pub fn from_save(save_char: &Character, char_id: u16) -> Self {
+        let current_class = save_char.selected_class;
+        Self {
+            class: *save_char.class_data(current_class as usize),
+            current_class: current_class as u16,
+            character_id: char_id,
+            costume_id: save_char.costume_id,
+            attachment: save_char.attachment,
+        }
+    }
+}
+
 impl OuroborosFormation {
+    /// Creates a new ouroboros formation from the current state of the save file.
+    pub fn from_save(save_ouro: &Ouroboros, char_id: u16) -> Self {
+        Self {
+            ouroboros_id: char_id,
+            art_ids: save_ouro.art_ids,
+            linked_skills: save_ouro.linked_skills,
+        }
+    }
+
     pub fn art_slot(&self, index: usize) -> Slot<u16> {
         Slot(self.art_ids[index])
     }

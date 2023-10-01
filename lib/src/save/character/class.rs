@@ -9,7 +9,7 @@ pub const CHARACTER_CLASS_SKILL_MAX: usize = 8;
 pub const CHARACTER_CLASS_GEM_MAX: usize = 10;
 pub const CHARACTER_CLASS_ACCESSORY_MAX: usize = 3;
 
-#[derive(SaveBin, Debug)]
+#[derive(SaveBin, Debug, Clone, Copy)]
 #[size(68)]
 pub struct CharacterClass {
     pub cp: u32,
