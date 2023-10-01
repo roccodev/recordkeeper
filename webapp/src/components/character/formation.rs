@@ -62,6 +62,12 @@ editor!(
     capture formation: usize
 );
 
+#[derive(PartialEq, Properties)]
+pub struct FormationStateProps {
+    pub id: usize,
+    pub state: UseStateHandle<Option<usize>>,
+}
+
 #[function_component]
 pub fn FormationCharacters(props: &FormationProps) -> Html {
     let char_id_state = use_state(|| 1usize);
@@ -149,9 +155,11 @@ pub fn FormationCardEmpty(props: &FormationProps) -> Html {
     };
 
     html! {
-        <Card>
-            <CardContent>
-                <Text path="formation_empty" />
+        <Card classes="recordkeeper-formation-card">
+            <CardContent classes="recordkeeper-formation-empty">
+                <p class={classes!("card-header-title", "is-centered")}>
+                    <Text path="formation_empty" />
+                </p>
             </CardContent>
             <CardFooter>
                 <a class="card-footer-item" onclick={new_callback}><Text path="formation_create" /></a>
@@ -162,7 +170,7 @@ pub fn FormationCardEmpty(props: &FormationProps) -> Html {
 }
 
 #[function_component]
-pub fn FormationCardPresent(props: &FormationProps) -> Html {
+pub fn FormationCardPresent(props: &FormationStateProps) -> Html {
     let data = use_context::<Data>().unwrap();
     let save_context = use_context::<SaveContext>().unwrap();
 
@@ -176,8 +184,22 @@ pub fn FormationCardPresent(props: &FormationProps) -> Html {
         })
     };
 
+    let edit_callback = {
+        let state = props.state.clone();
+        let id = props.id;
+        Callback::from(move |_: MouseEvent| state.set(Some(id)))
+    };
+
+    let delete_callback = {
+        let save_context = save_context.clone();
+        let id = props.id;
+        Callback::from(move |_: MouseEvent| {
+            save_context.edit(move |save| save.party_formations[id].clear())
+        })
+    };
+
     html! {
-        <Card>
+        <Card classes="recordkeeper-formation-card">
             <CardContent>
                 <Field>
                     <Control>
@@ -195,8 +217,8 @@ pub fn FormationCardPresent(props: &FormationProps) -> Html {
                 </Field>
             </CardContent>
             <CardFooter>
-                <a class="card-footer-item"><Text path="formation_edit" /></a>
-                <a class="card-footer-item"><Text path="formation_delete" /></a>
+                <a class="card-footer-item" onclick={edit_callback}><Text path="formation_edit" /></a>
+                <a class="card-footer-item" onclick={delete_callback}><Text path="formation_delete" /></a>
             </CardFooter>
         </Card>
     }

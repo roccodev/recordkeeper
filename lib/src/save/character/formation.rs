@@ -141,6 +141,11 @@ impl PartyFormation {
         slot.ouroboros_id = ouro_id;
         slot
     }
+
+    /// Clears the saved formation.
+    pub fn clear(&mut self) {
+        self.party.clear();
+    }
 }
 
 impl CharacterFormation {

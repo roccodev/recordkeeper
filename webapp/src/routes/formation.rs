@@ -1,6 +1,6 @@
 use recordkeeper::character::formation::PARTY_FORMATION_MAX;
 use strum::{EnumIter, IntoEnumIterator};
-use ybc::{Tabs, Tile};
+use ybc::{Button, Tabs, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -26,14 +26,23 @@ const CARDS_PER_ROW: usize = 5;
 
 #[function_component]
 pub fn Formations() -> Html {
-    let current = use_state(|| None::<usize>);
+    let current_state = use_state(|| None::<usize>);
     let save = use_context::<SaveContext>().unwrap();
     let save = save.get();
 
-    if let Some(current) = *current {
+    let back_callback = {
+        let current_state = current_state.clone();
+        Callback::from(move |_: MouseEvent| {
+            current_state.set(None);
+        })
+    };
+
+    if let Some(current) = *current_state {
         html! {
             <>
-                <Text path="formation_back" />
+                <Button onclick={back_callback}>
+                    <Text path="formation_back" />
+                </Button>
                 <FormationEditor id={current} />
             </>
         }
@@ -47,7 +56,11 @@ pub fn Formations() -> Html {
                     html! {
                         <Tile classes="is-parent">
                             {for (start..end).map(|i| if save.get().save().party_formations[i].is_valid() {
-                                html!(<Tile classes={child_classes.clone()}><FormationCardPresent id={i} /></Tile>)
+                                html! {
+                                    <Tile classes={child_classes.clone()}>
+                                        <FormationCardPresent id={i} state={current_state.clone()} />
+                                    </Tile>
+                                }
                             } else {
                                 html!(<Tile classes={child_classes.clone()}><FormationCardEmpty id={i} /></Tile>)
                             })}

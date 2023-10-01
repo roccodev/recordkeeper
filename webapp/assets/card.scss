@@ -1,0 +1,12 @@
+.recordkeeper-formation-card {
+    // Bootstrap style
+    border: 1px solid rgba(0, 0, 0, .125);
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+}
+
+.recordkeeper-formation-empty {
+    background-color: rgba(0, 0, 0, .095);
+    flex-grow: 1;
+}

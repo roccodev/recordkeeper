@@ -69,6 +69,10 @@ where
         self.buf.iter().take(self.len as usize)
     }
 
+    pub fn clear(&mut self) {
+        self.len = 0;
+    }
+
     pub const fn capacity(&self) -> usize {
         MAX
     }
