@@ -22,7 +22,7 @@ pub struct PartyFormation {
     pub ouroboros: [OuroborosFormation; OUROBOROS_MAX],
 }
 
-#[derive(SaveBin, Debug)]
+#[derive(SaveBin, Debug, Default)]
 pub struct FormationName {
     /// ID for `33F137E8`
     pub name_id: u16,
@@ -77,6 +77,11 @@ impl PartyFormation {
                 .try_into()
                 .unwrap(),
         }
+    }
+
+    /// Returns whether a valid party formation is currently in the slot.
+    pub fn is_valid(&self) -> bool {
+        !self.party.is_empty()
     }
 
     /// Returns the character formation slot for the given character ID. (starts at 1)
@@ -143,7 +148,11 @@ impl CharacterFormation {
     pub fn from_save(save_char: &Character, char_id: u16) -> Self {
         let current_class = save_char.selected_class;
         Self {
-            class: *save_char.class_data(current_class as usize),
+            class: if current_class != 0 {
+                *save_char.class_data(current_class as usize)
+            } else {
+                Default::default()
+            },
             current_class: current_class as u16,
             character_id: char_id,
             costume_id: save_char.costume_id,

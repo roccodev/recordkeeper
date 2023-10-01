@@ -1,10 +1,14 @@
+use recordkeeper::character::formation::PARTY_FORMATION_MAX;
 use strum::{EnumIter, IntoEnumIterator};
-use ybc::Tabs;
+use ybc::{Tabs, Tile};
 use yew::prelude::*;
 
 use crate::{
-    components::character::formation::{FormationCharacters, FormationOuroboros},
+    components::character::formation::{
+        FormationCardEmpty, FormationCardPresent, FormationCharacters, FormationOuroboros,
+    },
     lang::Text,
+    save::SaveContext,
 };
 
 #[derive(Clone, Copy, PartialEq, EnumIter)]
@@ -18,11 +22,40 @@ pub struct FormationProps {
     pub id: usize,
 }
 
+const CARDS_PER_ROW: usize = 5;
+
 #[function_component]
 pub fn Formations() -> Html {
-    // TODO: formation list
-    html! {
-        <FormationEditor id={0} />
+    let current = use_state(|| None::<usize>);
+    let save = use_context::<SaveContext>().unwrap();
+    let save = save.get();
+
+    if let Some(current) = *current {
+        html! {
+            <>
+                <Text path="formation_back" />
+                <FormationEditor id={current} />
+            </>
+        }
+    } else {
+        let child_classes = classes!("is-child", "pr-2");
+
+        html! {
+            <Tile classes="is-vertical">
+                {for (0..PARTY_FORMATION_MAX).step_by(CARDS_PER_ROW).map(|start| {
+                    let end = (start + CARDS_PER_ROW).min(PARTY_FORMATION_MAX);
+                    html! {
+                        <Tile classes="is-parent">
+                            {for (start..end).map(|i| if save.get().save().party_formations[i].is_valid() {
+                                html!(<Tile classes={child_classes.clone()}><FormationCardPresent id={i} /></Tile>)
+                            } else {
+                                html!(<Tile classes={child_classes.clone()}><FormationCardEmpty id={i} /></Tile>)
+                            })}
+                        </Tile>
+                    }
+                })}
+            </Tile>
+        }
     }
 }
 

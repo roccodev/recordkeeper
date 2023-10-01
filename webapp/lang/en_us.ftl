@@ -354,6 +354,11 @@ enemy_soul_hack_upgraded = Upgraded
 ## Party Formations screens
 
 formation_back = Back to list
+formation_edit = Edit
+formation_delete = Delete
+formation_create = New from save
+formation_copy = Copy existing
+formation_empty = Empty
 
 formation_tab_characters = Characters
 formation_tab_ouroboros = Ouroboros

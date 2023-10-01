@@ -61,6 +61,10 @@ where
         self.len as usize
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
     pub fn iter(&self) -> impl Iterator<Item = &T> {
         self.buf.iter().take(self.len as usize)
     }

@@ -1,7 +1,7 @@
 use bdat::Label;
 use game_data::formation::{FormationData, FormationLang, FormationNameProfile, ProfileName};
 
-use crate::{const_hash, lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry};
+use crate::{const_hash, lang::filter_table_from_bdat, BdatRegistry, LangBdatRegistry};
 
 pub fn read_data(bdat: &BdatRegistry) -> FormationData {
     let names = bdat.table(&Label::Hash(0x33F137E8));
@@ -61,6 +61,6 @@ pub fn read_lang(bdat: &LangBdatRegistry) -> FormationLang {
     let names = bdat.table(&Label::Hash(0x96DFBB81));
 
     FormationLang {
-        names: text_table_from_bdat(names),
+        names: filter_table_from_bdat(names),
     }
 }

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    lang::{Nameable, TextEntry, TextTable},
+    lang::{FilterEntry, FilterTable, Filterable, Id},
     LanguageData,
 };
 
@@ -13,16 +13,16 @@ pub struct FormationData {
 
 #[derive(Serialize, Deserialize)]
 pub struct FormationLang {
-    pub names: TextTable,
+    pub names: FilterTable,
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub struct FormationNameProfile {
     name: ProfileName,
     pub save_id: u16,
 }
 
-#[derive(Clone, Copy, Serialize, Deserialize)]
+#[derive(Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum ProfileName {
     Literal(usize),
     Challenge(usize),
@@ -34,11 +34,17 @@ impl FormationNameProfile {
     }
 }
 
-impl Nameable for FormationNameProfile {
-    fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l TextEntry> {
+impl Filterable for FormationNameProfile {
+    fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
         match self.name {
             ProfileName::Literal(id) => language.formation.names.get(id),
-            ProfileName::Challenge(id) => language.dlc.challenge.challenges.get(id).map(Into::into),
+            ProfileName::Challenge(id) => language.dlc.challenge.challenges.get(id),
         }
+    }
+}
+
+impl Id for FormationNameProfile {
+    fn id(&self) -> usize {
+        self.save_id as usize
     }
 }
