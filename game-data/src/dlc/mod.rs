@@ -1,7 +1,11 @@
 use serde::{Deserialize, Serialize};
 
-use self::masha::{GameCraftItems, LangCraftItems};
+use self::{
+    challenge::ChallengeLang,
+    masha::{GameCraftItems, LangCraftItems},
+};
 
+pub mod challenge;
 pub mod masha;
 
 #[derive(Serialize, Deserialize)]
@@ -12,4 +16,5 @@ pub struct DlcData {
 #[derive(Serialize, Deserialize)]
 pub struct DlcLang {
     pub masha: LangCraftItems,
+    pub challenge: ChallengeLang,
 }

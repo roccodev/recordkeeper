@@ -111,3 +111,9 @@ impl From<TextEntry> for FilterEntry {
         }
     }
 }
+
+impl<'a> From<&'a FilterEntry> for &'a TextEntry {
+    fn from(value: &FilterEntry) -> &TextEntry {
+        &value.text
+    }
+}

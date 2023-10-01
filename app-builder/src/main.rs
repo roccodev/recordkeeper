@@ -1,12 +1,13 @@
-use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
-
 use bdat::{Label, SwitchEndian, Table};
+use game_data::{GameData, LanguageData};
+use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
 
 mod character;
 mod dlc;
 mod enemy;
 mod enhance;
 mod field;
+mod formation;
 mod item;
 mod lang;
 mod manual;
@@ -22,7 +23,6 @@ macro_rules! const_hash {
 }
 
 pub(crate) use const_hash;
-use game_data::{GameData, LanguageData};
 
 pub struct BdatRegistry<'b> {
     game_tables: HashMap<Label, Table<'b>>,
@@ -68,6 +68,7 @@ fn read_game_data(bdat: &BdatRegistry) -> GameData {
         ouroboros: ouroboros::read_ouroboros(bdat),
         field: field::read_data(bdat),
         enemies: enemy::read_data(bdat),
+        formation: formation::read_data(bdat),
     }
 }
 
@@ -80,6 +81,7 @@ fn read_lang_data(bdat: &LangBdatRegistry) -> LanguageData {
         characters: character::read_lang(bdat),
         field: field::read_lang(bdat),
         enemies: enemy::read_lang(bdat),
+        formation: formation::read_lang(bdat),
     }
 }
 

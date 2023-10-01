@@ -2,6 +2,7 @@ use game_data::dlc::{DlcData, DlcLang};
 
 use crate::{BdatRegistry, LangBdatRegistry};
 
+mod challenge;
 mod masha;
 
 pub fn read_dlc_game(bdat: &BdatRegistry) -> DlcData {
@@ -13,5 +14,6 @@ pub fn read_dlc_game(bdat: &BdatRegistry) -> DlcData {
 pub fn read_dlc_lang(bdat: &LangBdatRegistry) -> DlcLang {
     DlcLang {
         masha: masha::read_lang(bdat),
+        challenge: challenge::read_lang(bdat),
     }
 }

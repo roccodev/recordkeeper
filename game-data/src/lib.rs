@@ -5,6 +5,7 @@ use dlc::{DlcData, DlcLang};
 use enemy::{EnemyLang, EnemyRegistry};
 use enhance::{EnhanceLang, EnhanceRegistry};
 use field::{FieldLang, FieldRegistry};
+use formation::{FormationData, FormationLang};
 use item::{ItemLanguageRegistry, ItemRegistry};
 use manual::ManualData;
 use ouroboros::OuroborosRegistry;
@@ -18,6 +19,7 @@ pub mod dlc;
 pub mod enemy;
 pub mod enhance;
 pub mod field;
+pub mod formation;
 pub mod item;
 pub mod lang;
 pub mod manual;
@@ -36,6 +38,7 @@ pub struct GameData {
     pub ouroboros: OuroborosRegistry,
     pub field: FieldRegistry,
     pub enemies: EnemyRegistry,
+    pub formation: FormationData,
 
     /// Manually inputted data, that can't be read
     /// from game files.
@@ -51,6 +54,7 @@ pub struct LanguageData {
     pub characters: CharacterLang,
     pub field: FieldLang,
     pub enemies: EnemyLang,
+    pub formation: FormationLang,
 }
 
 pub fn save_game_data(data: &GameData, mut writer: impl Write) -> Result<(), Box<dyn Error>> {
