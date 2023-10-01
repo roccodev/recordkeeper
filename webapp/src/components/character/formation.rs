@@ -1,10 +1,10 @@
-use game_data::ouroboros::Ouroboros;
-use ybc::{Container, Control, Field, Tile};
+use game_data::{character::Character, ouroboros::Ouroboros};
+use ybc::{Container, Control, Field, Notification, Tile};
 use yew::prelude::*;
 
 use crate::{
     components::{
-        character::Selector,
+        character::{appearance::Appearance, class::ClassEditor, CharacterAccessor, Selector},
         edit::editor,
         ouroboros::{self, OuroEditorConfig, OuroborosEditor},
     },
@@ -33,7 +33,42 @@ editor!(
 
 #[function_component]
 pub fn FormationCharacters(props: &FormationProps) -> Html {
-    html! {}
+    let char_id_state = use_state(|| 1usize);
+    let char_id = *char_id_state;
+    let data = use_context::<Data>().unwrap();
+
+    let accessor = CharacterAccessor::Formation {
+        formation: props.id,
+        id: char_id as u16,
+    };
+
+    html! {
+        <Container>
+            <Tile classes={classes!("mb-2")}>
+                <Tile>
+                    <Field>
+                        <label class="label"><Text path="character_character" /></label>
+                        <Control>
+                            <Selector<Character> state={char_id_state.clone()} values={data.game().characters.characters()} />
+                        </Control>
+                    </Field>
+                </Tile>
+                <Tile classes={classes!("is-10", "is-justify-content-right")}>
+                    {"<PartyEditor />"}
+                </Tile>
+            </Tile>
+            <div>
+                <Notification>
+                    <Tile classes={classes!("notification")}>
+                        <Appearance accessor={accessor} char_id={char_id} />
+                    </Tile>
+                </Notification>
+                <Notification>
+                    <ClassEditor accessor={accessor.into_class(0)} stats={false} />
+                </Notification>
+            </div>
+        </Container>
+    }
 }
 
 #[function_component]

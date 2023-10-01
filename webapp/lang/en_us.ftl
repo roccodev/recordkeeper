@@ -349,3 +349,11 @@ enemy_soul_hack_name = Name
 enemy_soul_hack_unlocked = Unlocked
 enemy_soul_hack_progress = Upgrade Progress
 enemy_soul_hack_upgraded = Upgraded
+
+
+## Party Formations screens
+
+formation_back = Back to list
+
+formation_tab_characters = Characters
+formation_tab_ouroboros = Ouroboros

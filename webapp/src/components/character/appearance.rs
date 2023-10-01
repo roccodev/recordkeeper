@@ -17,6 +17,8 @@ use crate::{
     save::SaveContext,
 };
 
+use super::CharacterAccessor;
+
 #[rustfmt::skip]
 editor!(
     DirtinessEditor,
@@ -30,18 +32,18 @@ editor!(
 editor!(
     CostumeEditor,
     u16,
-    get |editor, save| save.characters[editor.char_idx].costume_id,
-    set |editor, save, new| save.characters[editor.char_idx].costume_id = new,
-    capture char_idx: usize
+    get |editor, save| editor.char.get_costume_id(save),
+    set |editor, save, new| editor.char.set_costume_id(save, new),
+    capture char: CharacterAccessor
 );
 
 #[rustfmt::skip]
 editor!(
     AttachmentEditor,
     u8,
-    get |editor, save| save.characters[editor.char_idx].attachment,
-    set |editor, save, new| save.characters[editor.char_idx].attachment = new,
-    capture char_idx: usize
+    get |editor, save| editor.char.get_attachment(save),
+    set |editor, save, new| editor.char.set_attachment(save, new),
+    capture char: CharacterAccessor
 );
 
 #[rustfmt::skip]
@@ -55,7 +57,8 @@ editor!(
 
 #[derive(Properties, PartialEq)]
 pub struct AppearanceProps {
-    pub char_idx: usize,
+    pub accessor: CharacterAccessor,
+    pub char_id: usize,
 }
 
 #[derive(Properties, PartialEq)]
@@ -76,18 +79,22 @@ pub fn Appearance(props: &AppearanceProps) -> Html {
     html! {
         <Tile classes={classes!("is-parent", "is-vertical")}>
             <Tile>
-                <Field classes={classes!("mr-2")}>
-                    <label class="label"><Text path="character_dirt" /></label>
-                    <Control>
-                        <NumberInput<DirtinessEditor> editor={DirtinessEditor { char_idx: props.char_idx }} />
-                    </Control>
-                </Field>
+                {if let CharacterAccessor::Save { idx } = props.accessor {
+                    html! {
+                        <Field classes={classes!("mr-2")}>
+                            <label class="label"><Text path="character_dirt" /></label>
+                            <Control>
+                                <NumberInput<DirtinessEditor> editor={DirtinessEditor { char_idx: idx }} />
+                            </Control>
+                        </Field>
+                    }
+                } else { html!() }}
                 <Field classes={classes!("mr-2")}>
                     <label class="label"><Text path="character_costume" /></label>
                     <Control>
                         <EditorSelect<CostumeEditor, Costume>
-                            editor={CostumeEditor { char_idx: props.char_idx }}
-                            options={Options::from(data.game().characters.costumes(props.char_idx.checked_add(1).unwrap()))}
+                            editor={CostumeEditor { char: props.accessor }}
+                            options={Options::from(data.game().characters.costumes(props.char_id))}
                         />
                     </Control>
                 </Field>
@@ -95,25 +102,29 @@ pub fn Appearance(props: &AppearanceProps) -> Html {
                     <label class="label"><Text path="character_attachment" /></label>
                     <Control>
                         <EditorSelect<AttachmentEditor, Attachment>
-                            editor={AttachmentEditor { char_idx: props.char_idx }}
+                            editor={AttachmentEditor { char: props.accessor }}
                             options={Options::from(data.game().characters.attachments())}
                         />
                     </Control>
                 </Field>
             </Tile>
-            <Tile>
-                <Field classes={classes!("is-grouped", "is-grouped-multiline")}>
-                    {for CharacterFlag::iter().filter_map(|flag| {
-                        Some(html! {
-                            <Control>
-                                <CheckboxInput<CharacterFlagEditor> editor={CharacterFlagEditor { char_idx: props.char_idx, flag }}>
-                                    {" "}<Text path={flag.lang_id()} />
-                                </CheckboxInput<CharacterFlagEditor>>
-                            </Control>
-                        })
-                    })}
-                </Field>
-            </Tile>
+            {if let CharacterAccessor::Save { idx } = props.accessor {
+                html! {
+                    <Tile>
+                        <Field classes={classes!("is-grouped", "is-grouped-multiline")}>
+                            {for CharacterFlag::iter().filter_map(|flag| {
+                                Some(html! {
+                                    <Control>
+                                        <CheckboxInput<CharacterFlagEditor> editor={CharacterFlagEditor { char_idx: idx, flag }}>
+                                            {" "}<Text path={flag.lang_id()} />
+                                        </CheckboxInput<CharacterFlagEditor>>
+                                    </Control>
+                                })
+                            })}
+                        </Field>
+                    </Tile>
+                }
+            } else { html!() }}
         </Tile>
     }
 }

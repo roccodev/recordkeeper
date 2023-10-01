@@ -20,6 +20,8 @@ use crate::{
     save::SaveContext,
 };
 
+use super::ClassAccessor;
+
 #[derive(Properties, PartialEq)]
 pub struct SlotProps<E: Editor + PartialEq, I: PartialEq + 'static>
 where
@@ -32,8 +34,7 @@ where
 
 #[derive(Properties, PartialEq, Clone, Copy)]
 pub struct AccessorySlotProps {
-    pub char_idx: usize,
-    pub class_id: usize,
+    pub char: ClassAccessor,
     pub slot_idx: usize,
 }
 
@@ -170,14 +171,12 @@ pub fn AccessoryInput(props: &AccessorySlotProps) -> Html {
 
 impl AccessorySlotProps {
     fn save_slot(&self, save: &SaveData) -> Slot<ClassAccessory> {
-        save.characters[self.char_idx]
-            .class_data(self.class_id)
-            .accessory_slot(self.slot_idx)
+        self.char.class_data(save).accessory_slot(self.slot_idx)
     }
 
     fn save_slot_mut<'a>(&self, save: &'a mut SaveData) -> SlotMut<'a, ClassAccessory> {
-        save.characters[self.char_idx]
-            .class_data_mut(self.class_id)
+        self.char
+            .class_data_mut(save)
             .accessory_slot_mut(self.slot_idx)
     }
 }

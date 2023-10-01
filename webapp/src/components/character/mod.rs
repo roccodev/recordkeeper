@@ -1,5 +1,8 @@
-use game_data::lang::{Filterable, Id};
-use recordkeeper::{flags::BitFlags, SaveData};
+use game_data::{
+    character::Class,
+    lang::{Filterable, Id},
+};
+use recordkeeper::{character::class::CharacterClass, flags::BitFlags, SaveData};
 use strum::{EnumIter, IntoEnumIterator};
 use web_sys::HtmlSelectElement;
 use ybc::{Control, Field, Notification, Tile};
@@ -7,7 +10,10 @@ use yew::prelude::*;
 
 use crate::{
     components::character::{appearance::Appearance, class::ClassEditor, stats::CharacterStats},
-    components::edit::{editor, CheckboxInput},
+    components::{
+        character::class::ClassAccessor,
+        edit::{editor, CheckboxInput},
+    },
     data::Data,
     lang::Text,
 };
@@ -54,9 +60,19 @@ enum CharacterSet {
     Temporary,
 }
 
+#[derive(Clone, Copy, PartialEq)]
+pub enum CharacterAccessor {
+    Save { idx: usize },
+    Formation { formation: usize, id: u16 },
+}
+
 #[function_component]
 pub fn CharacterEditor(props: &CharacterProps) -> Html {
+    let data = use_context::<Data>().unwrap();
     let char_idx = props.char_id.checked_sub(1).unwrap();
+    let class_id = use_state(|| 1); // TODO use selected class
+
+    let accessor = CharacterAccessor::Save { idx: char_idx };
 
     html! {
         <>
@@ -72,11 +88,19 @@ pub fn CharacterEditor(props: &CharacterProps) -> Html {
                 </Field>
                 <Tile classes={classes!("notification")}>
                     <CharacterStats ..*props />
-                    <Appearance char_idx={char_idx} />
+                    <Appearance accessor={accessor} char_id={props.char_id} />
                 </Tile>
             </Notification>
             <Notification>
-                <ClassEditor char_id={props.char_id} />
+                <Tile>
+                    <Field>
+                        <label class="label"><Text path="character_class" /></label>
+                        <Control>
+                            <Selector<Class> state={class_id.clone()} values={data.game().characters.classes()} />
+                        </Control>
+                    </Field>
+                </Tile>
+                <ClassEditor accessor={accessor.into_class(*class_id)} stats={true} />
             </Notification>
         </>
     }
@@ -170,5 +194,66 @@ impl CharacterSet {
             CharacterSet::Temporary => "temp",
         };
         html!(<Text path={format!("character_set_{id}")} />)
+    }
+}
+
+impl CharacterAccessor {
+    pub fn get_costume_id(&self, save: &SaveData) -> u16 {
+        match self {
+            CharacterAccessor::Save { idx } => save.characters[*idx].costume_id,
+            CharacterAccessor::Formation { formation, id } => {
+                save.party_formations[*formation]
+                    .character(*id)
+                    .unwrap()
+                    .costume_id
+            }
+        }
+    }
+
+    pub fn set_costume_id(&self, save: &mut SaveData, costume: u16) {
+        match self {
+            CharacterAccessor::Save { idx } => save.characters[*idx].costume_id = costume,
+            CharacterAccessor::Formation { formation, id } => {
+                save.party_formations[*formation]
+                    .character_mut(*id)
+                    .costume_id = costume
+            }
+        }
+    }
+
+    pub fn get_attachment(&self, save: &SaveData) -> u8 {
+        match self {
+            CharacterAccessor::Save { idx } => save.characters[*idx].attachment,
+            CharacterAccessor::Formation { formation, id } => {
+                save.party_formations[*formation]
+                    .character(*id)
+                    .unwrap()
+                    .attachment
+            }
+        }
+    }
+
+    pub fn set_attachment(&self, save: &mut SaveData, attachment: u8) {
+        match self {
+            CharacterAccessor::Save { idx } => save.characters[*idx].attachment = attachment,
+            CharacterAccessor::Formation { formation, id } => {
+                save.party_formations[*formation]
+                    .character_mut(*id)
+                    .attachment = attachment
+            }
+        }
+    }
+
+    pub fn into_class(self, class_id: usize) -> ClassAccessor {
+        match self {
+            CharacterAccessor::Save { idx } => ClassAccessor::Character {
+                char: idx,
+                class: class_id,
+            },
+            CharacterAccessor::Formation { formation, id } => ClassAccessor::Formation {
+                formation,
+                char: id,
+            },
+        }
     }
 }
