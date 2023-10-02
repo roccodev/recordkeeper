@@ -244,6 +244,18 @@ impl CharacterAccessor {
         }
     }
 
+    pub fn get_selected_class(&self, save: &SaveData) -> u16 {
+        match self {
+            CharacterAccessor::Save { idx } => save.characters[*idx].selected_class as u16,
+            CharacterAccessor::Formation { formation, id } => {
+                save.party_formations[*formation]
+                    .character(*id)
+                    .unwrap()
+                    .current_class
+            }
+        }
+    }
+
     pub fn into_class(self, class_id: usize) -> ClassAccessor {
         match self {
             CharacterAccessor::Save { idx } => ClassAccessor::Character {

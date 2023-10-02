@@ -4,6 +4,8 @@ undo = Undo
 redo = Redo
 download = Save & Download
 ok = OK
+yes = Yes
+no = No
 
 # The project's info page
 nav_about = About
@@ -362,3 +364,6 @@ formation_empty = Empty
 
 formation_tab_characters = Characters
 formation_tab_ouroboros = Ouroboros
+
+formation_class_change = Edit/Selected Class
+formation_class_confirm = There is no data for the selected class. Would you like to copy it from the current state of the save file?

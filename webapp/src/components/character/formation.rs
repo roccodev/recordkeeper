@@ -1,4 +1,8 @@
-use game_data::{character::Character, formation::FormationNameProfile, ouroboros::Ouroboros};
+use game_data::{
+    character::{Character, Class},
+    formation::FormationNameProfile,
+    ouroboros::Ouroboros,
+};
 use recordkeeper::character::formation::{FormationName, PartyFormation};
 use ybc::{Card, CardContent, CardFooter, Container, Control, Field, Notification, Tile};
 use yew::prelude::*;
@@ -12,6 +16,7 @@ use crate::{
         ouroboros::{self, OuroEditorConfig, OuroborosEditor},
     },
     data::Data,
+    dialog::{DialogLayout, DialogQueue},
     lang::Text,
     routes::formation::FormationProps,
     save::SaveContext,
@@ -72,11 +77,49 @@ pub struct FormationStateProps {
 pub fn FormationCharacters(props: &FormationProps) -> Html {
     let char_id_state = use_state(|| 1usize);
     let char_id = *char_id_state;
+
     let data = use_context::<Data>().unwrap();
+    let save_context = use_context::<SaveContext>().unwrap();
+    let dialog_context = use_context::<DialogQueue>().unwrap();
 
     let accessor = CharacterAccessor::Formation {
         formation: props.id,
         id: char_id as u16,
+    };
+
+    let class_callback = {
+        let save_context = save_context.clone();
+        let id = props.id;
+        move |class_id: usize, import: bool| {
+            let save_context = save_context.clone();
+            let id = id;
+            Callback::from(move |_| {
+                save_context.edit(move |save| {
+                    // Transfer new class data from save file
+                    let char = save.party_formations[id].character_mut(char_id as u16);
+                    char.current_class = class_id as u16;
+                    if import {
+                        char.copy_class_from_save(
+                            save.characters[char_id.checked_sub(1).unwrap()].class_data(class_id),
+                        );
+                    }
+                })
+            })
+        }
+    };
+
+    let open_dialog = {
+        Callback::from(move |class_id: usize| {
+            dialog_context.dispatch(Some(
+                DialogLayout::YesNo {
+                    title: None,
+                    message: html!(<Text path="formation_class_confirm" />),
+                    yes_callback: class_callback(class_id, true),
+                    no_callback: class_callback(class_id, false),
+                }
+                .into(),
+            ))
+        })
     };
 
     html! {
@@ -98,6 +141,18 @@ pub fn FormationCharacters(props: &FormationProps) -> Html {
                 <Notification>
                     <Tile classes={classes!("notification")}>
                         <Appearance accessor={accessor} char_id={char_id} />
+                        <Tile classes="is-parent">
+                            <Field>
+                                <label class="label"><Text path="formation_class_change" /></label>
+                                <Control>
+                                    <UpdateSelector<Class>
+                                        values={data.game().characters.classes()}
+                                        update={open_dialog}
+                                        current={accessor.get_selected_class(save_context.get().get().save()) as usize}
+                                    />
+                                </Control>
+                            </Field>
+                        </Tile>
                     </Tile>
                 </Notification>
                 <Notification>

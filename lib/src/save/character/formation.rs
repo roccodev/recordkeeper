@@ -164,6 +164,11 @@ impl CharacterFormation {
             attachment: save_char.attachment,
         }
     }
+
+    /// Copies class data from the save file format of a character class.
+    pub fn copy_class_from_save(&mut self, class: &CharacterClass) {
+        self.class = *class;
+    }
 }
 
 impl OuroborosFormation {

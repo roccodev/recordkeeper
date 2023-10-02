@@ -20,6 +20,12 @@ pub enum DialogLayout {
         message: Html,
         severity: Severity,
     },
+    YesNo {
+        title: Option<AttrValue>,
+        message: Html,
+        yes_callback: Callback<()>,
+        no_callback: Callback<()>,
+    },
 }
 
 #[derive(PartialEq, Eq, Clone, Copy)]
@@ -97,6 +103,46 @@ impl DialogLayout {
                     </footer>
                 </>
             },
+            Self::YesNo {
+                title,
+                message,
+                yes_callback,
+                no_callback,
+            } => {
+                let yes = {
+                    let yes_callback = yes_callback.clone();
+                    let close_callback = close_callback.clone();
+                    Callback::from(move |e: MouseEvent| {
+                        close_callback.emit(e);
+                        yes_callback.emit(());
+                    })
+                };
+                let no = {
+                    let no_callback = no_callback.clone();
+                    Callback::from(move |e: MouseEvent| {
+                        close_callback.emit(e);
+                        no_callback.emit(());
+                    })
+                };
+                html! {
+                    <>
+                        <span><b>{title.as_ref().map(|t| t.as_str())}</b></span>
+
+                        <Block>
+                            {message.clone()}
+                        </Block>
+
+                        <footer class="buttons">
+                            <Button onclick={yes} classes={classes!("is-primary")}>
+                                <Text path="yes" />
+                            </Button>
+                            <Button onclick={no}>
+                                <Text path="no" />
+                            </Button>
+                        </footer>
+                    </>
+                }
+            }
         }
     }
 }
