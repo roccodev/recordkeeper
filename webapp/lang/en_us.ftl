@@ -361,6 +361,8 @@ formation_delete = Delete
 formation_create = New from save
 formation_copy = Copy existing
 formation_empty = Empty
+# $id: the formation ID
+formation_current = Editing Formation { $id }
 
 formation_tab_characters = Characters
 formation_tab_ouroboros = Ouroboros
