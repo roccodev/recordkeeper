@@ -16,6 +16,7 @@ use crate::{
     },
     data::Data,
     lang::Text,
+    save::SaveContext,
 };
 
 mod appearance;
@@ -69,9 +70,10 @@ pub enum CharacterAccessor {
 
 #[function_component]
 pub fn CharacterEditor(props: &CharacterProps) -> Html {
-    let data = use_context::<Data>().unwrap();
+    let save = use_context::<SaveContext>().unwrap();
+
     let char_idx = props.char_id.checked_sub(1).unwrap();
-    let class_id = use_state(|| 1); // TODO use selected class
+    let class_id = save.get().get().save().characters[char_idx].selected_class;
 
     let accessor = CharacterAccessor::Save { idx: char_idx };
 
@@ -93,15 +95,7 @@ pub fn CharacterEditor(props: &CharacterProps) -> Html {
                 </Tile>
             </Notification>
             <Notification>
-                <Tile>
-                    <Field>
-                        <label class="label"><Text path="character_class" /></label>
-                        <Control>
-                            <Selector<Class> state={class_id.clone()} values={data.game().characters.classes()} />
-                        </Control>
-                    </Field>
-                </Tile>
-                <ClassEditor accessor={accessor.into_class(*class_id)} stats={true} />
+                <ClassEditor accessor={accessor.into_class(class_id as usize)} stats={true} />
             </Notification>
         </>
     }

@@ -183,11 +183,10 @@ quest_task_talk = Talk
 
 character_character = Character
 character_party = Party Setup
-character_class = Edit Class
 character_level = Level
 character_exp = EXP
 character_bexp = Bonus EXP
-character_selected_class = Selected {-class}
+character_selected_class = Edit/Selected Class
 
 character_set_selectable = Selectable
 character_set_permanent = Permanent
