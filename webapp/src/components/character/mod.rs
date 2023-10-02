@@ -24,6 +24,7 @@ pub mod formation;
 pub mod party;
 pub mod slot;
 mod stats;
+mod util;
 
 #[rustfmt::skip]
 editor!(

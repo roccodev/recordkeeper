@@ -10,3 +10,10 @@
     background-color: rgba(0, 0, 0, .095);
     flex-grow: 1;
 }
+
+.recordkeeper-collst-color {
+    width: 3rem;
+    height: $control-height;
+    border: 1px solid black;
+    border-radius: $radius;
+}

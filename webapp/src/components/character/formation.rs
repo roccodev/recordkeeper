@@ -16,6 +16,7 @@ use crate::{
             appearance::Appearance,
             class::ClassEditor,
             party::{FormationPartyEditor, PartyEditor},
+            util::ColorList,
             CharacterAccessor, Selector, UpdateSelector,
         },
         edit::{editor, Editor, NumberInput},
@@ -67,9 +68,9 @@ editor!(
 #[rustfmt::skip]
 editor!(
     pub FormationNameColor,
-    u16,
-    get |editor, save| save.party_formations[editor.formation].name.color_id,
-    set |editor, save, new| save.party_formations[editor.formation].name.color_id = new,
+    usize,
+    get |editor, save| save.party_formations[editor.formation].name.color_id as usize,
+    set |editor, save, new| save.party_formations[editor.formation].name.color_id = new.try_into().unwrap(),
     capture formation: usize
 );
 
@@ -224,7 +225,7 @@ pub fn FormationCardEmpty(props: &FormationProps) -> Html {
             </CardContent>
             <CardFooter>
                 <a class="card-footer-item" onclick={new_callback}><Text path="formation_create" /></a>
-                <a class="card-footer-item"><Text path="formation_copy" /></a>
+                // <a class="card-footer-item"><Text path="formation_copy" /></a>
             </CardFooter>
         </Card>
     }
@@ -274,6 +275,11 @@ pub fn FormationCardPresent(props: &FormationStateProps) -> Html {
                 <Field>
                     <Control>
                         <NumberInput<FormationNameNum> editor={FormationNameNum { formation: props.id }} />
+                    </Control>
+                </Field>
+                <Field>
+                    <Control>
+                        <ColorList<FormationNameColor> colors={data.game().formation.colors.as_ref()} editor={FormationNameColor { formation: props.id }} />
                     </Control>
                 </Field>
             </CardContent>
