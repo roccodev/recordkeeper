@@ -3,14 +3,20 @@ use game_data::{
     formation::FormationNameProfile,
     ouroboros::Ouroboros,
 };
-use recordkeeper::character::formation::{FormationName, PartyFormation};
+use recordkeeper::character::{
+    formation::{FormationName, PartyFormation},
+    PARTY_MAX,
+};
 use ybc::{Card, CardContent, CardFooter, Container, Control, Field, Notification, Tile};
 use yew::prelude::*;
 
 use crate::{
     components::{
         character::{
-            appearance::Appearance, class::ClassEditor, CharacterAccessor, Selector, UpdateSelector,
+            appearance::Appearance,
+            class::ClassEditor,
+            party::{FormationPartyEditor, PartyEditor},
+            CharacterAccessor, Selector, UpdateSelector,
         },
         edit::{editor, Editor, NumberInput},
         ouroboros::{self, OuroEditorConfig, OuroborosEditor},
@@ -134,7 +140,7 @@ pub fn FormationCharacters(props: &FormationProps) -> Html {
                     </Field>
                 </Tile>
                 <Tile classes={classes!("is-10", "is-justify-content-right")}>
-                    {"<PartyEditor />"}
+                    <PartyEditor<PARTY_MAX, FormationPartyEditor> editor={FormationPartyEditor { formation: props.id }} />
                 </Tile>
             </Tile>
             <div>

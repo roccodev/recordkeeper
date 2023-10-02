@@ -1,9 +1,13 @@
 use game_data::character::Character;
+use recordkeeper::character::PARTY_MAX;
 use ybc::{Container, Control, Field, Tile};
 use yew::prelude::*;
 
 use crate::{
-    components::character::{party::PartyEditor, CharacterEditor, Selector},
+    components::character::{
+        party::{PartyEditor, SavePartyEditor},
+        CharacterEditor, Selector,
+    },
     data::Data,
     lang::Text,
 };
@@ -25,7 +29,7 @@ pub fn Characters() -> Html {
                     </Field>
                 </Tile>
                 <Tile classes={classes!("is-10", "is-justify-content-right")}>
-                    <PartyEditor />
+                    <PartyEditor<PARTY_MAX, SavePartyEditor> editor={SavePartyEditor} />
                 </Tile>
             </Tile>
             <div>
