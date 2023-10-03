@@ -58,7 +58,7 @@ pub struct CharacterSets {
 #[derive(SaveBin, Debug)]
 pub struct Ouroboros {
     pub art_ids: [u16; 5],
-    pub exp: u16, // ???
+    #[loc(0xc)]
     pub sp: u32,
     pub linked_skills: [u16; 2],
 
