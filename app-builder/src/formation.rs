@@ -1,22 +1,18 @@
-use bdat::Label;
+use bdat::{label_hash, Label};
 use game_data::formation::{FormationData, FormationLang, FormationNameProfile, ProfileName};
 
-use crate::{const_hash, lang::filter_table_from_bdat, BdatRegistry, LangBdatRegistry};
+use crate::{lang::filter_table_from_bdat, BdatRegistry, LangBdatRegistry};
 
 pub fn read_data(bdat: &BdatRegistry) -> FormationData {
     let names = bdat.table(&Label::Hash(0x33F137E8));
-    let challenges = bdat.table(&const_hash!("BTL_ChTA_List"));
+    let challenges = bdat.table(label_hash!("BTL_ChTA_List"));
 
     let mut challenges_by_list_num = challenges
         .rows()
-        .map(|r| challenges.row(r.id()))
         .map(|row| {
             (
-                row[const_hash!("Name")].as_single().unwrap().to_integer() as usize,
-                row[const_hash!("ListNum")]
-                    .as_single()
-                    .unwrap()
-                    .to_integer(),
+                row.get(label_hash!("Name")).to_integer() as usize,
+                row.get(label_hash!("ListNum")).to_integer(),
             )
         })
         .collect::<Vec<_>>();
@@ -24,22 +20,15 @@ pub fn read_data(bdat: &BdatRegistry) -> FormationData {
 
     let names = names
         .rows()
-        .map(|r| names.row(r.id()))
         .filter_map(|row| {
-            let ty = row[const_hash!("Type")].as_single().unwrap().to_integer();
-            let save_id = row[Label::Hash(0x44E4B99C)]
-                .as_single()
-                .unwrap()
-                .to_integer() as u16;
+            let ty = row.get(label_hash!("Type")).to_integer();
+            let save_id = row.get(Label::Hash(0x44E4B99C)).to_integer() as u16;
 
             let name = match ty {
                 0 => return None,
-                1 => ProfileName::Literal(
-                    row[const_hash!("Name")].as_single().unwrap().to_integer() as usize,
-                ),
+                1 => ProfileName::Literal(row.get(label_hash!("Name")).to_integer() as usize),
                 2 => {
-                    let sort_id =
-                        row[const_hash!("SortNo")].as_single().unwrap().to_integer() as usize;
+                    let sort_id = row.get(label_hash!("SortNo")).to_integer() as usize;
                     ProfileName::Challenge(
                         challenges_by_list_num[sort_id.checked_sub(1).unwrap()].0,
                     )

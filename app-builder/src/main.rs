@@ -1,6 +1,6 @@
-use bdat::{Label, SwitchEndian, Table};
+use bdat::{BdatFile, Label, ModernCell, ModernTable, RowRef, SwitchEndian, TableAccessor};
 use game_data::{GameData, LanguageData};
-use std::{collections::HashMap, fs::File, io::BufReader, path::Path};
+use std::{borrow::Borrow, collections::HashMap, fs::File, io::BufReader, path::Path};
 
 mod character;
 mod dlc;
@@ -15,22 +15,15 @@ mod ouroboros;
 mod quest;
 mod scenario;
 
-macro_rules! const_hash {
-    ($name:literal) => {{
-        const HASH: u32 = ::bdat::hash::murmur3_str($name);
-        ::bdat::Label::Hash(HASH)
-    }};
-}
-
-pub(crate) use const_hash;
+pub type ModernRow<'a, 'b> = RowRef<'a, 'b, ModernCell<'a, 'b>>;
 
 pub struct BdatRegistry<'b> {
-    game_tables: HashMap<Label, Table<'b>>,
+    game_tables: HashMap<Label, ModernTable<'b>>,
 }
 
 pub struct LangBdatRegistry<'b> {
     game: BdatRegistry<'b>,
-    tables: HashMap<Label, Table<'b>>,
+    tables: HashMap<Label, ModernTable<'b>>,
 }
 
 const LANG_IDS: &[&str] = &["gb"];
@@ -105,11 +98,11 @@ impl<'b> BdatRegistry<'b> {
         Self { game_tables }
     }
 
-    pub fn get_table(&self, label: &Label) -> Option<&Table<'b>> {
-        self.game_tables.get(label)
+    pub fn get_table(&self, label: impl Borrow<Label>) -> Option<&ModernTable<'b>> {
+        self.game_tables.get(label.borrow())
     }
 
-    pub fn table(&self, label: &Label) -> &Table<'b> {
+    pub fn table(&self, label: impl Borrow<Label>) -> &ModernTable<'b> {
         self.get_table(label).expect("table not found")
     }
 }
@@ -138,7 +131,8 @@ impl<'b> LangBdatRegistry<'b> {
         }
     }
 
-    pub fn table(&self, label: &Label) -> &Table<'b> {
+    pub fn table(&self, label: impl Borrow<Label>) -> &ModernTable<'b> {
+        let label = label.borrow();
         self.tables
             .get(label)
             .or_else(|| self.game.game_tables.get(label))

@@ -1,25 +1,18 @@
-use crate::const_hash;
-use bdat::Table;
+use bdat::{label_hash, ModernTable, TableAccessor};
 use game_data::lang::{FilterEntry, FilterTable, TextEntry, TextTable};
 
-pub fn text_table_from_bdat(table: &Table) -> TextTable {
+pub fn text_table_from_bdat(table: &ModernTable) -> TextTable {
     TextTable::new(table.rows().filter_map(|row| {
         let row = table.get_row(row.id()).unwrap();
-        row[const_hash!("name")]
-            .as_single()
-            .map(|v| v.as_str())
-            .and_then(|s| (!s.is_empty()).then_some(s))
-            .map(|text| TextEntry::new(text, row.id()))
+        let text = row.get(label_hash!("name")).as_str();
+        (!text.is_empty()).then(|| TextEntry::new(text, row.id()))
     }))
 }
 
-pub fn filter_table_from_bdat(table: &Table) -> FilterTable {
+pub fn filter_table_from_bdat(table: &ModernTable) -> FilterTable {
     FilterTable::new(table.rows().filter_map(|row| {
         let row = table.get_row(row.id()).unwrap();
-        row[const_hash!("name")]
-            .as_single()
-            .map(|v| v.as_str())
-            .and_then(|s| (!s.is_empty()).then_some(s))
-            .map(|text| FilterEntry::new(text, row.id()))
+        let text = row.get(label_hash!("name")).as_str();
+        (!text.is_empty()).then(|| FilterEntry::new(text, row.id()))
     }))
 }

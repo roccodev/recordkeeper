@@ -1,12 +1,12 @@
-use bdat::{hash::murmur3_str, Label, RowRef, Table};
+use bdat::{label_hash, ModernTable, TableAccessor};
 use game_data::quest::{PurposeTask, Quest, QuestLang, QuestPurpose, QuestRegistry, TaskType};
 
-use crate::{const_hash, lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry};
+use crate::{lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry, ModernRow};
 
 pub fn read_quests(bdat: &BdatRegistry) -> QuestRegistry {
-    let quests = bdat.table(&const_hash!("QST_List"));
-    let purposes = bdat.table(&const_hash!("QST_Purpose"));
-    let tasks = bdat.table(&const_hash!("QST_Task"));
+    let quests = bdat.table(label_hash!("QST_List"));
+    let purposes = bdat.table(label_hash!("QST_Purpose"));
+    let tasks = bdat.table(label_hash!("QST_Task"));
 
     // This is an empty row with parameters set to 0.
     // The game usually includes these rows as spacers
@@ -15,12 +15,9 @@ pub fn read_quests(bdat: &BdatRegistry) -> QuestRegistry {
         .expect("no dlc4 quest marker")
         .id();
 
-    let mut quests = quests
-        .rows()
-        .map(|r| read_quest(&quests.row(r.id())))
-        .collect::<Vec<_>>();
+    let mut quests = quests.rows().map(read_quest).collect::<Vec<_>>();
 
-    for row in purposes.rows().map(|r| purposes.row(r.id())) {
+    for row in purposes.rows() {
         read_purpose(&row, &tasks, &mut quests);
     }
 
@@ -29,19 +26,13 @@ pub fn read_quests(bdat: &BdatRegistry) -> QuestRegistry {
 
 pub fn read_quest_lang(bdat: &LangBdatRegistry) -> QuestLang {
     QuestLang::new(text_table_from_bdat(
-        bdat.table(&const_hash!("msg_qst_task")),
+        bdat.table(label_hash!("msg_qst_task")),
     ))
 }
 
-fn read_quest(row: &RowRef) -> Quest {
-    let flag = row[const_hash!("FlagPrt")]
-        .as_single()
-        .unwrap()
-        .to_integer() as usize;
-    let name_id = row[const_hash!("QuestTitle")]
-        .as_single()
-        .unwrap()
-        .to_integer() as usize;
+fn read_quest(row: ModernRow) -> Quest {
+    let flag = row.get(label_hash!("FlagPrt")).to_integer() as usize;
+    let name_id = row.get(label_hash!("QuestTitle")).to_integer() as usize;
 
     Quest {
         id: row.id(),
@@ -51,21 +42,21 @@ fn read_quest(row: &RowRef) -> Quest {
     }
 }
 
-fn read_purpose(row: &RowRef, task_table: &Table, quests: &mut Vec<Quest>) {
-    let quest_id = row[const_hash!("QuestID")]
-        .as_single()
-        .unwrap()
-        .to_integer() as usize;
+fn read_purpose(row: &ModernRow, task_table: &ModernTable, quests: &mut Vec<Quest>) {
+    let quest_id = row.get(label_hash!("QuestID")).to_integer() as usize;
     // FlagLd???
-    let flag = row[const_hash!("Flagld")].as_single().unwrap().to_integer() as usize;
+    let flag = row.get(label_hash!("Flagld")).to_integer() as usize;
 
-    let task_row = row[const_hash!("TaskID")].as_single().unwrap().to_integer() as usize;
+    let task_row = row.get(label_hash!("TaskID")).to_integer() as usize;
     let task_row = task_table.row(task_row);
 
     let Ok(tasks) = (1..=4)
         .map(|i| read_task(&task_row, i))
         .collect::<Vec<_>>()
-        .try_into() else { unreachable!() };
+        .try_into()
+    else {
+        unreachable!()
+    };
 
     quests[quest_id.checked_sub(1).expect("quest ID out of bounds")]
         .purposes
@@ -76,30 +67,15 @@ fn read_purpose(row: &RowRef, task_table: &Table, quests: &mut Vec<Quest>) {
         });
 }
 
-fn read_task(row: &RowRef, id: usize) -> Option<PurposeTask> {
-    let task_id = row[Label::Hash(murmur3_str(&format!("TaskID{id}")))]
-        .as_single()
-        .unwrap()
-        .to_integer() as usize;
+fn read_task(row: &ModernRow, id: usize) -> Option<PurposeTask> {
+    let task_id = row.get(label_hash!(format!("TaskID{id}"))).to_integer() as usize;
     if task_id == 0 {
         return None;
     }
-    let ty = row[Label::Hash(murmur3_str(&format!("TaskType{id}")))]
-        .as_single()
-        .unwrap()
-        .to_integer() as usize;
-    let branch = row[Label::Hash(murmur3_str(&format!("Branch{id}")))]
-        .as_single()
-        .unwrap()
-        .to_integer();
-    let name = row[Label::Hash(murmur3_str(&format!("TaskLog{id}")))]
-        .as_single()
-        .unwrap()
-        .to_integer() as usize;
-    let flag = row[Label::Hash(murmur3_str(&format!("TaskFlag{id}")))]
-        .as_single()
-        .unwrap()
-        .to_integer() as usize;
+    let ty = row.get(label_hash!(format!("TaskType{id}"))).to_integer() as usize;
+    let branch = row.get(label_hash!(format!("Branch{id}"))).to_integer();
+    let name = row.get(label_hash!(format!("TaskLog{id}"))).to_integer() as usize;
+    let flag = row.get(label_hash!(format!("TaskFlag{id}"))).to_integer() as usize;
 
     Some(PurposeTask {
         id: task_id,

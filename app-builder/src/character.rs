@@ -1,30 +1,29 @@
 use std::num::NonZeroUsize;
 
-use bdat::{Label, RowRef, Table};
+use bdat::{label_hash, Label, ModernTable, TableAccessor};
 use game_data::character::{
     Art, Attachment, Character, CharacterData, CharacterLang, Class, Costume, Skill, SoulHack,
 };
 
-use crate::const_hash;
 use crate::lang::filter_table_from_bdat;
-use crate::{BdatRegistry, LangBdatRegistry};
+use crate::{BdatRegistry, LangBdatRegistry, ModernRow};
 
 const UI_NAME_HASHES: [Label; 6] = [
-    const_hash!("UIName1"),
-    const_hash!("UIName2"),
-    const_hash!("UIName3"),
-    const_hash!("UIName4"),
-    const_hash!("UIName5"),
-    const_hash!("UIName6"),
+    label_hash!("UIName1"),
+    label_hash!("UIName2"),
+    label_hash!("UIName3"),
+    label_hash!("UIName4"),
+    label_hash!("UIName5"),
+    label_hash!("UIName6"),
 ];
 
 pub fn read_data(bdat: &BdatRegistry) -> CharacterData {
-    let characters = bdat.table(&const_hash!("CHR_PC"));
-    let arts = bdat.table(&const_hash!("BTL_Arts_PC"));
-    let skills = bdat.table(&const_hash!("BTL_Skill_PC"));
-    let classes = bdat.table(&const_hash!("BTL_Talent"));
-    let attachments = bdat.table(&const_hash!("MNU_Attachment"));
-    let costumes_table = bdat.table(&const_hash!("RSC_PcCostumeOpen"));
+    let characters = bdat.table(label_hash!("CHR_PC"));
+    let arts = bdat.table(label_hash!("BTL_Arts_PC"));
+    let skills = bdat.table(label_hash!("BTL_Skill_PC"));
+    let classes = bdat.table(label_hash!("BTL_Talent"));
+    let attachments = bdat.table(label_hash!("MNU_Attachment"));
+    let costumes_table = bdat.table(label_hash!("RSC_PcCostumeOpen"));
 
     let characters =
         read_id_name_pairs(characters).map(|(id, name)| Character { id, name_id: name });
@@ -34,7 +33,7 @@ pub fn read_data(bdat: &BdatRegistry) -> CharacterData {
         soul_hack: read_soul_hack(
             &arts.row(id),
             Label::Hash(0xA2275574),
-            const_hash!("EnArtsAchieve"),
+            label_hash!("EnArtsAchieve"),
         ),
     });
     let skills = read_id_name_pairs(skills).map(|(id, name)| Skill {
@@ -43,7 +42,7 @@ pub fn read_data(bdat: &BdatRegistry) -> CharacterData {
         soul_hack: read_soul_hack(
             &skills.row(id),
             Label::Hash(0xA6E42F10),
-            const_hash!("EnSkillAchieve"),
+            label_hash!("EnSkillAchieve"),
         ),
     });
     let classes = read_id_name_pairs(classes).map(|(id, name)| Class { id, name_id: name });
@@ -60,11 +59,11 @@ pub fn read_data(bdat: &BdatRegistry) -> CharacterData {
 }
 
 pub fn read_lang(bdat: &LangBdatRegistry) -> CharacterLang {
-    let characters = bdat.table(&const_hash!("msg_player_name"));
-    let arts = bdat.table(&const_hash!("msg_btl_arts_name"));
-    let skills = bdat.table(&const_hash!("msg_btl_skill_name"));
-    let classes = bdat.table(&const_hash!("msg_btl_talent_name"));
-    let misc = bdat.table(&const_hash!("msg_mnu_char_ms"));
+    let characters = bdat.table(label_hash!("msg_player_name"));
+    let arts = bdat.table(label_hash!("msg_btl_arts_name"));
+    let skills = bdat.table(label_hash!("msg_btl_skill_name"));
+    let classes = bdat.table(label_hash!("msg_btl_talent_name"));
+    let misc = bdat.table(label_hash!("msg_mnu_char_ms"));
 
     CharacterLang {
         characters: filter_table_from_bdat(characters),
@@ -75,29 +74,30 @@ pub fn read_lang(bdat: &LangBdatRegistry) -> CharacterLang {
     }
 }
 
-fn read_id_name_pairs<'a>(table: &'a Table) -> impl Iterator<Item = (usize, usize)> + 'a {
-    table.rows().map(|r| table.row(r.id())).map(|row| {
-        let name = row[const_hash!("Name")].as_single().unwrap().to_integer() as usize;
+fn read_id_name_pairs<'a>(table: &'a ModernTable) -> impl Iterator<Item = (usize, usize)> + 'a {
+    table.rows().map(|row| {
+        let name = row.get(label_hash!("Name")).to_integer() as usize;
         (row.id(), name)
     })
 }
 
-fn read_costume(table: &Table, char_id: usize, out: &mut Vec<Costume>) {
-    for row in table.rows().map(|r| table.row(r.id())) {
+fn read_costume(table: &ModernTable, char_id: usize, out: &mut Vec<Costume>) {
+    for row in table.rows() {
         let id = row.id();
-        let name_id = row[&UI_NAME_HASHES[char_id]]
-            .as_single()
-            .unwrap()
-            .to_integer() as usize;
+        let name_id = row.get(&UI_NAME_HASHES[char_id]).to_integer() as usize;
         out.push(Costume { id, name_id })
     }
 }
 
-fn read_soul_hack(row: &RowRef, status_hash: Label, achievement_hash: Label) -> Option<SoulHack> {
-    let status = row[status_hash].as_single().unwrap().to_integer() as usize;
+fn read_soul_hack(
+    row: &ModernRow,
+    status_hash: Label,
+    achievement_hash: Label,
+) -> Option<SoulHack> {
+    let status = row.get(status_hash).to_integer() as usize;
     let status = NonZeroUsize::new(status)?;
 
-    let achievement = row[achievement_hash].as_single().unwrap().to_integer() as usize;
+    let achievement = row.get(achievement_hash).to_integer() as usize;
     let achievement = NonZeroUsize::new(achievement)?;
 
     Some(SoulHack {

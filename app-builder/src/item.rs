@@ -1,26 +1,26 @@
 use std::num::NonZeroUsize;
 
-use bdat::{Label, RowRef};
+use bdat::{label_hash, Label};
 use enum_map::enum_map;
 use game_data::item::{GemCategory, Item, ItemLanguageRegistry, Rarity};
 use game_data::item::{ItemRegistry, Type};
 use recordkeeper::item::ItemType;
 
 use crate::lang::filter_table_from_bdat;
-use crate::BdatRegistry;
-use crate::{const_hash, LangBdatRegistry};
+use crate::LangBdatRegistry;
+use crate::{BdatRegistry, ModernRow};
 
 pub fn load_items(bdat: &BdatRegistry) -> ItemRegistry {
     let categories = [
-        (ItemType::Collection, const_hash!("ITM_Collection")),
-        (ItemType::Cylinder, const_hash!("ITM_Cylinder")),
-        (ItemType::Accessory, const_hash!("ITM_Accessory")),
-        (ItemType::Exchange, const_hash!("ITM_Exchange")),
-        (ItemType::Gem, const_hash!("ITM_Gem")),
-        (ItemType::Extra, const_hash!("ITM_Extra")),
-        (ItemType::Info, const_hash!("ITM_Info")),
-        (ItemType::Precious, const_hash!("ITM_Precious")),
-        (ItemType::Collectopedia, const_hash!("ITM_Collepedia")),
+        (ItemType::Collection, label_hash!("ITM_Collection")),
+        (ItemType::Cylinder, label_hash!("ITM_Cylinder")),
+        (ItemType::Accessory, label_hash!("ITM_Accessory")),
+        (ItemType::Exchange, label_hash!("ITM_Exchange")),
+        (ItemType::Gem, label_hash!("ITM_Gem")),
+        (ItemType::Extra, label_hash!("ITM_Extra")),
+        (ItemType::Info, label_hash!("ITM_Info")),
+        (ItemType::Precious, label_hash!("ITM_Precious")),
+        (ItemType::Collectopedia, label_hash!("ITM_Collepedia")),
     ];
 
     let mut registry = ItemRegistry::default();
@@ -29,21 +29,18 @@ pub fn load_items(bdat: &BdatRegistry) -> ItemRegistry {
         let table = bdat.table(&table_id);
         table
             .rows()
-            .filter_map(|row| read_item(item_type, table.get_row(row.id()).unwrap()))
+            .filter_map(|row| read_item(item_type, row))
             .for_each(|item| registry.register_item(item));
     }
 
-    let gems = bdat.table(&const_hash!("ITM_Gem"));
+    let gems = bdat.table(label_hash!("ITM_Gem"));
     let mut registered = 0u64;
-    for row in gems.rows().map(|r| gems.row(r.id())) {
-        let category = row[const_hash!("Category")]
-            .as_single()
-            .unwrap()
-            .to_integer();
+    for row in gems.rows() {
+        let category = row.get(label_hash!("Category")).to_integer();
         if registered & (1 << category) == 0 {
             registered |= 1 << category;
 
-            let name_id = row[const_hash!("Name")].as_single().unwrap().to_integer() as usize;
+            let name_id = row.get(label_hash!("Name")).to_integer() as usize;
 
             registry.register_gem_category(GemCategory {
                 id: category,
@@ -57,24 +54,24 @@ pub fn load_items(bdat: &BdatRegistry) -> ItemRegistry {
 
 pub fn load_item_lang(bdat: &LangBdatRegistry) -> ItemLanguageRegistry {
     let categories = enum_map! {
-        Type(ItemType::Collection) => const_hash!("msg_item_collection"),
-        Type(ItemType::Cylinder) => const_hash!("msg_item_cylinder"),
-        Type(ItemType::Accessory) => const_hash!("msg_item_accessory"),
-        Type(ItemType::Exchange) => const_hash!("msg_item_exchange"),
-        Type(ItemType::Gem) => const_hash!("msg_item_gem"),
-        Type(ItemType::Extra) => const_hash!("msg_item_extra"),
+        Type(ItemType::Collection) => label_hash!("msg_item_collection"),
+        Type(ItemType::Cylinder) => label_hash!("msg_item_cylinder"),
+        Type(ItemType::Accessory) => label_hash!("msg_item_accessory"),
+        Type(ItemType::Exchange) => label_hash!("msg_item_exchange"),
+        Type(ItemType::Gem) => label_hash!("msg_item_gem"),
+        Type(ItemType::Extra) => label_hash!("msg_item_extra"),
         Type(ItemType::Info) => Label::Hash(0xCA2198EC),
-        Type(ItemType::Precious) => const_hash!("msg_item_precious"),
+        Type(ItemType::Precious) => label_hash!("msg_item_precious"),
         Type(ItemType::Collectopedia) => Label::Hash(0xBEDB6533),
     };
 
     ItemLanguageRegistry::new(categories.map(|_, label| filter_table_from_bdat(bdat.table(&label))))
 }
 
-fn read_item(item_type: ItemType, row: RowRef) -> Option<Item> {
+fn read_item(item_type: ItemType, row: ModernRow) -> Option<Item> {
     let rarity = row
-        .get(&const_hash!("Rarity"))
-        .map(|cell| Rarity::try_from(cell.as_single().unwrap().to_integer()).unwrap())
+        .get_if_present(label_hash!("Rarity"))
+        .map(|cell| Rarity::try_from(cell.to_integer()).unwrap())
         .unwrap_or(Rarity::Common);
     let mut amount_max = 99;
 
@@ -83,8 +80,8 @@ fn read_item(item_type: ItemType, row: RowRef) -> Option<Item> {
         ItemType::Accessory => {
             // Column is absent from no-DLC dumps
             let only_one_flag = row
-                .get(&Label::Hash(0xF620E3C8))
-                .map(|cell| cell.as_single().unwrap().to_integer() != 0)
+                .get_if_present(Label::Hash(0xF620E3C8))
+                .map(|cell| cell.to_integer() != 0)
                 .unwrap_or_default();
             if only_one_flag {
                 amount_max = 1;
@@ -95,9 +92,7 @@ fn read_item(item_type: ItemType, row: RowRef) -> Option<Item> {
 
     Some(Item {
         id: row.id().try_into().unwrap(),
-        name_id: NonZeroUsize::new(
-            row[const_hash!("Name")].as_single().unwrap().to_integer() as usize
-        ),
+        name_id: NonZeroUsize::new(row.get(label_hash!("Name")).to_integer() as usize),
         item_type: Type(item_type),
         amount_max,
         rarity,

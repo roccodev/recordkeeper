@@ -1,27 +1,23 @@
 use std::{collections::HashMap, num::NonZeroU16};
 
-use bdat::{hash::murmur3_str, Label, RowRef};
+use bdat::{hash::murmur3_str, label_hash, Label, TableAccessor};
 use game_data::field::{FieldLang, FieldRegistry, Location, LocationType, Map, MapId, MapPoint};
 
-use crate::{const_hash, lang::filter_table_from_bdat, BdatRegistry, LangBdatRegistry};
+use crate::{lang::filter_table_from_bdat, BdatRegistry, LangBdatRegistry, ModernRow};
 
 type GimmickTable = HashMap<u32, MapPoint>;
 type JumpTable = Vec<Option<MapPoint>>;
 
 pub fn read_data(bdat: &BdatRegistry) -> FieldRegistry {
-    let maps = bdat.table(&const_hash!("SYS_MapList"));
-    let resources = bdat.table(&const_hash!("RSC_MapFile"));
+    let maps = bdat.table(label_hash!("SYS_MapList"));
+    let resources = bdat.table(label_hash!("RSC_MapFile"));
 
     let gimmicks = read_gimmicks(bdat);
     let jumps = read_jumps(bdat, &gimmicks);
 
-    let maps = maps.rows().map(|r| maps.row(r.id())).filter_map(|row| {
-        let resource = resources.get_row(
-            row[const_hash!("ResourceId")]
-                .as_single()
-                .unwrap()
-                .to_integer() as usize,
-        )?;
+    let maps = maps.rows().filter_map(|row| {
+        let resource =
+            resources.get_row(row.get(label_hash!("ResourceId")).to_integer() as usize)?;
         read_map(bdat, row, resource, &gimmicks, &jumps)
     });
 
@@ -29,7 +25,7 @@ pub fn read_data(bdat: &BdatRegistry) -> FieldRegistry {
 }
 
 pub fn read_lang(bdat: &LangBdatRegistry) -> FieldLang {
-    let locations = bdat.table(&const_hash!("msg_location_name"));
+    let locations = bdat.table(label_hash!("msg_location_name"));
 
     FieldLang {
         locations: filter_table_from_bdat(locations),
@@ -38,20 +34,18 @@ pub fn read_lang(bdat: &LangBdatRegistry) -> FieldLang {
 
 fn read_map(
     bdat: &BdatRegistry,
-    map: RowRef,
-    resource: RowRef,
+    map: ModernRow,
+    resource: ModernRow,
     gimmicks: &GimmickTable,
     jumps: &JumpTable,
 ) -> Option<Map> {
-    let name_id = map[const_hash!("Name")].as_single()?.to_integer() as usize;
+    let name_id = map.get(label_hash!("Name")).to_integer() as usize;
     let id = MapId {
         id: map.id(),
         name_id,
     };
 
-    let bdat_prefix = resource[const_hash!("DefaultBdatPrefix")]
-        .as_single()?
-        .as_str();
+    let bdat_prefix = resource.get(label_hash!("DefaultBdatPrefix")).as_str();
     let location_map = bdat.get_table(&Label::Hash(murmur3_str(&format!(
         "{bdat_prefix}_GMK_Location"
     ))));
@@ -67,19 +61,12 @@ fn read_map(
     Some(Map { id, locations })
 }
 
-fn read_location(row: RowRef, gimmicks: &GimmickTable, jumps: &JumpTable) -> Location {
-    let hash_id = row[const_hash!("ID")].as_single().unwrap().to_integer();
-    let name_id = row[const_hash!("LocationName")]
-        .as_single()
-        .unwrap()
-        .to_integer() as usize;
-    let category = row[const_hash!("CategoryPriority")]
-        .as_single()
-        .unwrap()
-        .to_integer() as usize;
-    let map_jump: u16 = row[const_hash!("MapJumpID")]
-        .as_single()
-        .unwrap()
+fn read_location(row: ModernRow, gimmicks: &GimmickTable, jumps: &JumpTable) -> Location {
+    let hash_id = row.get(label_hash!("ID")).to_integer();
+    let name_id = row.get(label_hash!("LocationName")).to_integer() as usize;
+    let category = row.get(label_hash!("CategoryPriority")).to_integer() as usize;
+    let map_jump: u16 = row
+        .get(label_hash!("MapJumpID"))
         .to_integer()
         .try_into()
         .unwrap();
@@ -111,23 +98,20 @@ fn read_location(row: RowRef, gimmicks: &GimmickTable, jumps: &JumpTable) -> Loc
 }
 
 fn read_gimmicks(bdat: &BdatRegistry) -> GimmickTable {
-    let table = bdat.table(&const_hash!("SYS_GimmickLocation_dlc04"));
+    let table = bdat.table(label_hash!("SYS_GimmickLocation_dlc04"));
     table
         .rows()
         .map(|r| table.row(r.id()))
         .filter_map(|row| {
-            let gimmick_id = row[const_hash!("GimmickID")]
-                .as_single()
-                .unwrap()
-                .to_integer();
+            let gimmick_id = row.get(label_hash!("GimmickID")).to_integer();
 
             if gimmick_id == 0 {
                 return None;
             }
 
-            let x = row[const_hash!("X")].as_single().unwrap().to_float();
-            let y = row[const_hash!("Y")].as_single().unwrap().to_float();
-            let z = row[const_hash!("Z")].as_single().unwrap().to_float();
+            let x = row.get(label_hash!("X")).get_as();
+            let y = row.get(label_hash!("Y")).get_as();
+            let z = row.get(label_hash!("Z")).get_as();
 
             Some((gimmick_id, MapPoint { x, y, z }))
         })
@@ -135,16 +119,13 @@ fn read_gimmicks(bdat: &BdatRegistry) -> GimmickTable {
 }
 
 fn read_jumps(bdat: &BdatRegistry, gimmicks: &GimmickTable) -> JumpTable {
-    let table = bdat.table(&const_hash!("SYS_MapJumpList"));
+    let table = bdat.table(label_hash!("SYS_MapJumpList"));
 
     table
         .rows()
         .map(|r| table.row(r.id()))
         .map(|row| {
-            let formation_id = row[const_hash!("FormationID")]
-                .as_single()
-                .unwrap()
-                .to_integer();
+            let formation_id = row.get(label_hash!("FormationID")).to_integer();
 
             (formation_id != 0)
                 .then(|| ())
