@@ -4,6 +4,7 @@ use crate::{BdatRegistry, LangBdatRegistry};
 
 mod challenge;
 mod masha;
+pub mod pow_augment;
 
 pub fn read_dlc_game(bdat: &BdatRegistry) -> DlcData {
     DlcData {

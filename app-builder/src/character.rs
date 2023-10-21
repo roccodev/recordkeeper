@@ -6,7 +6,7 @@ use game_data::character::{
 };
 
 use crate::lang::filter_table_from_bdat;
-use crate::{BdatRegistry, LangBdatRegistry, ModernRow};
+use crate::{dlc, BdatRegistry, LangBdatRegistry, ModernRow};
 
 const UI_NAME_HASHES: [Label; 6] = [
     label_hash!("UIName1"),
@@ -25,8 +25,18 @@ pub fn read_data(bdat: &BdatRegistry) -> CharacterData {
     let attachments = bdat.table(label_hash!("MNU_Attachment"));
     let costumes_table = bdat.table(label_hash!("RSC_PcCostumeOpen"));
 
-    let characters =
-        read_id_name_pairs(characters).map(|(id, name)| Character { id, name_id: name });
+    let characters = read_id_name_pairs(characters).map(|(id, name)| {
+        let pow_augment = characters.row(id).get(label_hash!("PowAugment")).as_str();
+        let pow_augment = (!pow_augment.is_empty()).then(|| ()).and_then(|_| {
+            let table = bdat.get_table(label_hash!(pow_augment))?;
+            Some(dlc::pow_augment::read_for_character(table))
+        });
+        Character {
+            id,
+            name_id: name,
+            pow_augment,
+        }
+    });
     let arts = read_id_name_pairs(arts).map(|(id, name)| Art {
         id,
         name_id: name,

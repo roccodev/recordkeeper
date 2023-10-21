@@ -368,3 +368,12 @@ formation_tab_ouroboros = Ouroboros
 
 formation_class_change = Edit/Selected Class
 formation_class_confirm = There is no data for the selected class. Would you like to copy it from the current state of the save file?
+
+## Pow augment (Inoswap) screen
+
+pow_augment_character = Character
+pow_augment_tiers = Unlocked Tiers
+pow_augment_node_skill_unlock = Unlock Skill
+pow_augment_node_art_unlock = Unlock Art
+pow_augment_node_skill_upgrade = Upgrade Skill
+pow_augment_node_art_upgrade = Upgrade Art

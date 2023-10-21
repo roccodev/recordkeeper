@@ -3,6 +3,7 @@ use yew_router::Routable;
 
 mod about;
 mod character;
+mod dlc;
 mod enemy;
 mod field;
 mod flags;
@@ -62,7 +63,7 @@ pub fn render(route: Route) -> Html {
         Route::Quests => html!(<quest::Quests />),
         Route::Uniques => html!(<enemy::EnemyPage />),
         Route::Formations => html!(<formation::Formations />),
-        Route::PowAugment => html!(),
+        Route::PowAugment => html!(<dlc::pow_augment::PowAugmentPage />),
         Route::ChallengeBattle => html!(),
         Route::Gauntlet => html!(),
         Route::Masha => html!(),

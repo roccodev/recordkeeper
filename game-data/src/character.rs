@@ -1,6 +1,7 @@
 use std::num::NonZeroUsize;
 
 use crate::{
+    dlc::pow_augment::PowAugment,
     enemy::SoulLearnable,
     lang::{FilterEntry, FilterTable, Filterable, Id},
     LanguageData,
@@ -15,6 +16,8 @@ pub struct CharacterData {
     classes: Box<[Class]>,
     attachments: Box<[Attachment]>,
     costumes: [Vec<Costume>; 6],
+
+    pub pow_augment_characters: Box<[Character]>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -26,10 +29,11 @@ pub struct CharacterLang {
     pub misc: FilterTable,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, PartialEq)]
 pub struct Character {
     pub id: usize,
     pub name_id: usize,
+    pub pow_augment: Option<PowAugment>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
@@ -79,13 +83,20 @@ impl CharacterData {
         attachments: impl IntoIterator<Item = Attachment>,
         costumes: [Vec<Costume>; 6],
     ) -> Self {
+        let characters: Box<[Character]> = characters.into_iter().collect();
         Self {
-            characters: characters.into_iter().collect(),
             arts: arts.into_iter().collect(),
             skills: skills.into_iter().collect(),
             classes: classes.into_iter().collect(),
             attachments: attachments.into_iter().collect(),
             costumes,
+            pow_augment_characters: characters
+                .clone()
+                .into_vec()
+                .into_iter()
+                .filter(|c| c.pow_augment.is_some())
+                .collect(),
+            characters,
         }
     }
 
@@ -130,6 +141,12 @@ impl CharacterData {
             .checked_sub(1)
             .and_then(|i| self.costumes.get(i))
             .unwrap_or_else(|| &self.costumes[0])
+    }
+}
+
+impl Character {
+    pub fn is_dlc4(&self) -> bool {
+        [36, 37, 38, 39, 40, 41, 42, 43].contains(&self.id)
     }
 }
 
