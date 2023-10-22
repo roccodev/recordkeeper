@@ -384,7 +384,6 @@ pow_augment_node_art_upgrade = Upgrade Art
 
 challenge_id = ID
 challenge_name = Name
-challenge_bonus = 3x Bonus
 challenge_rank = Rank
 challenge_rank_none = --
 challenge_rank_s = S
@@ -394,3 +393,7 @@ challenge_rank_c = C
 challenge_time = Best Time
 challenge_clear_count = Clear Count
 challenge_stone = Red Noponstone
+challenge_clear = Cleared (Any)
+challenge_new = New
+challenge_bonus = 3x Bonus
+challenge_reward = Reward Claimed

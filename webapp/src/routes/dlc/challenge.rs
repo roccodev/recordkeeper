@@ -89,10 +89,13 @@ fn TablePage(props: &TableProps) -> Html {
                 <tr>
                     <th><Text path="challenge_id" /></th>
                     <th><Text path="challenge_name" /></th>
-                    <th><Text path="challenge_bonus" /></th>
                     <th><Text path="challenge_rank" /></th>
                     <th><Text path="challenge_time" /></th>
                     <th><Text path="challenge_clear_count" /></th>
+                    <th><Text path="challenge_clear" /></th>
+                    <th><Text path="challenge_new" /></th>
+                    <th><Text path="challenge_bonus" /></th>
+                    <th><Text path="challenge_reward" /></th>
                 </tr>
             </thead>
 

@@ -23,8 +23,32 @@ editor!(
 editor!(
     BonusEditor,
     bool,
-    get |editor, save| save.challenge_battle.challenge(editor.id).has_bonus(),
-    set |editor, save, new| save.challenge_battle.challenge_mut(editor.id).set_has_bonus(new),
+    get |editor, save| save.challenge_battle.challenge(editor.id).has_bonus,
+    set |editor, save, new| save.challenge_battle.challenge_mut(editor.id).has_bonus = new,
+    capture id: usize
+);
+
+editor!(
+    ClearEditor,
+    bool,
+    get |editor, save| save.challenge_battle.challenge(editor.id).cleared,
+    set |editor, save, new| save.challenge_battle.challenge_mut(editor.id).cleared = new,
+    capture id: usize
+);
+
+editor!(
+    NewEditor,
+    bool,
+    get |editor, save| save.challenge_battle.challenge(editor.id).new,
+    set |editor, save, new| save.challenge_battle.challenge_mut(editor.id).new = new,
+    capture id: usize
+);
+
+editor!(
+    RewardEditor,
+    bool,
+    get |editor, save| save.challenge_battle.challenge(editor.id).claimed_reward,
+    set |editor, save, new| save.challenge_battle.challenge_mut(editor.id).claimed_reward = new,
     capture id: usize
 );
 
@@ -76,9 +100,6 @@ pub fn ChallengeRow(props: &ChallengeProps) -> Html {
                 <th>{props.id.to_string()}</th>
                 <td>{challenge.get_name_str(data.lang())}</td>
                 <td>
-                    <CheckboxInput<BonusEditor> editor={BonusEditor { id }} />
-                </td>
-                <td>
                     <EnumInput<RankEditor> editor={RankEditor { id, difficulty: props.difficulty }} />
                 </td>
                 <td>
@@ -87,6 +108,10 @@ pub fn ChallengeRow(props: &ChallengeProps) -> Html {
                 <td>
                     <NumberInput<ClearCountEditor> editor={ClearCountEditor { id }} />
                 </td>
+                <td><CheckboxInput<ClearEditor> editor={ClearEditor { id }} /></td>
+                <td><CheckboxInput<NewEditor> editor={NewEditor { id }} /> </td>
+                <td><CheckboxInput<BonusEditor> editor={BonusEditor { id }} /></td>
+                <td><CheckboxInput<RewardEditor> editor={RewardEditor { id }} /></td>
             </tr>
         </>
     }

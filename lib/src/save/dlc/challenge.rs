@@ -38,10 +38,17 @@ pub struct ChallengeBattle {
 #[derive(SaveBin, Debug)]
 #[size(32)]
 pub struct Challenge {
-    ranks: [u32; CHALLENGE_BATTLE_DIFFICULTY_MAX], // TODO enum
+    ranks: [u32; CHALLENGE_BATTLE_DIFFICULTY_MAX],
     best_time: [f32; CHALLENGE_BATTLE_DIFFICULTY_MAX],
     pub clear_count: u32,
-    flags: [bool; 4], // #3: whether the challenge currently has a bonus
+    /// Purpose unclear
+    pub cleared: bool,
+    /// Shows the "new" notification dot
+    pub new: bool,
+    /// Whether the challenge currently has a 3x reward bonus
+    pub has_bonus: bool,
+    /// Whether the Rank A reward has been claimed
+    pub claimed_reward: bool,
 }
 
 /// Difficulties supported by challenge battle modes.
@@ -127,14 +134,9 @@ impl Challenge {
 
     pub fn set_best_time(&mut self, difficulty: ChallengeDifficulty, time: f32) {
         self.best_time[difficulty as usize] = time;
-    }
-
-    pub fn has_bonus(&self) -> bool {
-        self.flags[2]
-    }
-
-    pub fn set_has_bonus(&mut self, bonus: bool) {
-        self.flags[2] = bonus;
+        if time != 0.0 {
+            self.cleared = true;
+        }
     }
 }
 
