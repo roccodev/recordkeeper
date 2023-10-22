@@ -84,6 +84,7 @@ meta_scenario_flag = Scenario Flag
 meta_ngp = New Game Plus
 meta_settings = Settings
 meta_clear = Game Cleared
+meta_fr_complete = Future Redeemed Cleared
 
 ## Ouroboros translations
 
@@ -377,3 +378,18 @@ pow_augment_node_skill_unlock = Unlock Skill
 pow_augment_node_art_unlock = Unlock Art
 pow_augment_node_skill_upgrade = Upgrade Skill
 pow_augment_node_art_upgrade = Upgrade Art
+
+
+## Challenge battle screen
+
+challenge_id = ID
+challenge_name = Name
+challenge_bonus = 3x Bonus
+challenge_rank = Rank
+challenge_rank_none = --
+challenge_rank_s = S
+challenge_rank_a = A
+challenge_rank_b = B
+challenge_rank_c = C
+challenge_time = Best Time
+challenge_clear_count = Clear Count

@@ -55,6 +55,12 @@ where
     }
 }
 
+impl<T> Table<T> {
+    pub fn len(&self) -> usize {
+        self.entries.len()
+    }
+}
+
 impl TextEntry {
     pub fn new(text: &str, id: usize) -> Self {
         Self {

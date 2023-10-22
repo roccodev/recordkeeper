@@ -34,5 +34,9 @@
     "secret_count": {
         "bits": 16,
         "index": 1944
+    },
+    "fr_complete": {
+        "bits": 1,
+        "index": 21620
     }
 }

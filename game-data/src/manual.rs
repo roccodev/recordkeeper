@@ -22,6 +22,9 @@ pub struct Flags {
     pub game_clear: Flag,
     pub landmark_count: Flag,
     pub secret_count: Flag,
+    /// Main game flag, set when a save is loaded/created and there is
+    /// a completed Future Redeemed save.
+    pub fr_complete: Flag,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]

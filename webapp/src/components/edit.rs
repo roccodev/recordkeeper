@@ -204,7 +204,7 @@ pub fn CheckboxInput<E: Editor<Target = bool> + PartialEq>(props: &CheckboxInput
     }
 }
 
-/// Checkbox field for boolean editors
+/// Input field for types that can be parsed from strings
 #[function_component]
 pub fn StringInput<T, E>(props: &StringInputProps<E>) -> Html
 where

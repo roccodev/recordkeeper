@@ -9,6 +9,7 @@ pub mod pow_augment;
 pub fn read_dlc_game(bdat: &BdatRegistry) -> DlcData {
     DlcData {
         masha: masha::read_game(bdat),
+        challenge: challenge::read_game(bdat),
     }
 }
 

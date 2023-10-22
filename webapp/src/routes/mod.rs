@@ -64,7 +64,7 @@ pub fn render(route: Route) -> Html {
         Route::Uniques => html!(<enemy::EnemyPage />),
         Route::Formations => html!(<formation::Formations />),
         Route::PowAugment => html!(<dlc::pow_augment::PowAugmentPage />),
-        Route::ChallengeBattle => html!(),
+        Route::ChallengeBattle => html!(<dlc::challenge::ChallengePage />),
         Route::Gauntlet => html!(),
         Route::Masha => html!(),
         Route::Dlc4Collepedia => html!(),

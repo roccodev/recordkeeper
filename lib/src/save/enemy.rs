@@ -36,7 +36,7 @@ pub enum Achievement {
     InProgress(u32),
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 #[cfg_attr(feature = "strum", derive(strum::EnumIter, strum::FromRepr))]
 #[repr(u32)]
 pub enum Difficulty {

@@ -1,4 +1,7 @@
 use recordkeeper_macros::SaveBin;
+use thiserror::Error;
+
+use crate::enemy::Difficulty;
 
 use super::{EmblemItem, Gauntlet, GauntletState, EMBLEM_MAX};
 
@@ -37,6 +40,138 @@ pub struct ChallengeBattle {
 pub struct Challenge {
     ranks: [u32; CHALLENGE_BATTLE_DIFFICULTY_MAX], // TODO enum
     best_time: [f32; CHALLENGE_BATTLE_DIFFICULTY_MAX],
-    clear_count: u32,
+    pub clear_count: u32,
     flags: [bool; 4], // #3: whether the challenge currently has a bonus
+}
+
+/// Difficulties supported by challenge battle modes.
+///
+/// Notably, this is the same as [`Difficulty`], but without Very Hard.
+///
+/// [`Difficulty`]: crate::save::enemy::Difficulty
+#[cfg_attr(feature = "strum", derive(strum::EnumIter, strum::FromRepr))]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ChallengeDifficulty {
+    Easy = 1,
+    Normal = 0,
+    Hard = 2,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[cfg_attr(feature = "strum", derive(strum::EnumIter, strum::FromRepr))]
+pub enum ChallengeRank {
+    None = 0,
+    S = 1,
+    A = 2,
+    B = 3,
+    C = 4,
+}
+
+#[derive(Error, Debug)]
+#[error("unknown rank {0}")]
+pub struct RankFromIntError(u32);
+
+#[derive(Error, Debug)]
+#[error("unsupported difficulty: {0:?}")]
+pub struct FromDifficultyError(Difficulty);
+
+impl ChallengeBattle {
+    const CHALLENGE_2_START: usize = CHALLENGE_BATTLE_NUM_CHALLENGES + 1;
+
+    /// Returns a view of a challenge record.
+    ///
+    /// The ID starts at 1.
+    ///
+    /// ## Panics
+    /// Panics if the ID is out of bounds.
+    pub fn challenge(&self, id: usize) -> &Challenge {
+        match id {
+            1..=CHALLENGE_BATTLE_NUM_CHALLENGES => &self.challenges_1_18[id - 1],
+            Self::CHALLENGE_2_START => &self.challenges_19[id - Self::CHALLENGE_2_START],
+            _ => panic!("id out of bounds"),
+        }
+    }
+
+    /// Returns a mutable view of a challenge record.
+    ///
+    /// The ID starts at 1.
+    ///
+    /// ## Panics
+    /// Panics if the ID is out of bounds.
+    pub fn challenge_mut(&mut self, id: usize) -> &mut Challenge {
+        match id {
+            1..=CHALLENGE_BATTLE_NUM_CHALLENGES => &mut self.challenges_1_18[id - 1],
+            Self::CHALLENGE_2_START => &mut self.challenges_19[id - Self::CHALLENGE_2_START],
+            _ => panic!("id out of bounds"),
+        }
+    }
+
+    /// Returns an iterator over the challenge records.
+    pub fn challenges(&self) -> impl Iterator<Item = &Challenge> {
+        self.challenges_1_18.iter().chain(self.challenges_19.iter())
+    }
+}
+
+impl Challenge {
+    pub fn get_rank(&self, difficulty: ChallengeDifficulty) -> ChallengeRank {
+        self.ranks[difficulty as usize].try_into().unwrap()
+    }
+
+    pub fn set_rank(&mut self, difficulty: ChallengeDifficulty, rank: ChallengeRank) {
+        self.ranks[difficulty as usize] = rank as u32;
+    }
+
+    pub fn get_best_time(&self, difficulty: ChallengeDifficulty) -> f32 {
+        self.best_time[difficulty as usize]
+    }
+
+    pub fn set_best_time(&mut self, difficulty: ChallengeDifficulty, time: f32) {
+        self.best_time[difficulty as usize] = time;
+    }
+
+    pub fn has_bonus(&self) -> bool {
+        self.flags[2]
+    }
+
+    pub fn set_has_bonus(&mut self, bonus: bool) {
+        self.flags[2] = bonus;
+    }
+}
+
+impl TryFrom<u32> for ChallengeRank {
+    type Error = RankFromIntError;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        Ok(match value {
+            0 => Self::None,
+            1 => Self::S,
+            2 => Self::A,
+            3 => Self::B,
+            4 => Self::C,
+            n => return Err(RankFromIntError(n)),
+        })
+    }
+}
+
+impl TryFrom<Difficulty> for ChallengeDifficulty {
+    type Error = FromDifficultyError;
+
+    fn try_from(value: Difficulty) -> Result<Self, Self::Error> {
+        Ok(match value {
+            Difficulty::Easy => Self::Easy,
+            Difficulty::Normal => Self::Normal,
+            Difficulty::Hard => Self::Hard,
+            d => return Err(FromDifficultyError(d)),
+        })
+    }
+}
+
+impl From<ChallengeDifficulty> for Difficulty {
+    fn from(value: ChallengeDifficulty) -> Self {
+        match value {
+            ChallengeDifficulty::Easy => Self::Easy,
+            ChallengeDifficulty::Normal => Self::Normal,
+            ChallengeDifficulty::Hard => Self::Hard,
+        }
+    }
 }
