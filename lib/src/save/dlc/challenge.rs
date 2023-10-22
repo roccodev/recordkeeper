@@ -30,8 +30,8 @@ pub struct ChallengeBattle {
     emblem_shop: [EmblemItem; EMBLEM_MAX],
 
     #[loc(0x70cc)]
-    nopon_stone_red: u32,
-    nopon_stone_blue: u32,
+    pub nopon_stone_red: u32,
+    pub nopon_stone_blue: u32,
     // Two flags here for whether the current challenge has a bonus, not relevant for saves
 }
 

@@ -393,3 +393,4 @@ challenge_rank_b = B
 challenge_rank_c = C
 challenge_time = Best Time
 challenge_clear_count = Clear Count
+challenge_stone = Red Noponstone

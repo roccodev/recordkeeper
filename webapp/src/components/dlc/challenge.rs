@@ -1,19 +1,13 @@
 use std::{fmt::Display, str::FromStr};
 
 use game_data::lang::Nameable;
-use recordkeeper::{
-    dlc::{ChallengeDifficulty, ChallengeRank},
-    enemy::Difficulty,
-};
-use wasm_bindgen::JsCast;
-use web_sys::{EventTarget, HtmlInputElement};
+use recordkeeper::dlc::{ChallengeDifficulty, ChallengeRank};
 use yew::prelude::*;
 
 use crate::{
-    components::edit::{editor, CheckboxInput, Editor, EnumInput, NumberInput, StringInput},
+    components::edit::{editor, CheckboxInput, EnumInput, NumberInput, StringInput},
     data::Data,
     lang::Text,
-    save::SaveContext,
     util::FiniteF32,
     ToHtml,
 };

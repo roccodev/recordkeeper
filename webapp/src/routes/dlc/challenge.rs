@@ -1,12 +1,12 @@
-use game_data::character::{Art, Skill};
 use recordkeeper::{dlc::ChallengeDifficulty, enemy::Difficulty};
-use strum::{EnumIter, IntoEnumIterator};
-use ybc::{Container, Control, Field, Select, Table, Tabs, Tile};
+use strum::IntoEnumIterator;
+use ybc::{Container, Control, Field, Select, Table, Tile};
 use yew::prelude::*;
 
 use crate::{
     components::{
         dlc::challenge::ChallengeRow,
+        edit::{editor, NumberInput},
         page::{PageControls, PageOrganizer},
     },
     data::Data,
@@ -29,6 +29,14 @@ struct DifficultyProps {
     state: UseStateHandle<ChallengeDifficulty>,
 }
 
+#[rustfmt::skip]
+editor!(
+    RedStoneEditor,
+    u32,
+    get |_, save| save.challenge_battle.nopon_stone_red,
+    set |_, save, new| save.challenge_battle.nopon_stone_red = new
+);
+
 #[function_component]
 pub fn ChallengePage() -> Html {
     let data = use_context::<Data>().unwrap();
@@ -41,10 +49,22 @@ pub fn ChallengePage() -> Html {
 
     html! {
         <Container>
-            <Field>
-                <label class="label"><Text path="difficulty" /></label>
+            <Field classes="is-grouped">
                 <Control>
-                    <DifficultySelector state={difficulty.clone()} />
+                    <Field>
+                        <label class="label"><Text path="difficulty" /></label>
+                        <Control>
+                            <DifficultySelector state={difficulty.clone()} />
+                        </Control>
+                    </Field>
+                </Control>
+                <Control>
+                    <Field>
+                        <label class="label"><Text path="challenge_stone" /></label>
+                        <Control>
+                            <NumberInput<RedStoneEditor> editor={RedStoneEditor {}} />
+                        </Control>
+                    </Field>
                 </Control>
             </Field>
 
