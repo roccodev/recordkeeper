@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use game_data::item::Item;
 use recordkeeper::item::{edit::ItemEditor, ItemType};
 use yew::prelude::*;
@@ -60,7 +58,6 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
 
     let amount_editor = AmountEditor { index, item_type };
 
-    let items = items.clone();
     let save = save_context.clone();
     let on_select = Callback::from(move |new: usize| {
         let new_id: u16 = items[new].id.try_into().unwrap();
