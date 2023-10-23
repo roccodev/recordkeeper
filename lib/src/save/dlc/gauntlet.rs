@@ -1,6 +1,6 @@
 use recordkeeper_macros::SaveBin;
 
-use super::CHALLENGE_BATTLE_DIFFICULTY_MAX;
+use super::{ChallengeDifficulty, ChallengeRank, CHALLENGE_BATTLE_DIFFICULTY_MAX};
 
 pub const EMBLEM_MAX: usize = 300; // best guess
 
@@ -15,13 +15,18 @@ pub struct Gauntlet {
     high_score: [u32; CHALLENGE_BATTLE_DIFFICULTY_MAX],
     time: [f32; CHALLENGE_BATTLE_DIFFICULTY_MAX],
     play_count: [u32; CHALLENGE_BATTLE_DIFFICULTY_MAX],
-    in_progress: bool, // unsure
-    _unk1: bool,
-    _unk2: bool,
-    _unk3: bool, // could be whether rewards for ranks A/B have been received
-    _unk4: bool,
+    /// Purpose unclear
+    pub cleared: bool,
+    /// Shows the "new" notification dot
+    pub new: bool,
+    /// Whether the gauntlet currently has a 3x reward bonus
+    pub has_bonus: bool,
+    /// Whether the Rank B reward has been claimed
+    pub reward_b: bool,
+    /// Whether the Rank A reward has been claimed
+    pub reward_a: bool,
     #[loc(0x44)]
-    clear_count: u32,
+    pub clear_count: u32,
 }
 
 /// Archsage's Gauntlet save state
@@ -108,4 +113,46 @@ pub struct DateTime {
     day: u8,
     hour: u8,
     minute: u8,
+}
+
+impl Gauntlet {
+    pub fn get_rank(&self, difficulty: ChallengeDifficulty) -> ChallengeRank {
+        self.ranks[difficulty as usize].try_into().unwrap()
+    }
+
+    pub fn set_rank(&mut self, difficulty: ChallengeDifficulty, rank: ChallengeRank) {
+        self.ranks[difficulty as usize] = rank as u32;
+    }
+
+    pub fn get_best_time(&self, difficulty: ChallengeDifficulty) -> f32 {
+        self.time[difficulty as usize]
+    }
+
+    pub fn set_best_time(&mut self, difficulty: ChallengeDifficulty, time: f32) {
+        self.time[difficulty as usize] = time;
+    }
+
+    pub fn get_high_score(&self, difficulty: ChallengeDifficulty) -> u32 {
+        self.high_score[difficulty as usize]
+    }
+
+    pub fn set_high_score(&mut self, difficulty: ChallengeDifficulty, score: u32) {
+        self.high_score[difficulty as usize] = score;
+    }
+
+    pub fn get_stage_reached(&self, difficulty: ChallengeDifficulty) -> u32 {
+        self.stage_reached[difficulty as usize]
+    }
+
+    pub fn set_stage_reached(&mut self, difficulty: ChallengeDifficulty, stage: u32) {
+        self.stage_reached[difficulty as usize] = stage;
+    }
+
+    pub fn get_play_count(&self, difficulty: ChallengeDifficulty) -> u32 {
+        self.play_count[difficulty as usize]
+    }
+
+    pub fn set_play_count(&mut self, difficulty: ChallengeDifficulty, count: u32) {
+        self.play_count[difficulty as usize] = count;
+    }
 }

@@ -8,6 +8,7 @@ use crate::{
 #[derive(Serialize, Deserialize)]
 pub struct ChallengeGame {
     pub challenges: Box<[ChallengeData]>,
+    pub gauntlets: Box<[ChallengeData]>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
@@ -24,6 +25,10 @@ pub struct ChallengeLang {
 impl ChallengeGame {
     pub fn get_challenge(&self, id: usize) -> Option<&ChallengeData> {
         id.checked_sub(1).and_then(|idx| self.challenges.get(idx))
+    }
+
+    pub fn get_gauntlet(&self, id: usize) -> Option<&ChallengeData> {
+        id.checked_sub(1).and_then(|idx| self.gauntlets.get(idx))
     }
 }
 

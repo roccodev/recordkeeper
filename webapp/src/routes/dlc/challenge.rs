@@ -18,15 +18,15 @@ const PAGES_PER_VIEW: usize = 1;
 const ROWS_PER_PAGE: usize = 10;
 
 #[derive(Properties, PartialEq)]
-struct TableProps {
+pub struct TableProps {
     pub start: usize,
     pub end: usize,
     pub difficulty: ChallengeDifficulty,
 }
 
 #[derive(Properties, PartialEq)]
-struct DifficultyProps {
-    state: UseStateHandle<ChallengeDifficulty>,
+pub struct DifficultyProps {
+    pub state: UseStateHandle<ChallengeDifficulty>,
 }
 
 #[rustfmt::skip]
@@ -109,7 +109,7 @@ fn TablePage(props: &TableProps) -> Html {
 }
 
 #[function_component]
-fn DifficultySelector(props: &DifficultyProps) -> Html {
+pub fn DifficultySelector(props: &DifficultyProps) -> Html {
     let update = {
         let state = props.state.clone();
         Callback::from(move |diff: String| {

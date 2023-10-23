@@ -61,7 +61,7 @@ editor!(
 );
 
 editor!(
-    TimeEditor,
+    pub TimeEditor,
     Time,
     get |editor, save| Time(FiniteF32::try_from(save.challenge_battle.challenge(editor.id).get_best_time(editor.difficulty)).unwrap()),
     set |editor, save, new| save.challenge_battle.challenge_mut(editor.id).set_best_time(editor.difficulty, new.0.into()),
@@ -75,12 +75,12 @@ pub struct ChallengeProps {
 }
 
 #[derive(Properties, PartialEq, Clone)]
-struct TimeInputProps {
-    editor: TimeEditor,
+pub struct TimeInputProps {
+    pub editor: TimeEditor,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
-struct Time(FiniteF32);
+pub struct Time(pub FiniteF32);
 
 #[function_component]
 pub fn ChallengeRow(props: &ChallengeProps) -> Html {

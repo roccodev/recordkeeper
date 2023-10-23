@@ -391,9 +391,21 @@ challenge_rank_a = A
 challenge_rank_b = B
 challenge_rank_c = C
 challenge_time = Best Time
-challenge_clear_count = Clear Count
+challenge_clear_count = Clear Count (Any)
 challenge_stone = Red Noponstone
 challenge_clear = Cleared (Any)
 challenge_new = New
 challenge_bonus = 3x Bonus
 challenge_reward = Reward Claimed
+
+# Gauntlet
+
+gauntlet_tab_records = Records
+gauntlet_tab_emblems = Emblems
+gauntlet_tab_state = Save State
+
+gauntlet_score = High Score
+gauntlet_stage = Stage Reached
+gauntlet_play_count = Attempts
+gauntlet_reward_b = Rank B Reward
+gauntlet_reward_a = Rank A Reward

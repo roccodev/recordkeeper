@@ -49,23 +49,22 @@ pub fn PageControls<const PER_VIEW: usize>(props: &PageProps<PER_VIEW>) -> Html 
             <a onclick={change_page_callback(1)} class={pagination_classes(1)}>
                 {"1"}
             </a>
-            {if current_page_for_display > 2 {
-                html!(<PaginationEllipsis />)
-            } else {
-                html!()
-            }}
+            {(current_page_for_display > 2).then(|| html! {
+                <PaginationEllipsis />
+            })}
             {for (current_page_for_display-1..=current_page_for_display+1)
                 .filter(|&page| page > 1 && page < last_page)
                 .map(|page| html!(<a onclick={change_page_callback(page)} class={pagination_classes(page)}>{page.to_string()}</a>))
             }
-            {if current_page_for_display <= last_page.saturating_sub(2) {
-                html!(<PaginationEllipsis />)
-            } else {
-                html!()
-            }}
-            <a onclick={change_page_callback(last_page)} class={pagination_classes(last_page)}>
-                {last_page.to_string()}
-            </a>
+            {(current_page_for_display <= last_page.saturating_sub(2)).then(|| html! {
+                <PaginationEllipsis />
+            })}
+            {(last_page != 1).then(|| html! {
+                <a onclick={change_page_callback(last_page)} class={pagination_classes(last_page)}>
+                    {last_page.to_string()}
+                </a>
+            })}
+
         </Pagination>
     }
 }

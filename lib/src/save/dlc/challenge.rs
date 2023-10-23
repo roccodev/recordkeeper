@@ -113,9 +113,34 @@ impl ChallengeBattle {
         }
     }
 
+    /// Returns a view of a gauntlet record.
+    ///
+    /// The ID starts at 1.
+    ///
+    /// ## Panics
+    /// Panics if the ID is out of bounds.
+    pub fn gauntlet(&self, id: usize) -> &Gauntlet {
+        &self.gauntlet[id.checked_sub(1).expect("id > 0")]
+    }
+
+    /// Returns a mutable view of a gauntlet record.
+    ///
+    /// The ID starts at 1.
+    ///
+    /// ## Panics
+    /// Panics if the ID is out of bounds.
+    pub fn gauntlet_mut(&mut self, id: usize) -> &mut Gauntlet {
+        &mut self.gauntlet[id.checked_sub(1).expect("id > 0")]
+    }
+
     /// Returns an iterator over the challenge records.
     pub fn challenges(&self) -> impl Iterator<Item = &Challenge> {
         self.challenges_1_18.iter().chain(self.challenges_19.iter())
+    }
+
+    /// Returns an iterator over the gauntlet records.
+    pub fn gauntlets(&self) -> impl Iterator<Item = &Gauntlet> {
+        self.gauntlet.iter()
     }
 }
 
