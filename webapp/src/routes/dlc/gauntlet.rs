@@ -5,7 +5,7 @@ use yew::prelude::*;
 
 use crate::{
     components::{
-        dlc::gauntlet::GauntletRow,
+        dlc::gauntlet::records::GauntletRow,
         page::{PageControls, PageOrganizer},
     },
     data::Data,

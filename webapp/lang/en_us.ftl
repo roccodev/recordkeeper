@@ -289,6 +289,7 @@ ouroboros_tree_art_upgrade = Upgrade Art
 
 field_tab_player = Player
 field_tab_locations = Locations
+field_tab_colonies = Colonies
 field_tab_maps = Maps
 
 field_player_pos = Player Position

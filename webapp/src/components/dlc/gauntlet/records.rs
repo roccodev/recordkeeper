@@ -3,12 +3,13 @@ use recordkeeper::dlc::{ChallengeDifficulty, ChallengeRank};
 use yew::prelude::*;
 
 use crate::{
-    components::edit::{editor, CheckboxInput, EnumInput, NumberInput, StringInput},
+    components::{
+        dlc::challenge::Time,
+        edit::{editor, CheckboxInput, EnumInput, NumberInput, StringInput},
+    },
     data::Data,
     util::FiniteF32,
 };
-
-use super::challenge::Time;
 
 editor!(
     ClearCountEditor,
