@@ -1,6 +1,6 @@
 use recordkeeper::{dlc::ChallengeDifficulty, enemy::Difficulty};
 use strum::IntoEnumIterator;
-use ybc::{Container, Control, Field, Select, Table, Tile};
+use ybc::{Container, Control, Field, Table, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -8,6 +8,7 @@ use crate::{
         dlc::challenge::ChallengeRow,
         edit::{editor, NumberInput},
         page::{PageControls, PageOrganizer},
+        select::HtmlSelect,
     },
     data::Data,
     lang::Text,
@@ -118,8 +119,12 @@ pub fn DifficultySelector(props: &DifficultyProps) -> Html {
         })
     };
 
+    let idx = ChallengeDifficulty::iter()
+        .position(|d| d == *props.state)
+        .unwrap();
+
     html! {
-        <Select name="difficulty" update={update} value={(*props.state as u32).to_string()}>
+        <HtmlSelect on_change={update} value={(*props.state as u32).to_string()} selected_idx={idx}>
             {for ChallengeDifficulty::iter().map(|difficulty| {
                 html! {
                     <option value={(difficulty as u32).to_string()} selected={*props.state == difficulty}>
@@ -127,6 +132,6 @@ pub fn DifficultySelector(props: &DifficultyProps) -> Html {
                     </option>
                 }
             })}
-        </Select>
+        </HtmlSelect>
     }
 }

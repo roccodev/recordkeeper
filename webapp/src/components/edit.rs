@@ -8,7 +8,7 @@ use web_sys::{EventTarget, HtmlInputElement};
 use ybc::{Checkbox, Select};
 use yew::prelude::*;
 
-use crate::{save::SaveContext, ToHtml};
+use crate::{components::select::HtmlSelect, save::SaveContext, ToHtml};
 
 /// Helper structs that query and edit a field or a portion
 /// of the save file.
@@ -177,11 +177,11 @@ where
     });
 
     html! {
-        <Select name="" value={current_index.to_string()} update={callback}>
+        <HtmlSelect value={current_index.to_string()} on_change={callback} selected_idx={current_index}>
             {for <E as Editor>::Target::iter().enumerate().map(|(i, v)| {
                 html!(<option value={i.to_string()} selected={v == current_value}>{v.to_html()}</option>)
             })}
-        </Select>
+        </HtmlSelect>
     }
 }
 

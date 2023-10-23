@@ -1,13 +1,14 @@
 use game_data::character::{Art, Skill};
 use recordkeeper::enemy::Difficulty;
 use strum::{EnumIter, IntoEnumIterator};
-use ybc::{Container, Control, Field, Select, Table, Tabs, Tile};
+use ybc::{Container, Control, Field, Table, Tabs, Tile};
 use yew::prelude::*;
 
 use crate::{
     components::{
         enemy::{records::UniqueMonsterRow, soul_hack::SoulHackTable},
         page::{PageControls, PageOrganizer},
+        select::HtmlSelect,
     },
     data::Data,
     lang::Text,
@@ -133,8 +134,10 @@ fn DifficultySelector(props: &DifficultyProps) -> Html {
         })
     };
 
+    let idx = Difficulty::iter().position(|d| d == *props.state).unwrap();
+
     html! {
-        <Select name="difficulty" update={update} value={(*props.state as u32).to_string()}>
+        <HtmlSelect on_change={update} value={(*props.state as u32).to_string()} selected_idx={idx}>
             {for Difficulty::iter().map(|difficulty| {
                 html! {
                     <option value={(difficulty as u32).to_string()} selected={*props.state == difficulty}>
@@ -142,7 +145,7 @@ fn DifficultySelector(props: &DifficultyProps) -> Html {
                     </option>
                 }
             })}
-        </Select>
+        </HtmlSelect>
     }
 }
 

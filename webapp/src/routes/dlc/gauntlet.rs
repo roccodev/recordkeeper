@@ -27,7 +27,6 @@ pub enum GauntletTab {
 #[function_component]
 pub fn GauntletPage() -> Html {
     let tab = use_state(|| GauntletTab::Records);
-    let data = use_context::<Data>().unwrap();
 
     let update_tab = |t| {
         let tab_state = tab.clone();
