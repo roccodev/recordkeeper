@@ -102,7 +102,7 @@ pub struct GauntletState {
 #[derive(SaveBin, Debug)]
 #[size(8)]
 pub struct EmblemItem {
-    unlocked: bool,
+    pub unlocked: bool,
 }
 
 #[derive(SaveBin, Debug)]

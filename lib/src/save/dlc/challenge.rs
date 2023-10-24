@@ -133,6 +133,26 @@ impl ChallengeBattle {
         &mut self.gauntlet[id.checked_sub(1).expect("id > 0")]
     }
 
+    /// Returns a view of an emblem shop item.
+    ///
+    /// The ID starts at 1.
+    ///
+    /// ## Panics
+    /// Panics if the ID is out of bounds.
+    pub fn emblem(&self, id: usize) -> &EmblemItem {
+        &self.emblem_shop[id.checked_sub(1).expect("id > 0")]
+    }
+
+    /// Returns a mutable view of an emblem shop item.
+    ///
+    /// The ID starts at 1.
+    ///
+    /// ## Panics
+    /// Panics if the ID is out of bounds.
+    pub fn emblem_mut(&mut self, id: usize) -> &mut EmblemItem {
+        &mut self.emblem_shop[id.checked_sub(1).expect("id > 0")]
+    }
+
     /// Returns an iterator over the challenge records.
     pub fn challenges(&self) -> impl Iterator<Item = &Challenge> {
         self.challenges_1_18.iter().chain(self.challenges_19.iter())

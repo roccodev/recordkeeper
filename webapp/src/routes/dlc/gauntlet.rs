@@ -5,7 +5,7 @@ use yew::prelude::*;
 
 use crate::{
     components::{
-        dlc::gauntlet::records::GauntletRow,
+        dlc::gauntlet::{emblem::EmblemRow, records::GauntletRow},
         page::{PageControls, PageOrganizer},
     },
     data::Data,
@@ -15,13 +15,21 @@ use crate::{
 use super::challenge::{DifficultySelector, TableProps};
 
 const PAGES_PER_VIEW: usize = 1;
-const ROWS_PER_PAGE: usize = 10;
+const ROWS_PER_PAGE_RECORDS: usize = 10;
+const ROWS_PER_PAGE_EMBLEMS: usize = 15;
 
 #[derive(Clone, PartialEq, Copy, EnumIter)]
 pub enum GauntletTab {
     Records,
     Emblems,
     SaveState,
+}
+
+#[derive(Properties, PartialEq)]
+struct EmblemProps {
+    pub start: usize,
+    pub end: usize,
+    pub max_level: usize,
 }
 
 #[function_component]
@@ -46,7 +54,7 @@ pub fn GauntletPage() -> Html {
 
             {match *tab {
                 GauntletTab::Records => html!(<Records />),
-                GauntletTab::Emblems => html!(),
+                GauntletTab::Emblems => html!(<Emblems />),
                 GauntletTab::SaveState => html!(),
             }}
         </>
@@ -62,7 +70,7 @@ pub fn Records() -> Html {
     let page = use_state(|| 0);
     let difficulty = use_state(|| ChallengeDifficulty::Normal);
     let page_organizer =
-        PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, gauntlets.len());
+        PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE_RECORDS, *page, gauntlets.len());
 
     html! {
         <Container>
@@ -77,6 +85,33 @@ pub fn Records() -> Html {
                 {for page_organizer.current_bounds.into_iter().map(|(s, e)| html! {
                     <Tile>
                         <RecordPage start={1 + s} end={1 + e} difficulty={*difficulty} />
+                    </Tile>
+                })}
+            </Tile>
+
+            <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
+        </Container>
+    }
+}
+
+#[function_component]
+pub fn Emblems() -> Html {
+    let data = use_context::<Data>().unwrap();
+
+    let emblems = &data.game().dlc.challenge.emblems;
+
+    let page = use_state(|| 0);
+    let page_organizer =
+        PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE_EMBLEMS, *page, emblems.len());
+
+    let max_level = emblems.iter().map(|e| e.levels).max().unwrap();
+
+    html! {
+        <Container>
+            <Tile>
+                {for page_organizer.current_bounds.into_iter().map(|(s, e)| html! {
+                    <Tile>
+                        <EmblemPage start={1 + s} end={1 + e} max_level={max_level} />
                     </Tile>
                 })}
             </Tile>
@@ -111,6 +146,29 @@ fn RecordPage(props: &TableProps) -> Html {
             <tbody>
                 {for (props.start..=props.end).map(|index| {
                     html!(<GauntletRow id={index} difficulty={props.difficulty} />)
+                })}
+            </tbody>
+        </Table>
+    }
+}
+
+#[function_component]
+fn EmblemPage(props: &EmblemProps) -> Html {
+    html! {
+        <Table classes={classes!("is-fullwidth")}>
+            <thead>
+                <tr>
+                    <th><Text path="emblem_id" /></th>
+                    <th><Text path="emblem_name" /></th>
+                    {for (1..=props.max_level).map(|lv| html! {
+                        <th><Text path="emblem_level" args={vec![("id".into(), lv.into())]} /></th>
+                    })}
+                </tr>
+            </thead>
+
+            <tbody>
+                {for (props.start..=props.end).map(|index| {
+                    html!(<EmblemRow id={index} />)
                 })}
             </tbody>
         </Table>

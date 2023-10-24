@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    lang::{FilterEntry, FilterTable, Filterable},
+    lang::{FilterEntry, FilterTable, Filterable, Nameable, TextEntry, TextTable},
     LanguageData,
 };
 
@@ -9,6 +9,13 @@ use crate::{
 pub struct ChallengeGame {
     pub challenges: Box<[ChallengeData]>,
     pub gauntlets: Box<[ChallengeData]>,
+    pub emblems: Box<[Emblem]>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ChallengeLang {
+    pub challenges: FilterTable,
+    pub emblems: TextTable,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
@@ -17,9 +24,11 @@ pub struct ChallengeData {
     pub name_id: usize,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct ChallengeLang {
-    pub challenges: FilterTable,
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+pub struct Emblem {
+    pub id: usize,
+    pub name_id: usize,
+    pub levels: usize,
 }
 
 impl ChallengeGame {
@@ -30,10 +39,20 @@ impl ChallengeGame {
     pub fn get_gauntlet(&self, id: usize) -> Option<&ChallengeData> {
         id.checked_sub(1).and_then(|idx| self.gauntlets.get(idx))
     }
+
+    pub fn get_emblem(&self, id: usize) -> Option<&Emblem> {
+        id.checked_sub(1).and_then(|idx| self.emblems.get(idx))
+    }
 }
 
 impl Filterable for ChallengeData {
     fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
         language.dlc.challenge.challenges.get(self.name_id)
+    }
+}
+
+impl Nameable for Emblem {
+    fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l TextEntry> {
+        language.dlc.challenge.emblems.get(self.name_id)
     }
 }

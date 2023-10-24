@@ -410,3 +410,8 @@ gauntlet_stage = Stage Reached
 gauntlet_play_count = Attempts
 gauntlet_reward_b = Rank B Reward
 gauntlet_reward_a = Rank A Reward
+
+emblem_id = ID
+emblem_name = Name
+# $id: level ID (1-5)
+emblem_level = Starts at Lv. { $id }
