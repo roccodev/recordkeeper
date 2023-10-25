@@ -4,10 +4,10 @@ use yew::prelude::*;
 
 use crate::{
     components::{
-        character::Selector,
         ouroboros::{
             ArtEditor, OuroEditorConfig, OuroborosEditor, SaveArt, SaveSkill, SkillEditor,
         },
+        select::Selector,
     },
     data::Data,
     lang::Text,

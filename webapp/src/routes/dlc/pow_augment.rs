@@ -3,7 +3,7 @@ use ybc::{Container, Control, Field, Notification, Tile};
 use yew::prelude::*;
 
 use crate::{
-    components::{character::Selector, dlc::pow_augment::PowAugmentEditor},
+    components::{dlc::pow_augment::PowAugmentEditor, select::Selector},
     data::Data,
     lang::Text,
     save::SaveContext,

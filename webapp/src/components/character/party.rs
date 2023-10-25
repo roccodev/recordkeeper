@@ -4,7 +4,7 @@ use ybc::{Button, Control, Field, Icon};
 use yew::prelude::*;
 use yew_feather::{Minus, Plus};
 
-use crate::{components::character::UpdateSelector, data::Data, lang::Text, save::SaveContext};
+use crate::{components::select::UpdateSelector, data::Data, lang::Text, save::SaveContext};
 
 #[derive(PartialEq, Properties)]
 pub struct PartyEditorProps<const N: usize, E>

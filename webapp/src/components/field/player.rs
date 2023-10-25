@@ -6,8 +6,8 @@ use yew::prelude::*;
 use super::MetaFlagEditor;
 use crate::{
     components::{
-        character::UpdateSelector,
         edit::{editor, CheckboxInput, Editor, NumberInput, StringInput},
+        select::{EditorSelector, UpdateSelector},
     },
     data::Data,
     lang::Text,
@@ -18,9 +18,9 @@ use crate::{
 #[rustfmt::skip]
 editor!(
     pub MapIdEditor,
-    u16,
-    get |_, save| save.map_id,
-    set |_, save, new| save.map_id = new
+    usize,
+    get |_, save| save.map_id as usize,
+    set |_, save, new| save.map_id = new.try_into().unwrap()
 );
 
 #[rustfmt::skip]
@@ -80,17 +80,7 @@ pub enum Loc {
 #[function_component]
 pub fn PlayerLoc() -> Html {
     let data = use_context::<Data>().unwrap();
-    let save_context = use_context::<SaveContext>().unwrap();
     let maps = data.game().field.maps();
-
-    let save = save_context.get();
-    let map_id_editor = MapIdEditor {};
-    let update_map_id = {
-        let save_context = save_context.clone();
-        Callback::from(move |new: usize| {
-            save_context.edit(move |save| map_id_editor.set(save, new.try_into().unwrap()))
-        })
-    };
 
     html! {
         <Tile classes={classes!("is-child", "notification")}>
@@ -99,7 +89,7 @@ pub fn PlayerLoc() -> Html {
             <Field>
                 <label class="label"><Text path="field_map" /></label>
                 <Control>
-                    <UpdateSelector<Map> current={map_id_editor.get(save.get().save()) as usize} values={maps} update={update_map_id} />
+                    <EditorSelector<MapIdEditor, Map> editor={MapIdEditor {}} values={maps} />
                 </Control>
             </Field>
 

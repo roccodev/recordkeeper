@@ -1,14 +1,11 @@
-use game_data::{
-    character::Class,
-    lang::{Filterable, Id},
-};
-use ybc::{Control, Field, Section, Tile};
+use game_data::character::Class;
+use ybc::{Control, Field, Tile};
 use yew::prelude::*;
 
 use crate::{
     components::{
-        character::UpdateSelector,
         edit::{editor, Editor, NumberInput},
+        select::UpdateSelector,
     },
     data::Data,
     lang::Text,

@@ -9,9 +9,9 @@ use yew::prelude::*;
 
 use crate::{
     components::{
-        character::Selector,
         edit::{CheckboxInput, Editor, FlagEditor, ToBool},
         field::player::{Coord, CoordEditor, Loc, MapIdEditor, MapJumpEditor},
+        select::Selector,
     },
     data::Data,
     lang::Text,

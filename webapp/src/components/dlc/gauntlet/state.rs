@@ -5,8 +5,8 @@ use yew::prelude::*;
 
 use crate::{
     components::{
-        character::EditorSelector,
         edit::{editor, EnumInput, NumberInput, StringInput},
+        select::EditorSelector,
     },
     data::Data,
     lang::Text,

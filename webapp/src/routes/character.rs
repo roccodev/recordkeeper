@@ -4,9 +4,12 @@ use ybc::{Container, Control, Field, Tile};
 use yew::prelude::*;
 
 use crate::{
-    components::character::{
-        party::{PartyEditor, SavePartyEditor},
-        CharacterEditor, Selector,
+    components::{
+        character::{
+            party::{PartyEditor, SavePartyEditor},
+            CharacterEditor,
+        },
+        select::Selector,
     },
     data::Data,
     lang::Text,
