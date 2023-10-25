@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    lang::{FilterEntry, FilterTable, Filterable, Nameable, TextEntry, TextTable},
+    lang::{FilterEntry, FilterTable, Filterable, Id, Nameable, TextEntry, TextTable},
     LanguageData,
 };
 
@@ -54,5 +54,11 @@ impl Filterable for ChallengeData {
 impl Nameable for Emblem {
     fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l TextEntry> {
         language.dlc.challenge.emblems.get(self.name_id)
+    }
+}
+
+impl Id for ChallengeData {
+    fn id(&self) -> usize {
+        self.id
     }
 }

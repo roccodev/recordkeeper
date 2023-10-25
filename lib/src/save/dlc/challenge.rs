@@ -162,6 +162,14 @@ impl ChallengeBattle {
     pub fn gauntlets(&self) -> impl Iterator<Item = &Gauntlet> {
         self.gauntlet.iter()
     }
+
+    pub fn gauntlet_save(&self) -> &GauntletState {
+        &self.gauntlet_states[0]
+    }
+
+    pub fn gauntlet_save_mut(&mut self) -> &mut GauntletState {
+        &mut self.gauntlet_states[0]
+    }
 }
 
 impl Challenge {

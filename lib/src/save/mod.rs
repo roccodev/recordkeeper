@@ -197,6 +197,11 @@ impl SaveData {
     pub fn is_dlc4(&self) -> bool {
         self.is_flag_set(SaveFlag::Dlc4)
     }
+
+    /// Returns whether there currently is a mid-run gauntlet save.
+    pub fn has_gauntlet_save(&self) -> bool {
+        self.is_flag_set(SaveFlag::Gauntlet) && self.challenge_battle.gauntlet_save().active
+    }
 }
 
 impl PlayTime {

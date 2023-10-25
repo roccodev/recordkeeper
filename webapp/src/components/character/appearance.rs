@@ -9,7 +9,7 @@ use yew_feather::X;
 
 use crate::{
     components::{
-        edit::{editor, CheckboxInput, Editor, NumberInput},
+        edit::{editor, CheckboxInput, Editor, NumberInput, SearchInput},
         select::{HtmlName, Options, SearchSelect},
     },
     data::Data,
@@ -61,12 +61,6 @@ pub struct AppearanceProps {
     pub char_id: usize,
 }
 
-#[derive(Properties, PartialEq)]
-struct EditorSelectProps<E: PartialEq, I: PartialEq + 'static> {
-    pub editor: E,
-    pub options: Options<I>,
-}
-
 trait FlagBox {
     fn lang_id(&self) -> String;
     fn is_dlc4(&self) -> bool;
@@ -92,7 +86,7 @@ pub fn Appearance(props: &AppearanceProps) -> Html {
                 <Field classes={classes!("mr-2")}>
                     <label class="label"><Text path="character_costume" /></label>
                     <Control>
-                        <EditorSelect<CostumeEditor, Costume>
+                        <SearchInput<CostumeEditor, Costume>
                             editor={CostumeEditor { char: props.accessor }}
                             options={Options::from(data.game().characters.costumes(props.char_id))}
                         />
@@ -101,7 +95,7 @@ pub fn Appearance(props: &AppearanceProps) -> Html {
                 <Field classes={classes!("mr-2")}>
                     <label class="label"><Text path="character_attachment" /></label>
                     <Control>
-                        <EditorSelect<AttachmentEditor, Attachment>
+                        <SearchInput<AttachmentEditor, Attachment>
                             editor={AttachmentEditor { char: props.accessor }}
                             options={Options::from(data.game().characters.attachments())}
                         />
@@ -126,70 +120,6 @@ pub fn Appearance(props: &AppearanceProps) -> Html {
                 }
             } else { html!() }}
         </Tile>
-    }
-}
-
-/// Select component with a button to empty the field, as well as
-/// searchable options.
-///
-/// Note: only works when the option index = option ID - 1, and when the
-/// "None" value is 0.
-#[function_component]
-fn EditorSelect<E, I>(props: &EditorSelectProps<E, I>) -> Html
-where
-    E: Editor + PartialEq,
-    E::Target: TryInto<usize> + TryFrom<usize>,
-    <E::Target as TryInto<usize>>::Error: Debug,
-    <E::Target as TryFrom<usize>>::Error: Debug,
-    I: Clone + HtmlName + PartialEq + 'static,
-{
-    let save_context = use_context::<SaveContext>().unwrap();
-    let data = use_context::<Data>().unwrap();
-    let lang = data.to_lang();
-
-    let save = save_context.get();
-
-    // Conveniently, this is None when the value is 0
-    let current = props
-        .editor
-        .get(save.get().save())
-        .try_into()
-        .unwrap()
-        .checked_sub(1);
-
-    let update = {
-        let editor = props.editor;
-        let save_context = save_context.clone();
-        Callback::from(move |new: usize| {
-            save_context
-                .edit(move |save| editor.set(save, new.checked_add(1).unwrap().try_into().unwrap()))
-        })
-    };
-
-    let clear_callback = {
-        let editor = props.editor;
-        let save_context = save_context.clone();
-        Callback::from(move |_: MouseEvent| {
-            save_context.edit(move |save| editor.set(save, 0usize.try_into().unwrap()))
-        })
-    };
-
-    html! {
-        <Field classes={classes!("has-addons")}>
-            <Control>
-                <SearchSelect<I>
-                    current={current}
-                    options={props.options.clone()}
-                    on_select={update}
-                    lang={lang}
-                />
-            </Control>
-            <Control>
-                <Button onclick={clear_callback} disabled={current.is_none()}>
-                    <Icon><X /></Icon>
-                </Button>
-            </Control>
-        </Field>
     }
 }
 

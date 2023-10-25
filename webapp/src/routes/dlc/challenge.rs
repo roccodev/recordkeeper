@@ -128,10 +128,16 @@ pub fn DifficultySelector(props: &DifficultyProps) -> Html {
             {for ChallengeDifficulty::iter().map(|difficulty| {
                 html! {
                     <option value={(difficulty as u32).to_string()} selected={*props.state == difficulty}>
-                        {Difficulty::from(difficulty).to_html()}
+                        {difficulty.to_html()}
                     </option>
                 }
             })}
         </HtmlSelect>
+    }
+}
+
+impl ToHtml for ChallengeDifficulty {
+    fn to_html(&self) -> Html {
+        Difficulty::from(*self).to_html()
     }
 }

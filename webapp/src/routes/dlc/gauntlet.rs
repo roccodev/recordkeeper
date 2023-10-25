@@ -5,11 +5,12 @@ use yew::prelude::*;
 
 use crate::{
     components::{
-        dlc::gauntlet::{emblem::EmblemRow, records::GauntletRow},
+        dlc::gauntlet::{emblem::EmblemRow, records::GauntletRow, state::GauntletSaveState},
         page::{PageControls, PageOrganizer},
     },
     data::Data,
     lang::Text,
+    save::SaveContext,
 };
 
 use super::challenge::{DifficultySelector, TableProps};
@@ -55,7 +56,7 @@ pub fn GauntletPage() -> Html {
             {match *tab {
                 GauntletTab::Records => html!(<Records />),
                 GauntletTab::Emblems => html!(<Emblems />),
-                GauntletTab::SaveState => html!(),
+                GauntletTab::SaveState => html!(<SaveState />),
             }}
         </>
     }
@@ -117,6 +118,21 @@ pub fn Emblems() -> Html {
             </Tile>
 
             <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
+        </Container>
+    }
+}
+
+#[function_component]
+pub fn SaveState() -> Html {
+    let save = use_context::<SaveContext>().unwrap();
+
+    html! {
+        <Container>
+            {if save.get().get().save().has_gauntlet_save() {
+                html!(<GauntletSaveState />)
+            } else {
+                html!()
+            }}
         </Container>
     }
 }

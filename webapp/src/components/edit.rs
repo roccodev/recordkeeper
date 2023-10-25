@@ -1,14 +1,23 @@
-use std::{fmt::Display, str::FromStr};
+use std::{
+    fmt::{Debug, Display},
+    str::FromStr,
+};
 
 use game_data::manual::Flag;
 use recordkeeper::{flags::FlagType, SaveData};
 use strum::IntoEnumIterator;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
-use ybc::{Checkbox, Select};
+use ybc::{Button, Checkbox, Control, Field, Icon};
 use yew::prelude::*;
+use yew_feather::X;
 
-use crate::{components::select::HtmlSelect, save::SaveContext, ToHtml};
+use crate::{
+    components::select::{HtmlSelect, SearchSelect},
+    data::Data,
+    save::SaveContext,
+    ToHtml,
+};
 
 /// Helper structs that query and edit a field or a portion
 /// of the save file.
@@ -81,6 +90,8 @@ macro_rules! editor {
 
 pub(crate) use editor;
 
+use super::select::{HtmlName, Options};
+
 #[derive(Clone, Copy, PartialEq)]
 pub struct ToBool<E: Editor>(pub E)
 where
@@ -133,6 +144,12 @@ where
     pub editor: E,
     #[prop_or_default]
     pub children: Children,
+}
+
+#[derive(Properties, PartialEq)]
+pub struct SearchInputProps<E: PartialEq, I: PartialEq + 'static> {
+    pub editor: E,
+    pub options: Options<I>,
 }
 
 /// General-purpose number input that automatically saves changes to
@@ -285,6 +302,70 @@ where
             value={input.to_string()}
             oninput={change_listener.reform(|e: InputEvent| e.dyn_into().unwrap())}
         />
+    }
+}
+
+/// Select component with a button to empty the field, as well as
+/// searchable options.
+///
+/// Note: only works when the option index = option ID - 1, and when the
+/// "None" value is 0.
+#[function_component]
+pub fn SearchInput<E, I>(props: &SearchInputProps<E, I>) -> Html
+where
+    E: Editor + PartialEq,
+    E::Target: TryInto<usize> + TryFrom<usize>,
+    <E::Target as TryInto<usize>>::Error: Debug,
+    <E::Target as TryFrom<usize>>::Error: Debug,
+    I: Clone + HtmlName + PartialEq + 'static,
+{
+    let save_context = use_context::<SaveContext>().unwrap();
+    let data = use_context::<Data>().unwrap();
+    let lang = data.to_lang();
+
+    let save = save_context.get();
+
+    // Conveniently, this is None when the value is 0
+    let current = props
+        .editor
+        .get(save.get().save())
+        .try_into()
+        .unwrap()
+        .checked_sub(1);
+
+    let update = {
+        let editor = props.editor;
+        let save_context = save_context.clone();
+        Callback::from(move |new: usize| {
+            save_context
+                .edit(move |save| editor.set(save, new.checked_add(1).unwrap().try_into().unwrap()))
+        })
+    };
+
+    let clear_callback = {
+        let editor = props.editor;
+        let save_context = save_context.clone();
+        Callback::from(move |_: MouseEvent| {
+            save_context.edit(move |save| editor.set(save, 0usize.try_into().unwrap()))
+        })
+    };
+
+    html! {
+        <Field classes={classes!("has-addons")}>
+            <Control>
+                <SearchSelect<I>
+                    current={current}
+                    options={props.options.clone()}
+                    on_select={update}
+                    lang={lang}
+                />
+            </Control>
+            <Control>
+                <Button onclick={clear_callback} disabled={current.is_none()}>
+                    <Icon><X /></Icon>
+                </Button>
+            </Control>
+        </Field>
     }
 }
 

@@ -415,3 +415,12 @@ emblem_id = ID
 emblem_name = Name
 # $id: level ID (1-5)
 emblem_level = Starts at Lv. { $id }
+
+# as in which challenge the player is in
+gauntlet_save_challenge = Level
+gauntlet_save_lead = Lead Character
+gauntlet_save_stage = Last Stage
+gauntlet_save_chain = Chain Gauge
+gauntlet_save_launch = Launch Charge
+gauntlet_save_watch = Nopwatch Gauge
+gauntlet_save_shuffle = Shuffle Tickets

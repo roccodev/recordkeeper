@@ -20,6 +20,8 @@ use crate::{
     save::SaveContext,
 };
 
+use super::edit::Editor;
+
 mod appearance;
 pub mod class;
 pub mod formation;
@@ -54,6 +56,12 @@ pub struct UpdateSelectorProps<F: Filterable + PartialEq + Id + 'static> {
     pub values: &'static [F],
     pub current: usize,
     pub update: Callback<usize>,
+}
+
+#[derive(Properties, PartialEq)]
+pub struct EditorSelectorProps<E: PartialEq, F: Filterable + PartialEq + Id + 'static> {
+    pub editor: E,
+    pub values: &'static [F],
 }
 
 #[derive(EnumIter, Clone, Copy, PartialEq)]
@@ -144,6 +152,23 @@ pub fn UpdateSelector<F: Filterable + PartialEq + Id + 'static>(
             })}
         </HtmlSelect>
     }
+}
+
+#[function_component]
+pub fn EditorSelector<E, F>(props: &EditorSelectorProps<E, F>) -> Html
+where
+    E: PartialEq + Editor<Target = usize>,
+    F: Filterable + PartialEq + Id + 'static,
+{
+    let save_context = use_context::<SaveContext>().unwrap();
+    let editor = props.editor.clone();
+
+    let update = {
+        let save = save_context.clone();
+        Callback::from(move |i| save.edit(move |save| editor.set(save, i)))
+    };
+
+    html!(<UpdateSelector<F> update={update} values={props.values} current={editor.get(save_context.get().get().save())} />)
 }
 
 impl CharacterSet {
