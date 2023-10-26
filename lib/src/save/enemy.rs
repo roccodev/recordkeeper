@@ -1,4 +1,5 @@
 use recordkeeper_macros::SaveBin;
+use thiserror::Error;
 
 pub const ENEMY_TOMBSTONE_MAX: usize = 200;
 pub const SOUL_HACK_ACHIEVEMENT_MAX: usize = 220;
@@ -45,6 +46,10 @@ pub enum Difficulty {
     Hard = 2,
     VeryHard = 3,
 }
+
+#[derive(Error, Debug)]
+#[error("unknown difficulty ID {0}")]
+pub struct DifficultyFromIntError(u32);
 
 impl EnemyTombstone {
     pub fn time_record(&self, difficulty: Difficulty) -> &TombstoneTime {
@@ -102,5 +107,29 @@ impl From<Achievement> for u32 {
             Achievement::Completed => u32::MAX,
             Achievement::InProgress(n) => n,
         }
+    }
+}
+
+#[cfg(feature = "strum")]
+impl TryFrom<u32> for Difficulty {
+    type Error = DifficultyFromIntError;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        Self::from_repr(value).ok_or(DifficultyFromIntError(value))
+    }
+}
+
+#[cfg(not(feature = "strum"))]
+impl TryFrom<u32> for Difficulty {
+    type Error = DifficultyFromIntError;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        Ok(match value {
+            0 => Self::Normal,
+            1 => Self::Easy,
+            2 => Self::Hard,
+            3 => Self::VeryHard,
+            v => return Err(DifficultyFromIntError(v)),
+        })
     }
 }

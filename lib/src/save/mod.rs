@@ -1,12 +1,15 @@
-use crate::character::{
-    formation::{PartyFormation, PARTY_FORMATION_MAX},
-    PARTY_GUEST_MAX, PARTY_MAX,
-};
 use crate::error::SaveError;
 use crate::item::Inventory;
 use crate::save::character::{Character, Ouroboros, CHARACTER_MAX, OUROBOROS_MAX};
 use crate::save::enemy::{EnemyTombstone, ENEMY_TOMBSTONE_MAX};
 use crate::save::flags::AllFlags;
+use crate::{
+    character::{
+        formation::{PartyFormation, PARTY_FORMATION_MAX},
+        PARTY_GUEST_MAX, PARTY_MAX,
+    },
+    io::SaveBin,
+};
 
 use crate::menu::MenuData;
 use crate::util::FixVec;
@@ -163,9 +166,14 @@ pub struct Pos {
 }
 
 #[derive(SaveBin, Debug)]
-pub struct MapTime {
-    pub hour: u16,
-    pub minute: u16,
+pub struct MapTime<N = u16>
+where
+    N: for<'a> SaveBin<'a>,
+    SaveError: for<'a> From<<N as SaveBin<'a>>::ReadError>,
+    SaveError: for<'a> From<<N as SaveBin<'a>>::WriteError>,
+{
+    pub hour: N,
+    pub minute: N,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]

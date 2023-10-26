@@ -1,11 +1,16 @@
 use recordkeeper_macros::SaveBin;
 
+use crate::{enemy::Difficulty, flags::BitFlags, MapTime};
+
 use super::{ChallengeDifficulty, ChallengeRank, CHALLENGE_BATTLE_DIFFICULTY_MAX};
 
 pub const EMBLEM_MAX: usize = 300; // best guess
 
 const GAUNTLET_STATE_CHARACTER_MAX: usize = 7;
 const GAUNTLET_STATE_EMBLEM_MAX: usize = 60;
+const GAUNTLET_STATE_NOTIFICATION_MAX: usize = 11;
+const GAUNTLET_STATE_JUMP_MAX: usize = 32;
+const GAUNTLET_STATE_SYS_OPEN_MAX: usize = 16;
 
 #[derive(SaveBin, Debug)]
 #[size(72)]
@@ -40,23 +45,32 @@ pub struct GauntletState {
 
     #[loc(0x18)]
     pub gauntlet_id: u32,
-    pub lead_character_id: u32,
-    pub difficulty: u32,
-
+    lead_character_id: u32,
+    challenge_difficulty: u32,
+    pub map_time: MapTime<u32>,
     /// ID for `RSC_WeatherSet`
-    #[loc(0x24)]
     pub weather: u32,
+    _unk_f: f32,
+    /// Original game difficulty, used to reset after the run ends.
+    pub game_difficulty: u32,
 
-    /// Character IDs currently in the party
-    #[loc(0x38)]
+    /// Character IDs currently in the party.
+    ///
+    /// The first entry is ignored by the game, and is instead set to
+    /// `lead_character_id`.
     pub party_characters: [u32; GAUNTLET_STATE_CHARACTER_MAX],
-    _unk_array_1: [u32; GAUNTLET_STATE_CHARACTER_MAX],
+    /// Join queue for effects (?)
+    pub hero_join_queue: [u32; GAUNTLET_STATE_CHARACTER_MAX],
 
     /// Emblems currently active
     pub emblems: [u32; GAUNTLET_STATE_EMBLEM_MAX],
 
-    _unk_array_2: [u32; 11],
-    _unk_array_3: [u8; 32],
+    /// IDs for `1178340A`. Notifications shown at the end of the round.
+    pub notifications: [u32; GAUNTLET_STATE_NOTIFICATION_MAX],
+    /// Map jumps that have already been visited in the current map.
+    ///
+    /// Index relative to the first row with the proper `Map` value in `BTL_ChSU_MapBattleLock`.
+    pub visited_jumps: [bool; GAUNTLET_STATE_JUMP_MAX],
 
     /// Current map ID. (Actual map ID = value + 75, ID for `SYS_MapList`)
     pub map_id: u32,
@@ -82,7 +96,8 @@ pub struct GauntletState {
     /// Number of nopwatch refill purchases
     pub nopwatch_buy_count: u32,
 
-    #[loc(0x1e4)]
+    #[loc(0x1e0)]
+    flags: BitFlags<1, 1>,
     /// ID for `BTL_ChSU_SettingGate`. It's likely that setting both of these will
     /// open the whimsy screen when the save is loaded.
     // needs testing
@@ -91,11 +106,17 @@ pub struct GauntletState {
     pub whimsy_positive: u32,
     /// 0-900
     pub chain_gauge: f32,
+    /// Unsure
+    level_multiplier: f32,
+    /// On load, if this is `true`, `level_multiplier` is applied, then this is set to `false`.
+    has_level_multiplier: bool,
+    /// Unlocked SysOpens that were locked by the gauntlet. Used to reset at the end of the run.
+    unlocked_sys_opens: [u32; GAUNTLET_STATE_SYS_OPEN_MAX],
 
     // End screen stats
-    /// Score spent in the shop
+    /// Total score gained (does not decrease)
     #[loc(0x23c)]
-    pub score_spent: u32,
+    pub score_gained: u32,
     pub emblems_bought: u32,
 }
 
@@ -154,5 +175,27 @@ impl Gauntlet {
 
     pub fn set_play_count(&mut self, difficulty: ChallengeDifficulty, count: u32) {
         self.play_count[difficulty as usize] = count;
+    }
+}
+
+impl GauntletState {
+    pub fn get_challenge_difficulty(&self) -> ChallengeDifficulty {
+        Difficulty::try_from(self.challenge_difficulty)
+            .expect("invalid difficulty")
+            .try_into()
+            .expect("difficulty not supported")
+    }
+
+    pub fn set_challenge_difficulty(&mut self, difficulty: ChallengeDifficulty) {
+        self.challenge_difficulty = difficulty as u32;
+    }
+
+    pub fn get_lead_character(&self) -> u32 {
+        self.lead_character_id
+    }
+
+    pub fn set_lead_character(&mut self, lead: u32) {
+        self.lead_character_id = lead;
+        self.party_characters[0] = lead;
     }
 }

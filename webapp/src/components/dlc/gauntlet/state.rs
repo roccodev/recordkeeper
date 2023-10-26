@@ -37,7 +37,6 @@ macro_rules! edit_num {
 }
 
 edit_num!(IdEditor, gauntlet_id, usize);
-edit_num!(LeadEditor, lead_character_id, usize);
 
 edit_num!(MapIdEditor, map_id);
 edit_num!(WeatherEditor, weather);
@@ -49,7 +48,7 @@ edit_num!(NoponStoneEditor, nopon_stone_reward);
 edit_num!(HeroCountEditor, hero_buy_count);
 edit_num!(EmblemCountEditor, emblems_bought);
 edit_num!(WatchCountEditor, nopwatch_buy_count);
-edit_num!(ScoreSpentEditor, score_spent);
+edit_num!(ScoreGainedEditor, score_gained);
 
 edit_num!(ChainGaugeEditor, chain_gauge, FF32);
 edit_num!(LaunchGaugeEditor, launch_charge, FF32);
@@ -57,10 +56,18 @@ edit_num!(WatchGaugeEditor, nopwatch_gauge, FF32);
 
 #[rustfmt::skip]
 editor!(
+    LeadEditor,
+    usize,
+    get |_, save| save.challenge_battle.gauntlet_save().get_lead_character() as usize,
+    set |_, save, new| save.challenge_battle.gauntlet_save_mut().set_lead_character(new.try_into().unwrap())
+);
+
+#[rustfmt::skip]
+editor!(
     DifficultyEditor,
     ChallengeDifficulty,
-    get |_, save| ChallengeDifficulty::from_repr(save.challenge_battle.gauntlet_save().difficulty as usize).unwrap(),
-    set |_, save, new| save.challenge_battle.gauntlet_save_mut().difficulty = new as u32
+    get |_, save| save.challenge_battle.gauntlet_save().get_challenge_difficulty(),
+    set |_, save, new| save.challenge_battle.gauntlet_save_mut().set_challenge_difficulty(new)
 );
 
 #[derive(Properties, PartialEq)]
@@ -77,17 +84,19 @@ pub fn GauntletSaveState() -> Html {
         <>
             <Tile>
                 // ID, difficulty
-                <Entry label="gauntlet_save_challenge">
-                    <EditorSelector<IdEditor, ChallengeData> editor={IdEditor {}} values={data.game().dlc.challenge.gauntlets.as_ref()} />
-                </Entry>
+                <Field classes="is-grouped">
+                    <Entry label="gauntlet_save_challenge">
+                        <EditorSelector<IdEditor, ChallengeData> editor={IdEditor {}} values={data.game().dlc.challenge.gauntlets.as_ref()} />
+                    </Entry>
 
-                <Entry label="difficulty">
-                    <EnumInput<DifficultyEditor> editor={DifficultyEditor {}} />
-                </Entry>
+                    <Entry label="difficulty">
+                        <EnumInput<DifficultyEditor> editor={DifficultyEditor {}} />
+                    </Entry>
 
-                <Entry label="gauntlet_save_lead">
-                    <EditorSelector<LeadEditor, Character> editor={LeadEditor {}} values={data.game().characters.characters().as_ref()} />
-                </Entry>
+                    <Entry label="gauntlet_save_lead">
+                        <EditorSelector<LeadEditor, Character> editor={LeadEditor {}} values={data.game().characters.characters().as_ref()} />
+                    </Entry>
+                </Field>
 
                 // Party editor
             </Tile>
@@ -95,33 +104,67 @@ pub fn GauntletSaveState() -> Html {
             <Tile>
                 // Current stage, map ID,
 
-                <Entry label="gauntlet_save_stage">
-                    <NumberInput<StageEditor> editor={StageEditor {}} />
-                </Entry>
+                <Field classes="is-grouped">
+                    <Entry label="gauntlet_save_stage">
+                        <NumberInput<StageEditor> editor={StageEditor {}} />
+                    </Entry>
+
+                    <Entry label="gauntlet_save_score">
+                        <NumberInput<ScoreEditor> editor={ScoreEditor {}} />
+                    </Entry>
+
+                    <Entry label="gauntlet_save_stone">
+                        <NumberInput<NoponStoneEditor> editor={NoponStoneEditor {}} />
+                    </Entry>
+
+                    <Entry label="gauntlet_save_no_ko">
+                        <NumberInput<NoKoStreakEditor> editor={NoKoStreakEditor {}} />
+                    </Entry>
+                </Field>
             </Tile>
 
             <Tile>
                 // Gauges
 
-                <Entry label="gauntlet_save_chain">
-                    <StringInput<FiniteF32, ChainGaugeEditor> editor={ChainGaugeEditor {}} />
-                </Entry>
+                <Field classes="is-grouped">
+                    <Entry label="gauntlet_save_chain">
+                        <StringInput<FiniteF32, ChainGaugeEditor> editor={ChainGaugeEditor {}} />
+                    </Entry>
 
-                <Entry label="gauntlet_save_launch">
-                    <StringInput<FiniteF32, LaunchGaugeEditor> editor={LaunchGaugeEditor {}} />
-                </Entry>
+                    <Entry label="gauntlet_save_launch">
+                        <StringInput<FiniteF32, LaunchGaugeEditor> editor={LaunchGaugeEditor {}} />
+                    </Entry>
 
-                <Entry label="gauntlet_save_watch">
-                    <StringInput<FiniteF32, WatchGaugeEditor> editor={WatchGaugeEditor {}} />
-                </Entry>
+                    <Entry label="gauntlet_save_watch">
+                        <StringInput<FiniteF32, WatchGaugeEditor> editor={WatchGaugeEditor {}} />
+                    </Entry>
 
-                <Entry label="gauntlet_save_shuffle">
-                    <NumberInput<ShuffleEditor> editor={ShuffleEditor {}} />
-                </Entry>
+                    <Entry label="gauntlet_save_shuffle">
+                        <NumberInput<ShuffleEditor> editor={ShuffleEditor {}} />
+                    </Entry>
+                </Field>
             </Tile>
 
             <Tile>
                 // Emblem shop, prices
+
+                <Field classes="is-grouped">
+                    <Entry label="gauntlet_save_purchase_hero">
+                        <NumberInput<HeroCountEditor> editor={HeroCountEditor {}} />
+                    </Entry>
+
+                    <Entry label="gauntlet_save_purchase_watch">
+                        <NumberInput<WatchCountEditor> editor={WatchCountEditor {}} />
+                    </Entry>
+
+                    <Entry label="gauntlet_save_purchase_emblem">
+                        <NumberInput<EmblemCountEditor> editor={EmblemCountEditor {}} />
+                    </Entry>
+
+                    <Entry label="gauntlet_save_total_score">
+                        <NumberInput<ScoreGainedEditor> editor={ScoreGainedEditor {}} />
+                    </Entry>
+                </Field>
             </Tile>
         </>
     }
@@ -130,11 +173,13 @@ pub fn GauntletSaveState() -> Html {
 #[function_component]
 fn Entry(props: &EntryProps) -> Html {
     html! {
-        <Field>
-            <label class="label"><Text path={&props.label} /></label>
-            <Control>
-                {for props.children.clone()}
-            </Control>
-        </Field>
+        <Control>
+            <Field>
+                <label class="label"><Text path={&props.label} /></label>
+                <Control>
+                    {for props.children.clone()}
+                </Control>
+            </Field>
+        </Control>
     }
 }
