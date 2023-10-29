@@ -1,18 +1,20 @@
 use game_data::{
     character::Character,
-    dlc::challenge::{ChallengeData, GauntletMap},
+    dlc::challenge::{ChallengeData, GauntletMap, Whimsy},
 };
 use recordkeeper::dlc::ChallengeDifficulty;
-use ybc::{Control, Field, Tile};
+use ybc::{Button, Control, Field, Icon, Tile};
 use yew::prelude::*;
+use yew_feather::X;
 
 use crate::{
     components::{
-        edit::{editor, EnumInput, NumberInput, StringInput},
-        select::EditorSelector,
+        edit::{editor, Editor, EnumInput, NumberInput, StringInput},
+        select::{EditorSelector, Options, SearchSelect},
     },
     data::Data,
     lang::Text,
+    save::SaveContext,
     util::FiniteF32,
 };
 
@@ -70,6 +72,15 @@ editor!(
     usize,
     get |_, save| save.challenge_battle.gauntlet_save().map_id.checked_add(75).unwrap() as usize,
     set |_, save, new| save.challenge_battle.gauntlet_save_mut().map_id = new.checked_sub(75).unwrap().try_into().unwrap()
+);
+
+#[rustfmt::skip]
+editor!(
+    WhimsyEditor,
+    usize,
+    get |editor, save| save.challenge_battle.gauntlet_save().whimsy[editor.index] as usize,
+    set |editor, save, new| save.challenge_battle.gauntlet_save_mut().whimsy[editor.index] = new.try_into().unwrap(),
+    capture index: usize
 );
 
 #[rustfmt::skip]
@@ -180,7 +191,61 @@ pub fn GauntletSaveState() -> Html {
                     </Entry>
                 </Field>
             </Tile>
+
+            <Tile>
+                <WhimsySelect />
+            </Tile>
         </>
+    }
+}
+
+#[function_component]
+fn WhimsySelect() -> Html {
+    let data = use_context::<Data>().unwrap();
+    let save_context = use_context::<SaveContext>().unwrap();
+    let lang = data.to_lang();
+
+    let whimsy = Options::from(data.game().dlc.challenge.whimsy.as_ref());
+    let get_whimsy = |i| {
+        let editor = WhimsyEditor { index: i };
+        editor.get(save_context.get().get().save())
+    };
+    let update_whimsy = |i| {
+        let save_context = save_context.clone();
+        Callback::from(move |whimsy: usize| {
+            let editor = WhimsyEditor { index: i };
+            save_context.edit(move |save| editor.set(save, whimsy.wrapping_add(1)))
+        })
+    };
+
+    html! {
+        <Field>
+            <label class="label"><Text path="gauntlet_save_whimsy" /></label>
+            <Control>
+                <Field classes="is-grouped">
+                    {for (0..=1).map(|i| {
+                        let value = get_whimsy(i);
+                        html! {
+                            <Control>
+                                <Field classes={classes!("has-addons")}>
+                                    <SearchSelect<Whimsy>
+                                        current={value.checked_sub(1)}
+                                        options={whimsy.clone()}
+                                        on_select={update_whimsy(i)}
+                                        lang={lang.clone()}
+                                    />
+                                    <Control>
+                                        <Button onclick={update_whimsy(i).reform(|_| usize::MAX)} disabled={value == 0}>
+                                            <Icon><X /></Icon>
+                                        </Button>
+                                    </Control>
+                                </Field>
+                            </Control>
+                        }
+                    })}
+                </Field>
+            </Control>
+        </Field>
     }
 }
 

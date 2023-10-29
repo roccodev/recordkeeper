@@ -1,5 +1,7 @@
 use bdat::{label_hash, Label, ModernTable, TableAccessor};
-use game_data::dlc::challenge::{ChallengeData, ChallengeGame, ChallengeLang, Emblem, GauntletMap};
+use game_data::dlc::challenge::{
+    ChallengeData, ChallengeGame, ChallengeLang, Emblem, GauntletMap, Whimsy,
+};
 
 use crate::{
     lang::{filter_table_from_bdat, text_table_from_bdat},
@@ -13,6 +15,7 @@ pub fn read_game(bdat: &BdatRegistry) -> ChallengeGame {
     let gauntlet_jumps = bdat.table(label_hash!("BTL_ChSU_MapBattleLock"));
     let maps = bdat.table(label_hash!("SYS_MapList"));
     let map_resources = bdat.table(label_hash!("RSC_MapFile"));
+    let whimsy = bdat.table(label_hash!("BTL_ChSU_SettingGate"));
 
     let challenges = challenges.rows().map(read_challenge).collect();
     let gauntlets = gauntlets.rows().map(read_challenge).collect();
@@ -42,21 +45,26 @@ pub fn read_game(bdat: &BdatRegistry) -> ChallengeGame {
         .collect::<Vec<_>>();
     gauntlet_maps.dedup_by_key(|m| m.id);
 
+    let whimsy = whimsy.rows().map(read_whimsy).collect();
+
     ChallengeGame {
         challenges,
         gauntlets,
         emblems,
         gauntlet_maps: gauntlet_maps.into_boxed_slice(),
+        whimsy,
     }
 }
 
 pub fn read_lang(lang: &LangBdatRegistry) -> ChallengeLang {
     let challenges = lang.table(&Label::Hash(0x192F6292));
     let emblems = lang.table(label_hash!("msg_btl_ChSU_emblem_name"));
+    let whimsy = lang.table(label_hash!("msg_btl_ChSU_gate_caption"));
 
     ChallengeLang {
         challenges: filter_table_from_bdat(challenges),
         emblems: text_table_from_bdat(emblems),
+        whimsy: filter_table_from_bdat(whimsy),
     }
 }
 
@@ -84,5 +92,13 @@ fn read_gauntlet_map(maps: &ModernTable, resources: &ModernTable, jump: ModernRo
     GauntletMap {
         id: map.id(),
         based_on_lang_id: original_map.get(label_hash!("Name")).to_integer() as usize,
+    }
+}
+
+fn read_whimsy(row: ModernRow) -> Whimsy {
+    let caption = row.get(label_hash!("Caption")).to_integer() as usize;
+    Whimsy {
+        id: row.id(),
+        caption,
     }
 }

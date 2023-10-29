@@ -11,6 +11,7 @@ const GAUNTLET_STATE_EMBLEM_MAX: usize = 60;
 const GAUNTLET_STATE_NOTIFICATION_MAX: usize = 11;
 const GAUNTLET_STATE_JUMP_MAX: usize = 32;
 const GAUNTLET_STATE_SYS_OPEN_MAX: usize = 16;
+const GAUNTLET_STATE_WHIMSY_MAX: usize = 2;
 
 #[derive(SaveBin, Debug)]
 #[size(72)]
@@ -101,9 +102,7 @@ pub struct GauntletState {
     /// ID for `BTL_ChSU_SettingGate`. It's likely that setting both of these will
     /// open the whimsy screen when the save is loaded.
     // needs testing
-    pub whimsy_negative: u32,
-    /// ID for `BTL_ChSU_SettingGate`
-    pub whimsy_positive: u32,
+    pub whimsy: [u32; GAUNTLET_STATE_WHIMSY_MAX],
     /// 0-900
     pub chain_gauge: f32,
     /// Unsure

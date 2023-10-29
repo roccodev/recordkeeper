@@ -11,12 +11,14 @@ pub struct ChallengeGame {
     pub gauntlets: Box<[ChallengeData]>,
     pub emblems: Box<[Emblem]>,
     pub gauntlet_maps: Box<[GauntletMap]>,
+    pub whimsy: Box<[Whimsy]>,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct ChallengeLang {
     pub challenges: FilterTable,
     pub emblems: TextTable,
+    pub whimsy: FilterTable,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
@@ -36,6 +38,12 @@ pub struct Emblem {
 pub struct GauntletMap {
     pub id: usize,
     pub based_on_lang_id: usize,
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+pub struct Whimsy {
+    pub id: usize,
+    pub caption: usize,
 }
 
 impl ChallengeGame {
@@ -64,6 +72,12 @@ impl Filterable for GauntletMap {
     }
 }
 
+impl Filterable for Whimsy {
+    fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
+        language.dlc.challenge.whimsy.get(self.caption)
+    }
+}
+
 impl Nameable for Emblem {
     fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l TextEntry> {
         language.dlc.challenge.emblems.get(self.name_id)
@@ -77,6 +91,12 @@ impl Id for ChallengeData {
 }
 
 impl Id for GauntletMap {
+    fn id(&self) -> usize {
+        self.id
+    }
+}
+
+impl Id for Whimsy {
     fn id(&self) -> usize {
         self.id
     }
