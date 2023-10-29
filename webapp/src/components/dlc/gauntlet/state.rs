@@ -1,4 +1,7 @@
-use game_data::{character::Character, dlc::challenge::ChallengeData};
+use game_data::{
+    character::Character,
+    dlc::challenge::{ChallengeData, GauntletMap},
+};
 use recordkeeper::dlc::ChallengeDifficulty;
 use ybc::{Control, Field, Tile};
 use yew::prelude::*;
@@ -38,7 +41,6 @@ macro_rules! edit_num {
 
 edit_num!(IdEditor, gauntlet_id, usize);
 
-edit_num!(MapIdEditor, map_id);
 edit_num!(WeatherEditor, weather);
 edit_num!(StageEditor, last_stage);
 edit_num!(ScoreEditor, current_score);
@@ -60,6 +62,14 @@ editor!(
     usize,
     get |_, save| save.challenge_battle.gauntlet_save().get_lead_character() as usize,
     set |_, save, new| save.challenge_battle.gauntlet_save_mut().set_lead_character(new.try_into().unwrap())
+);
+
+#[rustfmt::skip]
+editor!(
+    MapIdEditor,
+    usize,
+    get |_, save| save.challenge_battle.gauntlet_save().map_id.checked_add(75).unwrap() as usize,
+    set |_, save, new| save.challenge_battle.gauntlet_save_mut().map_id = new.checked_sub(75).unwrap().try_into().unwrap()
 );
 
 #[rustfmt::skip]
@@ -94,7 +104,7 @@ pub fn GauntletSaveState() -> Html {
                     </Entry>
 
                     <Entry label="gauntlet_save_lead">
-                        <EditorSelector<LeadEditor, Character> editor={LeadEditor {}} values={data.game().characters.characters().as_ref()} />
+                        <EditorSelector<LeadEditor, Character> editor={LeadEditor {}} values={data.game().characters.characters()} />
                     </Entry>
                 </Field>
 
@@ -119,6 +129,10 @@ pub fn GauntletSaveState() -> Html {
 
                     <Entry label="gauntlet_save_no_ko">
                         <NumberInput<NoKoStreakEditor> editor={NoKoStreakEditor {}} />
+                    </Entry>
+
+                    <Entry label="gauntlet_save_map">
+                        <EditorSelector<MapIdEditor, GauntletMap> editor={MapIdEditor {}} values={data.game().dlc.challenge.gauntlet_maps.as_ref()} />
                     </Entry>
                 </Field>
             </Tile>

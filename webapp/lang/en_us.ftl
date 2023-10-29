@@ -431,3 +431,6 @@ gauntlet_save_purchase_hero = Purchase Count (Hero)
 gauntlet_save_purchase_watch = Purchase Count (Nopwatch)
 gauntlet_save_purchase_emblem = Purchase Count (Emblem)
 gauntlet_save_total_score = Score Gained
+gauntlet_save_map = Current Map
+# $id: slot ID
+gauntlet_save_whimsy = Whimsy Prompt (Slot {$id})
