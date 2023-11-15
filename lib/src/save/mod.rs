@@ -43,7 +43,7 @@ pub(crate) const SAVE_VERSION: u8 = 10;
 pub struct SaveData {
     #[assert(0xb368fa6a)]
     _magic: u32,
-    #[assert(SAVE_VERSION, SaveError::UnsupportedVersion(ACTUAL))]
+    #[assert(SAVE_VERSION, SaveError::UnsupportedVersion(ACTUAL as u32, SAVE_VERSION as u32))]
     save_version: u8,
 
     #[loc(0x10)]

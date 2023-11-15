@@ -1,4 +1,3 @@
-use crate::save::SAVE_VERSION;
 use std::convert::Infallible;
 use thiserror::Error;
 
@@ -6,10 +5,9 @@ use thiserror::Error;
 pub enum SaveError {
     #[error(
         "Unsupported version {0}. Please update the game to the latest version, \
-    then save again in the new version. (Only version {} is supported.)",
-        SAVE_VERSION
+    then save again in the new version. (Only version {1} is supported.)"
     )]
-    UnsupportedVersion(u8),
+    UnsupportedVersion(u32, u32),
     #[error("{0}")]
     AssertionError(String),
     #[error(transparent)]
