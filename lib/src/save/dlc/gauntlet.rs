@@ -48,10 +48,13 @@ pub struct GauntletState {
     pub gauntlet_id: u32,
     lead_character_id: u32,
     challenge_difficulty: u32,
-    pub map_time: MapTime<u32>,
+    /// Original game map time, used to reset after the run ends.
+    pub game_map_time: MapTime<u32>,
+    /// Original game weather, used to reset after the run ends.  
     /// ID for `RSC_WeatherSet`
-    pub weather: u32,
-    _unk_f: f32,
+    pub game_weather: u32,
+    /// Original game camera distance, used to reset after the run ends.
+    pub game_camera_distance: f32,
     /// Original game difficulty, used to reset after the run ends.
     pub game_difficulty: u32,
 

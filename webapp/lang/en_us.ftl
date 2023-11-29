@@ -404,6 +404,7 @@ challenge_reward = Reward Claimed
 gauntlet_tab_records = Records
 gauntlet_tab_emblems = Emblems
 gauntlet_tab_state = Save State
+gauntlet_stone = Blue Noponstone
 
 gauntlet_score = High Score
 gauntlet_stage = Stage Reached

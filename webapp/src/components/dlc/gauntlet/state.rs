@@ -43,7 +43,7 @@ macro_rules! edit_num {
 
 edit_num!(IdEditor, gauntlet_id, usize);
 
-edit_num!(WeatherEditor, weather);
+edit_num!(WeatherEditor, game_weather);
 edit_num!(StageEditor, last_stage);
 edit_num!(ScoreEditor, current_score);
 edit_num!(ShuffleEditor, shuffle_tickets);

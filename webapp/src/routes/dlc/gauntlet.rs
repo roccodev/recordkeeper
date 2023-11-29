@@ -6,6 +6,7 @@ use yew::prelude::*;
 use crate::{
     components::{
         dlc::gauntlet::{emblem::EmblemRow, records::GauntletRow, state::GauntletSaveState},
+        edit::{editor, NumberInput},
         page::{PageControls, PageOrganizer},
     },
     data::Data,
@@ -32,6 +33,14 @@ struct EmblemProps {
     pub end: usize,
     pub max_level: usize,
 }
+
+#[rustfmt::skip]
+editor!(
+    BlueStoneEditor,
+    u32,
+    get |_, save| save.challenge_battle.nopon_stone_blue,
+    set |_, save, new| save.challenge_battle.nopon_stone_blue = new
+);
 
 #[function_component]
 pub fn GauntletPage() -> Html {
@@ -75,10 +84,22 @@ pub fn Records() -> Html {
 
     html! {
         <Container>
-            <Field>
-                <label class="label"><Text path="difficulty" /></label>
+            <Field classes="is-grouped">
                 <Control>
-                    <DifficultySelector state={difficulty.clone()} />
+                    <Field>
+                        <label class="label"><Text path="difficulty" /></label>
+                        <Control>
+                            <DifficultySelector state={difficulty.clone()} />
+                        </Control>
+                    </Field>
+                </Control>
+                <Control>
+                    <Field>
+                        <label class="label"><Text path="gauntlet_stone" /></label>
+                        <Control>
+                            <NumberInput<BlueStoneEditor> editor={BlueStoneEditor {}} />
+                        </Control>
+                    </Field>
                 </Control>
             </Field>
 
