@@ -16,19 +16,20 @@ use crate::util::FixVec;
 use recordkeeper_macros::SaveBin;
 
 use self::character::CharacterSets;
+use self::chrono::ChronologicalData;
 use self::enemy::SoulHackAchievements;
 use self::field::FieldConfig;
 use self::flags::BitFlags;
 use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
 
 pub mod character;
+pub mod chrono;
 pub mod dlc;
 pub mod enemy;
 pub mod field;
 pub mod flags;
 pub mod item;
 pub mod menu;
-pub mod time;
 
 pub(crate) const SAVE_VERSION: u8 = 10;
 
@@ -78,7 +79,7 @@ pub struct SaveData {
     pub map_id: u16,
     pub map_time: MapTime,
 
-    /// ID for `RSC_WeatherSet`. The game only consider this if
+    /// ID for `RSC_WeatherSet`. The game only considers this if
     /// [`SaveFlag::WeatherLocked`] is set.
     pub weather: u16,
 
@@ -129,6 +130,9 @@ pub struct SaveData {
 
     #[loc(0x183000)]
     pub enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
+
+    #[loc(0x184648)]
+    pub chronological_data: ChronologicalData,
 
     #[loc(0x1911f0)]
     pub pow_augment: [PowAugment; POW_AUGMENT_NUM],

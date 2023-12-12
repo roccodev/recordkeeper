@@ -1,5 +1,4 @@
-use crate::flags::BitFlags;
-use crate::time::AmiiboTimeData;
+use crate::{chrono::amiibo::AmiiboTimeData, flags::BitFlags};
 use recordkeeper_macros::SaveBin;
 
 const FLAG_1_BIT_COUNT: usize = 20000;

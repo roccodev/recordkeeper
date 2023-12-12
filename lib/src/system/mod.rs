@@ -25,7 +25,7 @@ pub struct SystemData {
 
     /// ID for `MNU_PatchInfo`
     #[loc(0x61c)]
-    latest_patch_id: u16,
+    pub latest_patch_id: u32,
 
     /// Index is ID in `RSC_PcCostumeOpen`. In each byte, each bit is for each character.
     #[loc(0x66c)]
@@ -34,11 +34,11 @@ pub struct SystemData {
     #[loc(0x6a0)]
     _unk: u64, // new game count?
     /// One for each slot
-    save_count: [u64; 5],
+    save_counter: [u64; 5],
     /// One for each slot
-    load_count: [u64; 5],
-    pub continue_count: u64,
-    pub settings_save_count: u64,
+    load_counter: [u64; 5],
+    pub continue_counter: u64,
+    pub settings_save_counter: u64,
 }
 
 pub enum SystemFlag {
@@ -46,6 +46,7 @@ pub enum SystemFlag {
     MainGameClear = 0,
     /// Whether the main game has been cleared on any NG+ file.
     MainGameClearNgp = 1,
+    /// Whether the ability to use costumes (System Open 71) has been unlocked on any file.
     EnableCostumes = 2,
     /// Whether rewards for the Shulk amiibo have been claimed on any file.
     AmiiboRewards1 = 3,
@@ -68,5 +69,13 @@ impl SystemData {
 
     pub fn set_flag(&mut self, flag: SystemFlag, value: bool) {
         self.flags.set(flag as usize, u8::from(value).into())
+    }
+
+    pub fn get_setting(&self, option_id: usize) -> u16 {
+        self.global_settings[option_id]
+    }
+
+    pub fn set_setting(&mut self, option_id: usize, value: u16) {
+        self.global_settings[option_id] = value;
     }
 }
