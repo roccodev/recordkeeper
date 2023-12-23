@@ -12,6 +12,8 @@ pub mod edit;
 
 #[derive(SaveBin, Debug)]
 pub struct Inventory {
+    pub(crate) chronological_id_max: u32,
+
     #[loc(0x28)]
     /// `ITM_Cylinder`
     pub cylinders: [ItemSlot; 16],
@@ -109,6 +111,45 @@ impl Inventory {
             t => panic!("unsupported item type {t:?}"),
         }
     }
+
+    pub(crate) fn split_slots_mut(
+        &mut self,
+        id_a: u16,
+        id_b: u16,
+    ) -> (&mut ItemSlot, &mut ItemSlot) {
+        let (ty_a, ty_b) = (
+            ItemType::get_by_item_id(id_a),
+            ItemType::get_by_item_id(id_b),
+        );
+        let (idx_a, idx_b) = (
+            self.slots(ty_a)
+                .iter()
+                .position(|s| s.item_id() == id_a)
+                .expect("item a not found"),
+            self.slots(ty_b)
+                .iter()
+                .position(|s| s.item_id() == id_b)
+                .expect("item b not found"),
+        );
+        if ty_a == ty_b {
+            let slots = self.slots_mut(ty_a);
+            if idx_a > idx_b {
+                let (before_a, after_a) = slots.split_at_mut(idx_a);
+                (&mut after_a[0], &mut before_a[idx_b])
+            } else {
+                let (before_b, after_b) = slots.split_at_mut(idx_b);
+                (&mut before_b[idx_a], &mut after_b[0])
+            }
+        } else {
+            let (slots_a, slots_b) = (
+                self.slots_mut(ty_a) as *mut [ItemSlot],
+                self.slots_mut(ty_b) as *mut [ItemSlot],
+            );
+            // SAFETY: the two slot arrays are different, so we are just splitting
+            // the borrow. The indexing is still performed safely with bound checks.
+            unsafe { (&mut (&mut *slots_a)[idx_a], &mut (&mut *slots_b)[idx_b]) }
+        }
+    }
 }
 
 impl ItemSlot {
@@ -152,9 +193,22 @@ impl ItemSlot {
     pub fn craft_data<'s>(&self, save: &'s SaveData) -> Option<&'s CraftItemData> {
         save.accessory_crafting.get_data(self.slot_index as usize)
     }
+
+    pub(crate) fn chronological_id(&self) -> u32 {
+        self.chronological_id
+    }
+
+    pub(crate) fn set_chronological_id(&mut self, chronological_id: u32) {
+        self.chronological_id = chronological_id;
+    }
 }
 
 impl ItemType {
+    pub fn get_by_item_id(item_id: u16) -> Self {
+        //match item_id {}
+        todo!()
+    }
+
     pub fn lang_id(self) -> &'static str {
         match self {
             Self::Cylinder => "cylinder",
