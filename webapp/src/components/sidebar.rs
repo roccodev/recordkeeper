@@ -1,8 +1,8 @@
 use ybc::{Button, Icon, Menu, MenuList, Size};
 use yew::prelude::*;
 use yew_feather::{
-    BookOpen, Crosshair, Download, FilePlus, Flag, HelpCircle, Info, LifeBuoy, Map, ShoppingBag,
-    Target, TrendingUp, Triangle, Users, Watch,
+    BookOpen, Clock, Crosshair, Download, FilePlus, Flag, HelpCircle, Info, LifeBuoy, Map,
+    ShoppingBag, Target, TrendingUp, Triangle, Users, Watch,
 };
 use yew_router::prelude::{use_route, Link};
 
@@ -38,6 +38,7 @@ pub fn Sidebar() -> Html {
         Tab("base_field", html!(<Map />), Route::Field),
         Tab("base_quests", html!(<HelpCircle />), Route::Quests),
         Tab("base_ums", html!(<Crosshair />), Route::Uniques),
+        Tab("base_chrono", html!(<Clock />), Route::ChronoData),
         // Party formations if not DLC4
     ];
 

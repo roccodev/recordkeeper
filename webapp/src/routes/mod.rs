@@ -3,6 +3,7 @@ use yew_router::Routable;
 
 mod about;
 mod character;
+mod chrono;
 mod dlc;
 mod enemy;
 mod field;
@@ -47,6 +48,8 @@ pub enum Route {
     Dlc4Enemypedia,
     #[at("/flags")]
     Flags,
+    #[at("/chrono")]
+    ChronoData,
 }
 
 pub fn render(route: Route) -> Html {
@@ -67,5 +70,6 @@ pub fn render(route: Route) -> Html {
         Route::Dlc4Collepedia => html!(),
         Route::Dlc4Enemypedia => html!(),
         Route::Flags => html!(<flags::FlagList />),
+        Route::ChronoData => html!(<chrono::ChronoPage />),
     }
 }

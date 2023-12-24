@@ -44,6 +44,7 @@ menu_base_field = Field
 menu_base_quests = Quests
 menu_base_ums = Unique Monsters
 menu_base_formations = Party Formations
+menu_base_chrono = Chronological Data
 
 menu_dlc_powaugment = Inoswap
 menu_dlc_challenge = Challenge Battle
@@ -434,3 +435,11 @@ gauntlet_save_purchase_emblem = Purchase Count (Emblem)
 gauntlet_save_total_score = Score Gained
 gauntlet_save_map = Current Map
 gauntlet_save_whimsy = Whimsy Prompts
+
+# Chronological data page
+
+chrono_tab_characters = Characters
+chrono_tab_classes = Classes
+chrono_tab_items = Items
+chrono_tab_quests = Quests
+chrono_tab_npc = NPC
