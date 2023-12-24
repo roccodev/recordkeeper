@@ -103,7 +103,7 @@ pub fn Records() -> Html {
                 </Control>
             </Field>
 
-            <Tile>
+            <Tile classes="mb-2">
                 {for page_organizer.current_bounds.into_iter().map(|(s, e)| html! {
                     <Tile>
                         <RecordPage start={1 + s} end={1 + e} difficulty={*difficulty} />
@@ -130,7 +130,7 @@ pub fn Emblems() -> Html {
 
     html! {
         <Container>
-            <Tile>
+            <Tile classes="mb-2">
                 {for page_organizer.current_bounds.into_iter().map(|(s, e)| html! {
                     <Tile>
                         <EmblemPage start={1 + s} end={1 + e} max_level={max_level} />

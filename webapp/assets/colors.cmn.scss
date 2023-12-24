@@ -12,13 +12,13 @@ $link-focus: $text-on-surface;
 $link-active: $text-on-surface;
 $link: $primary;
 
-$background: $surface-alt;
+$background: $bg-dark;
 $body-background-color: $body-bg;
 $modal-card-body-background-color: $bg-dark;
 
 $aside-background-color: $body-bg;
 $aside-tools-background-color: $body-bg;
-$aside-border-color: $background;
+$aside-border-color: $surface-alt;
 
 $input-background-color: $bg-input;
 $input-border-color: $secondary;
@@ -27,13 +27,16 @@ $input-placeholder-color: $text-light;
 $button-background-color: rgba(0, 0, 0, 0.0);
 $button-border-color: $secondary;
 $button-hover-color: $text-light;
-$button-disabled-background-color: $background;
+$button-disabled-background-color: $surface-alt;
 
-$code-background-color: $background;
+$tabs-toggle-link-border-color: $secondary;
+
+$code-background-color: $surface-alt;
 $code: $text-on-surface-alt;
 
 $table-background-color: $bg-dark;
 $table-head-cell-color: $text-on-surface;
+$table-cell-border: 1px solid $surface-alt;
 
 $menu-item-active-color: $text-on-tertiary;
 $menu-item-hover-color: $text-light;
@@ -41,9 +44,11 @@ $menu-item-hover-color: $text-light;
 $navbar-background-color: $body-bg;
 $navbar-item-hover-background-color: $body-bg;
 $navbar-dropdown-background-color: $bg-dark;
+$navbar-box-shadow-color: $surface-alt;
 
 $card-background-color: $bg-dark;
-$card-footer-border-top: 1px solid $background;
+$card-footer-border-top: 1px solid $surface-alt;
 
 $pagination-hover-color: $text-light;
-$pagination-disabled-background-color: $background;
+$pagination-border-color: $secondary;
+$pagination-disabled-background-color: $surface-alt;

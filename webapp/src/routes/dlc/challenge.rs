@@ -69,7 +69,7 @@ pub fn ChallengePage() -> Html {
                 </Control>
             </Field>
 
-            <Tile>
+            <Tile classes="mb-2">
                 {for page_organizer.current_bounds.into_iter().map(|(s, e)| html! {
                     <Tile>
                         <TablePage start={1 + s} end={1 + e} difficulty={*difficulty} />

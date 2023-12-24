@@ -31,7 +31,7 @@ pub fn Quests() -> Html {
 
     html! {
         <Container>
-            <Tile>
+            <Tile classes="mb-2">
                 {for page_organizer.current_bounds.into_iter().map(|(s, e)| html! {
                     <Tile>
                         <TablePage start={start + s} end={start + e} />

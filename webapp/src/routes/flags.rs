@@ -45,7 +45,7 @@ pub fn FlagList() -> Html {
 
     html! {
         <Container>
-            <Tile classes={classes!("is-align-items-end")}>
+            <Tile classes={classes!("is-align-items-end", "mb-2")}>
                 <Tile>
                     <Field>
                         <label class="label"><Text path="flag_bits" /></label>
@@ -75,7 +75,7 @@ pub fn FlagList() -> Html {
                 </Tile>
             </Tile>
 
-            <Tile>
+            <Tile classes="mb-2">
                 {for page_organizer.current_bounds.into_iter().map(|(start, end)| html! {
                     <Tile>
                         <TablePage flag_type={*flag_type} start={start} end={end} />

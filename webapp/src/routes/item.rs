@@ -69,7 +69,7 @@ pub fn ItemInventory() -> Html {
 
     html! {
         <Container>
-            <Tile classes={classes!("is-align-items-end")}>
+            <Tile classes={classes!("is-align-items-end", "mb-2")}>
                 <Tile>
                     <Field>
                         <label class="label"><Text path="item_type" /></label>
@@ -102,7 +102,7 @@ pub fn ItemInventory() -> Html {
                 </Tile>
             </Tile>
 
-            <Tile>
+            <Tile classes="mb-2">
                 {for page_organizer.current_bounds.into_iter().map(|(start, end)| html! {
                     <Tile>
                         <TablePage items={items} options={options.clone()} item_type={*item_type} start={start} end={end} />
