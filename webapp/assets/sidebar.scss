@@ -87,6 +87,9 @@ aside.aside {
     padding: 0;
     box-shadow: $aside-box-shadow;
     background: $aside-background-color;
+    border-right-style: solid;
+    border-right-width: $aside-border-width;
+    border-right-color: $aside-border-color;
 
     .aside-tools {
         display: flex;

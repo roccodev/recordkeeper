@@ -77,7 +77,7 @@ pub fn ItemInventory() -> Html {
                             {for ITEM_TYPES.iter().map(|ty| {
                                 let item_type = item_type.clone();
                                 let classes = if ty == &*item_type {
-                                    classes!("is-info", "is-selected")
+                                    classes!("is-primary", "is-selected")
                                 } else {
                                     classes!("")
                                 };

@@ -54,7 +54,7 @@ pub fn FlagList() -> Html {
                                 let page = page.clone();
                                 let flag_type = flag_type.clone();
                                 let classes = if flag == &*flag_type {
-                                    classes!("is-info", "is-selected")
+                                    classes!("is-primary", "is-selected")
                                 } else {
                                     classes!("")
                                 };

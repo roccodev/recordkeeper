@@ -1,0 +1,49 @@
+$grey-dark: $text-on-surface;
+$beige-light: $primary;
+$beige-lighter: $tertiary;
+$grey-light: $primary;
+
+$text: $text-on-surface;
+$text-strong: $text-on-surface;
+$text-invert: $text-on-surface;
+$text-light: $text-on-surface-alt;
+$link-hover: $text-light;
+$link-focus: $text-on-surface;
+$link-active: $text-on-surface;
+$link: $primary;
+
+$background: $surface-alt;
+$body-background-color: $body-bg;
+$modal-card-body-background-color: $bg-dark;
+
+$aside-background-color: $body-bg;
+$aside-tools-background-color: $body-bg;
+$aside-border-color: $background;
+
+$input-background-color: $bg-input;
+$input-border-color: $secondary;
+$input-placeholder-color: $text-light;
+
+$button-background-color: rgba(0, 0, 0, 0.0);
+$button-border-color: $secondary;
+$button-hover-color: $text-light;
+$button-disabled-background-color: $background;
+
+$code-background-color: $background;
+$code: $text-on-surface-alt;
+
+$table-background-color: $bg-dark;
+$table-head-cell-color: $text-on-surface;
+
+$menu-item-active-color: $text-on-tertiary;
+$menu-item-hover-color: $text-light;
+
+$navbar-background-color: $body-bg;
+$navbar-item-hover-background-color: $body-bg;
+$navbar-dropdown-background-color: $bg-dark;
+
+$card-background-color: $bg-dark;
+$card-footer-border-top: 1px solid $background;
+
+$pagination-hover-color: $text-light;
+$pagination-disabled-background-color: $background;

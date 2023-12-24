@@ -86,7 +86,7 @@ fn FormationEditor(props: &FormationProps) -> Html {
 
     html! {
         <>
-            <Tabs classes={classes!("is-boxed", "is-centered")}>
+            <Tabs classes={classes!("is-toggle", "is-centered")}>
                 {for Tab::iter().map(|t| {
                     let classes = if t == *tab { classes!("is-active") } else { classes!() };
                     html!(<li class={classes}><a onclick={update_tab(t)}><Text path={t.lang()} /></a></li>)

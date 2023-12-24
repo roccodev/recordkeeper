@@ -5,14 +5,24 @@ $aside-mobile-width: $size-base * 15;
 $aside-icon-width: $size-base * 3;
 $aside-submenu-font-size: $size-base * .95;
 $aside-box-shadow: none;
-$aside-background-color: #d9d1d0;
-$aside-tools-background-color: darken($aside-background-color, 10%);
-$aside-tools-color: #575656;
+$aside-border-width: 2px;
 $sidebar-height: 3.25rem;
 $navbar-height: 2.3rem;
+
+// Fonts
+@import "fonts.scss";
+
+// Colors
+$aside-tools-color: #575656;
+@import "colors.dark.scss";
+@import "colors.cmn.scss";
 
 @import "bulma/bulma.sass";
 @import "sidebar.scss";
 @import "select.scss";
 @import "modal.scss";
 @import "card.scss";
+
+input[type="checkbox"] {
+  accent-color: $beige-light;
+}

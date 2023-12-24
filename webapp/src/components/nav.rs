@@ -28,7 +28,7 @@ pub fn Navbar() -> Html {
 fn Brand() -> Html {
     html! {
         <NavbarItem>
-            <NavbarDropdown navlink={html!(<>{BRAND_NAME}{" "}{GIT_SHA}</>)}>
+            <NavbarDropdown navlink={html!(<span class="recordkeeper-brand">{BRAND_NAME}{" "}<code>{GIT_SHA}</code></span>)}>
                 <Link<Route> classes={classes!("navbar-item")} to={Route::About}>
                     <IconText icon={html!(<Info />)} name={html!(<Text path="nav_about" />)} />
                 </Link<Route>>

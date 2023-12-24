@@ -130,7 +130,7 @@ fn DownloadButton() -> Html {
     });
 
     html! {
-        <Button classes={classes!("is-info")} disabled={!save.get().is_loaded()} onclick={on_click}>
+        <Button classes={classes!("is-primary")} disabled={!save.get().is_loaded()} onclick={on_click}>
             <span class="icon-text">
                 <Icon><Download /></Icon>
                 <span><Text path="download" /></span>
@@ -151,7 +151,7 @@ impl Tab {
                 <Link<Route> to={self.2} classes={classes!(classes)}>
                     <span class="icon-text">
                         <Icon size={Size::Small}>{self.1}</Icon>
-                        <span><Text path={format!("menu_{}", self.0)} /></span>
+                        <span class="is-family-secondary"><Text path={format!("menu_{}", self.0)} /></span>
                     </span>
                 </Link<Route>>
             </li>

@@ -102,7 +102,7 @@ where
     };
 
     let upgrade_classes = if is_upgraded {
-        classes!("button", "is-info")
+        classes!("button", "is-primary")
     } else {
         classes!("button")
     };
