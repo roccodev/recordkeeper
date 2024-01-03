@@ -43,9 +43,8 @@ impl<'ast> FieldVisitor<'ast> {
             let field_type = self.field.ty.to_token_stream();
             quote! {
                 let EXPECTED: #field_type = #assert_value;
-                // __OUT_PTR points to valid memory if the read succeeded
-                if EXPECTED != std::ptr::read(__OUT_PTR) {
-                    let ACTUAL = std::ptr::read(__OUT_PTR);
+                let ACTUAL = *__OUT_PTR;
+                if EXPECTED != ACTUAL {
                     return Err(#assert_error)
                 }
             }
@@ -54,7 +53,7 @@ impl<'ast> FieldVisitor<'ast> {
         quote! {
             #loc_code
             {
-                let __OUT_PTR = addr_of_mut!((*__BUILDING). #var_name);
+                let __OUT_PTR = &mut __BUILDING.#var_name;
                 <#type_ident as crate::io::SaveBin>::read_into(&__IN_BYTES[__POS..], __OUT_PTR)?;
                 #assert_code
             }
@@ -199,9 +198,7 @@ pub fn derive_save_deserialize(item: proc_macro::TokenStream) -> proc_macro::Tok
             type ReadError = crate::error::SaveError;
             type WriteError = crate::error::SaveError;
 
-            unsafe fn read_into(mut __IN_BYTES: &'__SRC [u8], __BUILDING: *mut Self) -> Result<(), Self::ReadError> {
-                use std::ptr::addr_of_mut;
-
+            fn read_into(mut __IN_BYTES: &'__SRC [u8], __BUILDING: &mut Self) -> Result<(), Self::ReadError> {
                 // Set up relative positions for start of struct
                 if __IN_BYTES.len() < Self::size() {
                     return Err(crate::error::SaveError::UnexpectedEof);

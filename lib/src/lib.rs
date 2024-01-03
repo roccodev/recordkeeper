@@ -43,7 +43,7 @@ impl SaveFile {
         // SAFETY: SaveBin::read_into needs to hold the invariant to never read or drop
         // the output pointer.
         unsafe {
-            SaveData::read_into(bytes, save.as_mut_ptr())?;
+            SaveData::read_into(bytes, save.assume_init_mut())?;
         }
 
         // Based on currently unstable Box::assume_init, issue 63291.
