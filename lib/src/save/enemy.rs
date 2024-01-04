@@ -1,6 +1,8 @@
 use recordkeeper_macros::SaveBin;
 use thiserror::Error;
 
+use crate::util::BoxArray;
+
 pub const ENEMY_TOMBSTONE_MAX: usize = 200;
 pub const SOUL_HACK_ACHIEVEMENT_MAX: usize = 220;
 
@@ -26,7 +28,7 @@ pub struct TombstoneTime {
 #[derive(SaveBin, Debug)]
 pub struct SoulHackAchievements {
     /// Indices from `BTL_Achievement`
-    progress: Box<[u32; SOUL_HACK_ACHIEVEMENT_MAX]>,
+    progress: BoxArray<u32, SOUL_HACK_ACHIEVEMENT_MAX>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]

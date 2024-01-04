@@ -1,3 +1,5 @@
+use std::ops::{Deref, DerefMut};
+
 use recordkeeper_macros::SaveBin;
 use thiserror::Error;
 
@@ -92,5 +94,49 @@ where
         let res = std::mem::take(&mut self.buf[len - 1]);
         self.len -= 1;
         Ok(res)
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct BoxArray<T, const N: usize> {
+    elements: Box<[T; N]>,
+}
+
+impl<T, const N: usize> Deref for BoxArray<T, N> {
+    type Target = [T; N];
+
+    fn deref(&self) -> &Self::Target {
+        &self.elements
+    }
+}
+
+impl<T, const N: usize> DerefMut for BoxArray<T, N> {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.elements
+    }
+}
+
+impl<T, const N: usize> SaveBin for BoxArray<T, N>
+where
+    T: SaveBin + std::fmt::Debug,
+    SaveError: From<<T as SaveBin>::ReadError>,
+    SaveError: From<<T as SaveBin>::WriteError>,
+{
+    type ReadError = SaveError;
+    type WriteError = T::WriteError;
+
+    fn read(bytes: &mut std::io::Cursor<&[u8]>) -> Result<Self, Self::ReadError> {
+        let mut items = Vec::with_capacity(N);
+        for _ in 0..N {
+            let item = T::read(bytes)?;
+            items.push(item);
+        }
+        let elements = items.into_boxed_slice().try_into().unwrap();
+
+        Ok(Self { elements })
+    }
+
+    fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
+        self.elements.write(bytes)
     }
 }

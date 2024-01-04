@@ -1,6 +1,6 @@
 use recordkeeper_macros::SaveBin;
 
-use crate::{error::SaveError, item::ITEM_ACCESSORY_MAX, SaveResult};
+use crate::{error::SaveError, item::ITEM_ACCESSORY_MAX, util::BoxArray, SaveResult};
 
 /// Item ID to be used to mark accessories as crafted.
 pub const CRAFTED_ITEM_ID: u16 = 793;
@@ -12,8 +12,8 @@ const MASHA_DATA_MAX: usize = 300;
 pub struct AccessoryCrafting {
     /// `0xffff` => no item. Otherwise, it's the 0-based index
     /// for the data table.
-    offsets: Box<[u16; ITEM_ACCESSORY_MAX]>,
-    data: Box<[CraftItemData; MASHA_DATA_MAX]>,
+    offsets: BoxArray<u16, ITEM_ACCESSORY_MAX>,
+    data: BoxArray<CraftItemData, MASHA_DATA_MAX>,
 }
 
 #[derive(SaveBin, Debug, Clone, Copy, PartialEq, Eq)]

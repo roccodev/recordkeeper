@@ -183,13 +183,7 @@ where
     type WriteError = T::WriteError;
 
     fn read(bytes: &mut Cursor<&[u8]>) -> Result<Self, Self::ReadError> {
-        let mut items = Vec::new();
-        for _ in 0..N {
-            let item = T::read(bytes).map_err(Into::into)?;
-            items.push(item);
-        }
-        // TODO: better to default initialize the array?
-        Ok(items.try_into().unwrap())
+        array_init::try_array_init(|_| T::read(bytes)).map_err(Into::into)
     }
 
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {

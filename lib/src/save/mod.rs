@@ -12,7 +12,7 @@ use crate::{
 };
 
 use crate::menu::MenuData;
-use crate::util::FixVec;
+use crate::util::{BoxArray, FixVec};
 use recordkeeper_macros::SaveBin;
 
 use self::character::CharacterSets;
@@ -105,8 +105,8 @@ pub struct SaveData {
     pub character_sets: CharacterSets,
 
     #[loc(0xe3a0)]
-    pub characters: Box<[Character; CHARACTER_MAX]>,
-    pub ouroboros: Box<[Ouroboros; OUROBOROS_MAX]>,
+    pub characters: BoxArray<Character, CHARACTER_MAX>,
+    pub ouroboros: BoxArray<Ouroboros, OUROBOROS_MAX>,
 
     /// ID for `BTL_Pair`
     #[loc(0x53c38)]
@@ -144,7 +144,7 @@ pub struct SaveData {
     pub challenge_battle: Box<ChallengeBattle>,
 
     #[loc(0x19afc0)]
-    pub party_formations: Box<[PartyFormation; PARTY_FORMATION_MAX]>,
+    pub party_formations: BoxArray<PartyFormation, PARTY_FORMATION_MAX>,
 
     #[loc(0x1bec5c)]
     pub dlc4: Box<Dlc4>,
