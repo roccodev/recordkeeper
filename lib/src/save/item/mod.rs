@@ -1,5 +1,3 @@
-use std::ops::{Deref, DerefMut};
-
 use recordkeeper_macros::SaveBin;
 use thiserror::Error;
 
@@ -89,28 +87,28 @@ pub struct TypeFromIntError(u32);
 impl Inventory {
     pub fn slots(&self, item_type: ItemType) -> &[ItemSlot] {
         match item_type {
-            ItemType::Cylinder => self.cylinders.deref(),
-            ItemType::Gem => self.gems.deref(),
-            ItemType::Collection => self.collectibles.deref(),
-            ItemType::Info => self.infos.deref(),
-            ItemType::Accessory => self.accessories.deref(),
-            ItemType::Precious => self.key_items.deref(),
-            ItemType::Exchange => self.exchange.deref(),
-            ItemType::Extra => self.extra.deref(),
+            ItemType::Cylinder => &*self.cylinders,
+            ItemType::Gem => &*self.gems,
+            ItemType::Collection => &*self.collectibles,
+            ItemType::Info => &*self.infos,
+            ItemType::Accessory => &*self.accessories,
+            ItemType::Precious => &*self.key_items,
+            ItemType::Exchange => &*self.exchange,
+            ItemType::Extra => &*self.extra,
             t => panic!("unsupported item type {t:?}"),
         }
     }
 
     pub fn slots_mut(&mut self, item_type: ItemType) -> &mut [ItemSlot] {
         match item_type {
-            ItemType::Cylinder => self.cylinders.deref_mut(),
-            ItemType::Gem => self.gems.deref_mut(),
-            ItemType::Collection => self.collectibles.deref_mut(),
-            ItemType::Info => self.infos.deref_mut(),
-            ItemType::Accessory => self.accessories.deref_mut(),
-            ItemType::Precious => self.key_items.deref_mut(),
-            ItemType::Exchange => self.exchange.deref_mut(),
-            ItemType::Extra => self.extra.deref_mut(),
+            ItemType::Cylinder => &mut *self.cylinders,
+            ItemType::Gem => &mut *self.gems,
+            ItemType::Collection => &mut *self.collectibles,
+            ItemType::Info => &mut *self.infos,
+            ItemType::Accessory => &mut *self.accessories,
+            ItemType::Precious => &mut *self.key_items,
+            ItemType::Exchange => &mut *self.exchange,
+            ItemType::Extra => &mut *self.extra,
             t => panic!("unsupported item type {t:?}"),
         }
     }

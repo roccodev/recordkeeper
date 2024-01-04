@@ -22,7 +22,7 @@ pub struct FixStr<const MAX: usize> {
 #[derive(SaveBin, Debug, Clone)]
 pub struct FixVec<T, const MAX: usize>
 where
-    T: SaveBin + std::fmt::Debug,
+    T: SaveBin,
     SaveError: From<<T as SaveBin>::ReadError>,
     SaveError: From<<T as SaveBin>::WriteError>,
 {
@@ -32,7 +32,7 @@ where
 
 impl<T, const MAX: usize> FixVec<T, MAX>
 where
-    T: SaveBin + std::fmt::Debug,
+    T: SaveBin,
     SaveError: From<<T as SaveBin>::ReadError>,
     SaveError: From<<T as SaveBin>::WriteError>,
 {
@@ -82,7 +82,7 @@ where
 
 impl<T, const MAX: usize> FixVec<T, MAX>
 where
-    T: Default + SaveBin + std::fmt::Debug,
+    T: Default + SaveBin,
     SaveError: From<<T as SaveBin>::ReadError>,
     SaveError: From<<T as SaveBin>::WriteError>,
 {
@@ -97,6 +97,8 @@ where
     }
 }
 
+/// Wrapper for a boxed array with a specialized
+/// read impl to avoid stack allocations.
 #[derive(Debug, Clone)]
 pub struct BoxArray<T, const N: usize> {
     elements: Box<[T; N]>,
@@ -118,7 +120,7 @@ impl<T, const N: usize> DerefMut for BoxArray<T, N> {
 
 impl<T, const N: usize> SaveBin for BoxArray<T, N>
 where
-    T: SaveBin + std::fmt::Debug,
+    T: SaveBin,
     SaveError: From<<T as SaveBin>::ReadError>,
     SaveError: From<<T as SaveBin>::WriteError>,
 {
@@ -131,9 +133,11 @@ where
             let item = T::read(bytes)?;
             items.push(item);
         }
-        let elements = items.into_boxed_slice().try_into().unwrap();
-
-        Ok(Self { elements })
+        // We already return early if we do not successfully read N elements.
+        match items.into_boxed_slice().try_into() {
+            Ok(elements) => Ok(Self { elements }),
+            Err(_) => unreachable!(),
+        }
     }
 
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {

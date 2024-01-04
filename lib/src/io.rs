@@ -71,12 +71,6 @@ pub trait SaveBin: Sized {
     ///
     /// The cursor's internal marker will be modified after the call,
     /// even if the read fails.
-    ///
-    /// ## Alternatives
-    /// If the type also implements `Default` and `Copy`, the [`read`] function from the
-    /// [`OwnedSaveBin`] trait may be used instead.
-    ///
-    /// [`read`]: OwnedSaveBin::read
     fn read(bytes: &mut Cursor<&[u8]>) -> Result<Self, Self::ReadError>;
 
     /// Writes the type to a byte buffer.
@@ -90,11 +84,6 @@ pub trait SaveBin: Sized {
     fn size() -> usize {
         std::mem::size_of::<Self>()
     }
-}
-
-pub trait OwnedSaveBin: SaveBin {
-    /// Reads the type from a byte buffer.
-    fn read(bytes: &mut Cursor<&[u8]>) -> Result<Self, Self::ReadError>;
 }
 
 macro_rules! byteorder_impl {
@@ -152,7 +141,7 @@ impl SaveBin for bool {
     type WriteError = SaveError;
 
     fn read(bytes: &mut Cursor<&[u8]>) -> Result<Self, Self::ReadError> {
-        let value = <u8 as OwnedSaveBin>::read(bytes)?;
+        let value = <u8 as SaveBin>::read(bytes)?;
         Ok(value != 0)
     }
 
@@ -176,7 +165,7 @@ impl<T> SaveBin for PhantomData<T> {
 
 impl<T, const N: usize> SaveBin for [T; N]
 where
-    T: SaveBin + std::fmt::Debug,
+    T: SaveBin,
     T::ReadError: Into<SaveError>,
 {
     type ReadError = SaveError;
@@ -215,14 +204,5 @@ impl<T: SaveBin> SaveBin for Box<T> {
 
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
         self.deref().write(bytes)
-    }
-}
-
-impl<T> OwnedSaveBin for T
-where
-    T: SaveBin + Default + Copy,
-{
-    fn read(bytes: &mut Cursor<&[u8]>) -> Result<Self, Self::ReadError> {
-        Self::read(bytes)
     }
 }
