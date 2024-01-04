@@ -143,4 +143,8 @@ where
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
         self.elements.write(bytes)
     }
+
+    fn size() -> usize {
+        <[T; N] as SaveBin>::size()
+    }
 }

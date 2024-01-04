@@ -205,4 +205,8 @@ impl<T: SaveBin> SaveBin for Box<T> {
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
         self.deref().write(bytes)
     }
+
+    fn size() -> usize {
+        T::size()
+    }
 }
