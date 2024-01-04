@@ -12,8 +12,8 @@ const MASHA_DATA_MAX: usize = 300;
 pub struct AccessoryCrafting {
     /// `0xffff` => no item. Otherwise, it's the 0-based index
     /// for the data table.
-    offsets: [u16; ITEM_ACCESSORY_MAX],
-    data: [CraftItemData; MASHA_DATA_MAX],
+    offsets: Box<[u16; ITEM_ACCESSORY_MAX]>,
+    data: Box<[CraftItemData; MASHA_DATA_MAX]>,
 }
 
 #[derive(SaveBin, Debug, Clone, Copy, PartialEq, Eq)]
@@ -93,9 +93,12 @@ impl AccessoryCrafting {
         offsets.sort_unstable();
 
         let Some((_, empty)) = offsets
-                .into_iter()
-                .zip(0..MASHA_DATA_MAX)
-                .find(|(a, b)| *a as usize != *b) else { return Err(SaveError::MashaInventoryFull) };
+            .into_iter()
+            .zip(0..MASHA_DATA_MAX)
+            .find(|(a, b)| *a as usize != *b)
+        else {
+            return Err(SaveError::MashaInventoryFull);
+        };
 
         // Place the data at the new offset.
         self.data[empty] = data;

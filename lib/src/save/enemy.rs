@@ -26,7 +26,7 @@ pub struct TombstoneTime {
 #[derive(SaveBin, Debug)]
 pub struct SoulHackAchievements {
     /// Indices from `BTL_Achievement`
-    progress: [u32; SOUL_HACK_ACHIEVEMENT_MAX],
+    progress: Box<[u32; SOUL_HACK_ACHIEVEMENT_MAX]>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]

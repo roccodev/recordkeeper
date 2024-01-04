@@ -116,13 +116,13 @@ enum CharacterChrono<'a, const R: usize, const C: usize> {
 
 #[derive(SaveBin, Debug)]
 struct TableInner<const R: usize, const C: usize> {
-    buf: [[u16; R]; C],
+    buf: Box<[[u16; R]; C]>,
 }
 
 /// Comparator (descending order) for order keys, making null values greater than every other key.
 struct NullsLastReverse<K: ChronologicalKey>(K);
 
-trait ChronologicalKey: Ord + Copy + for<'a> crate::io::SaveBin<'a> {
+trait ChronologicalKey: Ord + Copy + crate::io::SaveBin {
     fn is_null(&self) -> bool;
 }
 

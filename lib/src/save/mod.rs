@@ -77,7 +77,7 @@ pub struct SaveData {
 
     #[loc(0x68c)]
     pub map_id: u16,
-    pub map_time: MapTime,
+    pub map_time: Box<MapTime>,
 
     /// ID for `RSC_WeatherSet`. The game only considers this if
     /// [`SaveFlag::WeatherLocked`] is set.
@@ -105,8 +105,8 @@ pub struct SaveData {
     pub character_sets: CharacterSets,
 
     #[loc(0xe3a0)]
-    pub characters: [Character; CHARACTER_MAX],
-    pub ouroboros: [Ouroboros; OUROBOROS_MAX],
+    pub characters: Box<[Character; CHARACTER_MAX]>,
+    pub ouroboros: Box<[Ouroboros; OUROBOROS_MAX]>,
 
     /// ID for `BTL_Pair`
     #[loc(0x53c38)]
@@ -126,28 +126,28 @@ pub struct SaveData {
     pub map_visibility: field::map::MapBitmaps,
 
     #[loc(0x181c80)]
-    pub menu_data: MenuData,
+    pub menu_data: Box<MenuData>,
 
     #[loc(0x183000)]
     pub enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
 
     #[loc(0x184648)]
-    pub chronological_data: ChronologicalData,
+    pub chronological_data: Box<ChronologicalData>,
 
     #[loc(0x1911f0)]
     pub pow_augment: [PowAugment; POW_AUGMENT_NUM],
 
     #[loc(0x191250)]
-    pub accessory_crafting: AccessoryCrafting,
+    pub accessory_crafting: Box<AccessoryCrafting>,
 
     #[loc(0x193ed8)]
-    pub challenge_battle: ChallengeBattle,
+    pub challenge_battle: Box<ChallengeBattle>,
 
     #[loc(0x19afc0)]
-    pub party_formations: [PartyFormation; PARTY_FORMATION_MAX],
+    pub party_formations: Box<[PartyFormation; PARTY_FORMATION_MAX]>,
 
     #[loc(0x1bec5c)]
-    pub dlc4: Dlc4,
+    pub dlc4: Box<Dlc4>,
 }
 
 #[derive(SaveBin, Debug, Clone, Copy)]
@@ -172,9 +172,9 @@ pub struct Pos {
 #[derive(SaveBin, Debug)]
 pub struct MapTime<N = u16>
 where
-    N: for<'a> SaveBin<'a>,
-    SaveError: for<'a> From<<N as SaveBin<'a>>::ReadError>,
-    SaveError: for<'a> From<<N as SaveBin<'a>>::WriteError>,
+    N: SaveBin,
+    SaveError: From<<N as SaveBin>::ReadError>,
+    SaveError: From<<N as SaveBin>::WriteError>,
 {
     pub hour: N,
     pub minute: N,

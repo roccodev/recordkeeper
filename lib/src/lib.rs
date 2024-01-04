@@ -4,10 +4,9 @@ mod save;
 mod system;
 pub mod util;
 
+use std::io::Cursor;
+
 use crate::error::SaveError;
-use std::alloc::Layout;
-use std::any::{Any, TypeId};
-use std::mem::MaybeUninit;
 
 use crate::io::SaveBin;
 pub use save::*;
@@ -24,41 +23,11 @@ impl SaveFile {
     ///
     /// Both the given buffer and the parsed save file will be allocated.
     pub fn from_bytes(bytes: &[u8]) -> SaveResult<Self> {
-        // Allocate directly on the heap. The `SaveData` struct is *big*. I encountered
-        // stack overflow problems in tests.
-        let mut save: Box<MaybeUninit<SaveData>> = {
-            let layout = Layout::new::<MaybeUninit<SaveData>>();
-            assert_ne!(0, layout.size());
-
-            // SAFETY: size > 0
-            let ptr = unsafe { std::alloc::alloc(layout) };
-            if ptr.is_null() {
-                std::alloc::handle_alloc_error(layout);
-            }
-
-            // SAFETY: same behavior as Box::try_new_uninit_in
-            unsafe { Box::from_raw(ptr.cast()) }
-        };
-
-        // SAFETY: SaveBin::read_into needs to hold the invariant to never read or drop
-        // the output pointer.
-        unsafe {
-            SaveData::read_into(bytes, save.assume_init_mut())?;
-        }
-
-        // Based on currently unstable Box::assume_init, issue 63291.
-        // Also make sure that the Box is using the Global alloc, as it's also what
-        // Box::from_raw is using. Note that the incubating API handles this automatically.
-        assert_eq!(save.type_id(), TypeId::of::<Box<MaybeUninit<SaveData>>>());
-        let save = {
-            let raw = Box::into_raw(save);
-            // SAFETY: only condition is to have fully initialized data, which it is if
-            // all reads have succeeded.
-            unsafe { Box::from_raw(raw as *mut SaveData) }
-        };
+        let mut reader = Cursor::new(bytes);
+        let save = SaveData::read(&mut reader)?;
 
         Ok(Self {
-            save,
+            save: Box::new(save),
             bytes: Box::from(bytes),
         })
     }
