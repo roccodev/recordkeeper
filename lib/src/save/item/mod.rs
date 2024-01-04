@@ -3,7 +3,6 @@ use thiserror::Error;
 
 use crate::{
     dlc::{CraftItemData, CRAFTED_ITEM_ID},
-    util::BoxArray,
     SaveData,
 };
 
@@ -17,21 +16,21 @@ pub struct Inventory {
 
     #[loc(0x28)]
     /// `ITM_Cylinder`
-    pub cylinders: BoxArray<ItemSlot, 16>,
+    pub cylinders: Box<[ItemSlot; 16]>,
     /// `ITM_Gem`
-    pub gems: BoxArray<ItemSlot, 300>,
+    pub gems: Box<[ItemSlot; 300]>,
     /// `ITM_Collection`
-    pub collectibles: BoxArray<ItemSlot, 1500>,
+    pub collectibles: Box<[ItemSlot; 1500]>,
     /// `ITM_Info`, discussion info dialogues
-    pub infos: BoxArray<ItemSlot, 800>,
+    pub infos: Box<[ItemSlot; 800]>,
     /// `ITM_Accessory`
-    pub accessories: BoxArray<ItemSlot, ITEM_ACCESSORY_MAX>,
+    pub accessories: Box<[ItemSlot; ITEM_ACCESSORY_MAX]>,
     /// `ITM_Precious`
-    pub key_items: BoxArray<ItemSlot, 200>,
+    pub key_items: Box<[ItemSlot; 200]>,
     /// `ITM_Exchange` (unused item type)
-    pub exchange: BoxArray<ItemSlot, 16>,
+    pub exchange: Box<[ItemSlot; 16]>,
     /// `ITM_Extra`
-    pub extra: BoxArray<ItemSlot, 64>,
+    pub extra: Box<[ItemSlot; 64]>,
 }
 
 /// An item slot in the player's inventory.

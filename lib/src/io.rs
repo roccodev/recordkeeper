@@ -193,20 +193,35 @@ where
     }
 }
 
-impl<T: SaveBin> SaveBin for Box<T> {
+impl<T: SaveBin, const N: usize> SaveBin for Box<[T; N]>
+where
+    SaveError: From<<T as SaveBin>::ReadError>,
+    SaveError: From<<T as SaveBin>::WriteError>,
+{
     type ReadError = T::ReadError;
 
     type WriteError = T::WriteError;
 
     fn read(bytes: &mut Cursor<&[u8]>) -> Result<Self, Self::ReadError> {
-        T::read(bytes).map(Box::new)
+        // Read into a vec first to avoid large stack allocations with Box::new.
+        let mut items = Vec::with_capacity(N);
+        for _ in 0..N {
+            let item = T::read(bytes)?;
+            items.push(item);
+        }
+        // Unreachable since we return early if we do not successfully read N elements.
+        match items.into_boxed_slice().try_into() {
+            Ok(items) => Ok(items),
+            Err(_) => unreachable!(),
+        }
     }
 
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
-        self.deref().write(bytes)
+        let values: &[T; N] = &*self;
+        values.write(bytes)
     }
 
     fn size() -> usize {
-        T::size()
+        T::size() * N
     }
 }
