@@ -55,7 +55,7 @@ impl PartyFormation {
     pub fn from_save(save: &SaveData, name: FormationName) -> Self {
         Self {
             name,
-            party: save.party_characters,
+            party: save.party_characters.clone(),
             characters: save
                 .characters
                 .iter()

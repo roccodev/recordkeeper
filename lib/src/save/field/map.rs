@@ -38,7 +38,7 @@ const BITMAP_TOTAL_LEN: usize = 0x102000;
 
 #[derive(SaveBin, Debug)]
 pub struct MapBitmaps {
-    maps: [u8; BITMAP_TOTAL_LEN],
+    maps: Box<[u8; BITMAP_TOTAL_LEN]>,
 }
 
 pub struct Bitmap<'a>(&'a [u8]);

@@ -16,21 +16,21 @@ pub struct Inventory {
 
     #[loc(0x28)]
     /// `ITM_Cylinder`
-    pub cylinders: [ItemSlot; 16],
+    pub cylinders: Box<[ItemSlot; 16]>,
     /// `ITM_Gem`
-    pub gems: [ItemSlot; 300],
+    pub gems: Box<[ItemSlot; 300]>,
     /// `ITM_Collection`
-    pub collectibles: [ItemSlot; 1500],
+    pub collectibles: Box<[ItemSlot; 1500]>,
     /// `ITM_Info`, discussion info dialogues
-    pub infos: [ItemSlot; 800],
+    pub infos: Box<[ItemSlot; 800]>,
     /// `ITM_Accessory`
-    pub accessories: [ItemSlot; ITEM_ACCESSORY_MAX],
+    pub accessories: Box<[ItemSlot; ITEM_ACCESSORY_MAX]>,
     /// `ITM_Precious`
-    pub key_items: [ItemSlot; 200],
+    pub key_items: Box<[ItemSlot; 200]>,
     /// `ITM_Exchange` (unused item type)
-    pub exchange: [ItemSlot; 16],
+    pub exchange: Box<[ItemSlot; 16]>,
     /// `ITM_Extra`
-    pub extra: [ItemSlot; 64],
+    pub extra: Box<[ItemSlot; 64]>,
 }
 
 /// An item slot in the player's inventory.
@@ -86,28 +86,28 @@ pub struct TypeFromIntError(u32);
 impl Inventory {
     pub fn slots(&self, item_type: ItemType) -> &[ItemSlot] {
         match item_type {
-            ItemType::Cylinder => &self.cylinders,
-            ItemType::Gem => &self.gems,
-            ItemType::Collection => &self.collectibles,
-            ItemType::Info => &self.infos,
-            ItemType::Accessory => &self.accessories,
-            ItemType::Precious => &self.key_items,
-            ItemType::Exchange => &self.exchange,
-            ItemType::Extra => &self.extra,
+            ItemType::Cylinder => &*self.cylinders,
+            ItemType::Gem => &*self.gems,
+            ItemType::Collection => &*self.collectibles,
+            ItemType::Info => &*self.infos,
+            ItemType::Accessory => &*self.accessories,
+            ItemType::Precious => &*self.key_items,
+            ItemType::Exchange => &*self.exchange,
+            ItemType::Extra => &*self.extra,
             t => panic!("unsupported item type {t:?}"),
         }
     }
 
     pub fn slots_mut(&mut self, item_type: ItemType) -> &mut [ItemSlot] {
         match item_type {
-            ItemType::Cylinder => &mut self.cylinders,
-            ItemType::Gem => &mut self.gems,
-            ItemType::Collection => &mut self.collectibles,
-            ItemType::Info => &mut self.infos,
-            ItemType::Accessory => &mut self.accessories,
-            ItemType::Precious => &mut self.key_items,
-            ItemType::Exchange => &mut self.exchange,
-            ItemType::Extra => &mut self.extra,
+            ItemType::Cylinder => &mut *self.cylinders,
+            ItemType::Gem => &mut *self.gems,
+            ItemType::Collection => &mut *self.collectibles,
+            ItemType::Info => &mut *self.infos,
+            ItemType::Accessory => &mut *self.accessories,
+            ItemType::Precious => &mut *self.key_items,
+            ItemType::Exchange => &mut *self.exchange,
+            ItemType::Extra => &mut *self.extra,
             t => panic!("unsupported item type {t:?}"),
         }
     }

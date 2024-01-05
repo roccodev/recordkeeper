@@ -17,22 +17,22 @@ pub struct FixStr<const MAX: usize> {
 }
 
 /// Dynamic array with fixed capacity.
-#[derive(SaveBin, Debug, Clone, Copy)]
+#[derive(SaveBin, Debug, Clone)]
 pub struct FixVec<T, const MAX: usize>
 where
-    for<'a> T: SaveBin<'a>,
-    SaveError: for<'a> From<<T as SaveBin<'a>>::ReadError>,
-    SaveError: for<'a> From<<T as SaveBin<'a>>::WriteError>,
+    T: SaveBin,
+    SaveError: From<<T as SaveBin>::ReadError>,
+    SaveError: From<<T as SaveBin>::WriteError>,
 {
-    buf: [T; MAX],
+    buf: Box<[T; MAX]>,
     len: u64,
 }
 
 impl<T, const MAX: usize> FixVec<T, MAX>
 where
-    for<'a> T: SaveBin<'a>,
-    SaveError: for<'a> From<<T as SaveBin<'a>>::ReadError>,
-    SaveError: for<'a> From<<T as SaveBin<'a>>::WriteError>,
+    T: SaveBin,
+    SaveError: From<<T as SaveBin>::ReadError>,
+    SaveError: From<<T as SaveBin>::WriteError>,
 {
     pub fn get(&self, i: usize) -> Option<&T> {
         if i >= self.len() {
@@ -80,10 +80,9 @@ where
 
 impl<T, const MAX: usize> FixVec<T, MAX>
 where
-    T: Default,
-    for<'a> T: SaveBin<'a>,
-    SaveError: for<'a> From<<T as SaveBin<'a>>::ReadError>,
-    SaveError: for<'a> From<<T as SaveBin<'a>>::WriteError>,
+    T: Default + SaveBin,
+    SaveError: From<<T as SaveBin>::ReadError>,
+    SaveError: From<<T as SaveBin>::WriteError>,
 {
     pub fn try_pop(&mut self) -> Result<T, CapacityError> {
         let len = self.len();

@@ -15,19 +15,19 @@ pub const CHALLENGE_BATTLE_DIFFICULTY_MAX: usize = 3;
 pub struct ChallengeBattle {
     #[assert(6)]
     _unk: u32,
-    challenges_1_18: [Challenge; CHALLENGE_BATTLE_NUM_CHALLENGES],
+    challenges_1_18: Box<[Challenge; CHALLENGE_BATTLE_NUM_CHALLENGES]>,
 
-    gauntlet: [Gauntlet; CHALLENGE_BATTLE_NUM_GAUNTLET],
+    gauntlet: Box<[Gauntlet; CHALLENGE_BATTLE_NUM_GAUNTLET]>,
 
     #[loc(0x368)]
-    gauntlet_states: [GauntletState; CHALLENGE_BATTLE_NUM_GAUNTLET_STATES],
+    gauntlet_states: Box<[GauntletState; CHALLENGE_BATTLE_NUM_GAUNTLET_STATES]>,
 
     #[loc(0x6320)]
     challenges_19: [Challenge; 1], // easier to work with
 
     /// Actual size: number of rows in `BTL_ChSU_Emblem`
     #[loc(0x658c)]
-    emblem_shop: [EmblemItem; EMBLEM_MAX],
+    emblem_shop: Box<[EmblemItem; EMBLEM_MAX]>,
 
     #[loc(0x70cc)]
     pub nopon_stone_red: u32,
