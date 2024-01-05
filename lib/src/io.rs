@@ -172,7 +172,16 @@ where
     type WriteError = T::WriteError;
 
     fn read(bytes: &mut Cursor<&[u8]>) -> Result<Self, Self::ReadError> {
-        array_init::try_array_init(|_| T::read(bytes)).map_err(Into::into)
+        let mut items = Vec::with_capacity(N);
+        for _ in 0..N {
+            let item = T::read(bytes).map_err(Into::into)?;
+            items.push(item);
+        }
+        // Unreachable since we return early if we do not successfully read N elements.
+        match items.try_into() {
+            Ok(items) => Ok(items),
+            Err(_) => unreachable!(),
+        }
     }
 
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {

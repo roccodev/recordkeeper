@@ -40,7 +40,7 @@ pub struct BitFlags<const BITS: usize, const WORDS: usize> {
 }
 
 #[derive(SaveBin, Debug)]
-struct ByteFlags<B: SaveBin + std::fmt::Debug, const N: usize>
+struct ByteFlags<B: SaveBin, const N: usize>
 where
     SaveError: From<<B as SaveBin>::ReadError>,
     SaveError: From<<B as SaveBin>::WriteError>,
@@ -150,7 +150,7 @@ impl<B: SaveBin, const N: usize> ByteFlags<B, N>
 where
     SaveError: From<<B as SaveBin>::ReadError>,
     SaveError: From<<B as SaveBin>::WriteError>,
-    B: Copy + std::fmt::Debug,
+    B: Copy,
 {
     pub fn get(&self, index: usize) -> Option<B> {
         self.flags.get(index).copied()
