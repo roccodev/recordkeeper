@@ -3,7 +3,6 @@ use byteorder::{ByteOrder, LittleEndian, ReadBytesExt};
 use std::convert::Infallible;
 use std::io::Cursor;
 use std::marker::PhantomData;
-use std::ops::Deref;
 
 /// Provides support for reading structs from save files, and writing to portions of them.
 ///
