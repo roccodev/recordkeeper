@@ -22,7 +22,7 @@ pub struct ChallengeBattle {
     #[loc(0x368)]
     gauntlet_states: Box<[GauntletState; CHALLENGE_BATTLE_NUM_GAUNTLET_STATES]>,
 
-    #[loc(0x6320)]
+    #[loc(0x6338)]
     challenges_19: [Challenge; 1], // easier to work with
 
     /// Actual size: number of rows in `BTL_ChSU_Emblem`
