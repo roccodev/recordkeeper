@@ -38,5 +38,13 @@
     "fr_complete": {
         "bits": 1,
         "index": 21620
+    },
+    "dx_cylinder_count": {
+        "bits": 16,
+        "index": 1949
+    },
+    "dx_cylinder_level": {
+        "bits": 4,
+        "index": 2188
     }
 }

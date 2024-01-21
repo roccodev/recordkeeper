@@ -3,7 +3,11 @@ use ybc::{Container, Control, Field, Notification, Tile};
 use yew::prelude::*;
 
 use crate::{
-    components::{dlc::pow_augment::PowAugmentEditor, select::Selector},
+    components::{
+        dlc::pow_augment::PowAugmentEditor,
+        edit::{FlagEditor, NumberInput},
+        select::Selector,
+    },
     data::Data,
     lang::Text,
     save::SaveContext,
@@ -34,11 +38,29 @@ pub fn PowAugmentPage() -> Html {
     html! {
         <Container>
             <Tile classes={classes!("mb-2")}>
-                <Field>
-                    <label class="label"><Text path="pow_augment_character" /></label>
+                <Field classes="is-grouped">
                     <Control>
-                        <Selector<Character> state={char_id_state.clone()} values={data.game().characters.pow_augment_characters.as_ref()} />
+                        <Field>
+                            <label class="label"><Text path="pow_augment_character" /></label>
+                            <Control>
+                                <Selector<Character> state={char_id_state.clone()} values={data.game().characters.pow_augment_characters.as_ref()} />
+                            </Control>
+                        </Field>
                     </Control>
+                    {if !dlc4 {
+                        html! {
+                            <>
+                                <Control>
+                                    <label class="label"><Text path="pow_augment_cylinders" /></label>
+                                    <NumberInput<FlagEditor> editor={FlagEditor::from(data.game().manual.flags.dx_cylinder_count)} />
+                                </Control>
+                                <Control>
+                                    <label class="label"><Text path="pow_augment_cylinder_level" /></label>
+                                    <NumberInput<FlagEditor> editor={FlagEditor::from(data.game().manual.flags.dx_cylinder_level)} />
+                                </Control>
+                            </>
+                        }
+                    } else { html!() }}
                 </Field>
             </Tile>
             <Notification>

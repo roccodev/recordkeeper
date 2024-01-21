@@ -25,6 +25,8 @@ pub struct Flags {
     /// Main game flag, set when a save is loaded/created and there is
     /// a completed Future Redeemed save.
     pub fr_complete: Flag,
+    pub dx_cylinder_count: Flag,
+    pub dx_cylinder_level: Flag,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
