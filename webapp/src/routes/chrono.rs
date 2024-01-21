@@ -8,6 +8,7 @@ use crate::lang::Text;
 pub enum ChronoTab {
     Characters,
     Classes,
+    Quests,
     Items,
     Npc,
 }
@@ -35,6 +36,7 @@ pub fn ChronoPage() -> Html {
             {match *tab {
                 ChronoTab::Characters => html!(),
                 ChronoTab::Classes => html!(),
+                ChronoTab::Quests => html!(),
                 ChronoTab::Items => html!(),
                 ChronoTab::Npc => html!(),
             }}
@@ -47,6 +49,7 @@ impl ChronoTab {
         let id = match self {
             ChronoTab::Characters => "characters",
             ChronoTab::Classes => "classes",
+            ChronoTab::Quests => "quests",
             ChronoTab::Items => "items",
             ChronoTab::Npc => "npc",
         };
