@@ -107,6 +107,11 @@ aside.aside {
         }
     }
 
+    .menu {
+        max-height: 100%;
+        overflow: scroll;
+    }
+
     .menu-list {
         li {
             a {
