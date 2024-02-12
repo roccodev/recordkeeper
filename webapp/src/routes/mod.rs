@@ -9,6 +9,7 @@ mod enemy;
 mod field;
 mod flags;
 pub mod formation;
+mod home;
 mod item;
 mod meta;
 mod ouroboros;
@@ -54,7 +55,7 @@ pub enum Route {
 
 pub fn render(route: Route) -> Html {
     match route {
-        Route::Home => html!(),
+        Route::Home => html!(<home::Home />),
         Route::About => html!(<about::About />),
         Route::Meta => html!(<meta::SaveMeta />),
         Route::Characters => html!(<character::Characters />),

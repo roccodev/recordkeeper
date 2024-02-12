@@ -14,6 +14,10 @@ nav_source = Source
 # The project's software license
 nav_license = License
 
+# Home page translations
+home_subtitle = Xenoblade 3/Future Redeemed save editor
+home_upload = To start, open a save file with this button.
+
 -arts = Arts
 -skills = Skills
 -class = Class
