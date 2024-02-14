@@ -156,7 +156,7 @@ pub fn FormationCharacters(props: &FormationProps) -> Html {
                                     <UpdateSelector<Class>
                                         values={data.game().characters.classes()}
                                         update={open_dialog}
-                                        current={accessor.get_selected_class(save_context.get().get().save()) as usize}
+                                        current={accessor.get_selected_class(save_context.get().get_save()) as usize}
                                     />
                                 </Control>
                             </Field>
@@ -269,7 +269,7 @@ pub fn FormationCardPresent(props: &FormationStateProps) -> Html {
                         <UpdateSelector<FormationNameProfile>
                             values={data.game().formation.names.as_ref()}
                             update={name_callback}
-                            current={name_editor.get(save_context.get().get().save()) as usize}
+                            current={name_editor.get(save_context.get().get_save()) as usize}
                         />
                     </Control>
                 </Field>

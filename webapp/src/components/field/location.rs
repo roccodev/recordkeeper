@@ -40,7 +40,7 @@ pub fn LocationsPage() -> Html {
     let save_context = use_context::<SaveContext>().unwrap();
 
     // Use save map as default
-    let map_state = use_state(|| MapIdEditor {}.get(save_context.get().get().save()) as usize);
+    let map_state = use_state(|| MapIdEditor {}.get(save_context.get().get_save()) as usize);
 
     let map_id = *map_state;
     let map = data
@@ -177,7 +177,7 @@ fn LocationRow(props: &LocationProps) -> Html {
                         </Button>
                     })}
                     {location.map_jump.map(|map_jump| html! {
-                        <Button disabled={spawn_editor.get(save.get().save()) == map_jump.get()} onclick={spawn_callback(map_jump.get())}>
+                        <Button disabled={spawn_editor.get(save.get_save()) == map_jump.get()} onclick={spawn_callback(map_jump.get())}>
                             <Text path="field_location_respawn" />
                         </Button>
                     })}

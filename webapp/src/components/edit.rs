@@ -180,7 +180,7 @@ where
     let save_context = use_context::<SaveContext>().unwrap();
     let current_value = {
         let save = save_context.get();
-        props.editor.get(save.get().save())
+        props.editor.get(save.get_save())
     };
     let current_index = <E as Editor>::Target::iter()
         .position(|e| e == current_value)
@@ -208,7 +208,7 @@ pub fn CheckboxInput<E: Editor<Target = bool> + PartialEq>(props: &CheckboxInput
     let save_context = use_context::<SaveContext>().unwrap();
     let checked = {
         let save = save_context.get();
-        props.editor.get(save.get().save())
+        props.editor.get(save.get_save())
     };
 
     let editor = props.editor;
@@ -231,7 +231,7 @@ where
     let save_context = use_context::<SaveContext>().unwrap();
     let current_value = {
         let save = save_context.get();
-        props.editor.get(save.get().save())
+        props.editor.get(save.get_save())
     };
 
     let input = use_state(|| String::new());
@@ -328,7 +328,7 @@ where
     // Conveniently, this is None when the value is 0
     let current = props
         .editor
-        .get(save.get().save())
+        .get(save.get_save())
         .try_into()
         .unwrap()
         .checked_sub(1);

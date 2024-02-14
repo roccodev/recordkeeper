@@ -16,7 +16,7 @@ pub fn ScenarioFlag() -> Html {
     let data = use_context::<Data>().unwrap();
     let save = use_context::<SaveContext>().unwrap();
     let save = save.get();
-    let save = save.get().save();
+    let save = save.get_save();
 
     let scenario_editor = FlagEditor::from(data.game().manual.flags.scenario);
     let chapter = data

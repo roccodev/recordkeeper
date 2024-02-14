@@ -44,8 +44,7 @@ pub fn PowAugmentEditor(props: &PowAugmentProps) -> Html {
     }
     let char_idx = save
         .get()
-        .get()
-        .save()
+        .get_save()
         .pow_augment
         .iter()
         .position(|p| p.chr_id == char_id)

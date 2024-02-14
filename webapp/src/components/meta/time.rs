@@ -10,7 +10,7 @@ use yew::prelude::*;
 pub fn PlayTime() -> Html {
     let save_context = use_context::<SaveContext>().unwrap();
     let save = save_context.get();
-    let save = save.get().save();
+    let save = save.get_save();
 
     let (hours, mins, secs) = save.play_time.to_hours_mins_secs();
 
@@ -70,7 +70,7 @@ pub fn PlayTime() -> Html {
 pub fn Timestamps() -> Html {
     let save_context = use_context::<SaveContext>().unwrap();
     let save = save_context.get();
-    let save = save.get().save();
+    let save = save.get_save();
 
     let timestamp = save.timestamp;
 
@@ -107,7 +107,9 @@ pub fn Timestamps() -> Html {
 
 fn number_from_event(event: InputEvent, prev_value: u32) -> u32 {
     let target: Option<EventTarget> = event.target();
-    let Some(input) = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok()) else { return prev_value };
+    let Some(input) = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok()) else {
+        return prev_value;
+    };
     match u32::from_str(&input.value()) {
         Ok(n) => n,
         Err(_) => {
@@ -120,22 +122,36 @@ fn number_from_event(event: InputEvent, prev_value: u32) -> u32 {
 
 fn date_from_event(event: InputEvent, prev_time: SaveTimestamp) -> SaveTimestamp {
     let target: Option<EventTarget> = event.target();
-    let Some(input) = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok()) else { return prev_time };
+    let Some(input) = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok()) else {
+        return prev_time;
+    };
     let value = input.value();
     let mut split = value.split('-');
-    let Ok(year) = split.next().unwrap().parse() else { return prev_time };
-    let Ok(month) = split.next().unwrap().parse() else { return prev_time };
-    let Ok(day) = split.next().unwrap().parse() else { return prev_time };
+    let Ok(year) = split.next().unwrap().parse() else {
+        return prev_time;
+    };
+    let Ok(month) = split.next().unwrap().parse() else {
+        return prev_time;
+    };
+    let Ok(day) = split.next().unwrap().parse() else {
+        return prev_time;
+    };
     SaveTimestamp::from_date_time(year, month, day, prev_time.hour(), prev_time.minute())
 }
 
 fn time_from_event(event: InputEvent, prev_time: SaveTimestamp) -> SaveTimestamp {
     let target: Option<EventTarget> = event.target();
-    let Some(input) = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok()) else { return prev_time };
+    let Some(input) = target.and_then(|t| t.dyn_into::<HtmlInputElement>().ok()) else {
+        return prev_time;
+    };
     let value = input.value();
     let mut split = value.split(':');
-    let Ok(hour) = split.next().unwrap().parse() else { return prev_time };
-    let Ok(minute) = split.next().unwrap().parse() else { return prev_time };
+    let Ok(hour) = split.next().unwrap().parse() else {
+        return prev_time;
+    };
+    let Ok(minute) = split.next().unwrap().parse() else {
+        return prev_time;
+    };
     SaveTimestamp::from_date_time(
         prev_time.year(),
         prev_time.month(),

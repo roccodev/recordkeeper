@@ -55,7 +55,7 @@ where
     let data = use_context::<Data>().unwrap();
     let lang = data.to_lang();
 
-    let current = props.editor.get(save_context.get().get().save());
+    let current = props.editor.get(save_context.get().get_save());
     // TODO: get_by_id callback
     let current = props
         .possible_values
@@ -112,7 +112,7 @@ pub fn AccessoryInput(props: &AccessorySlotProps) -> Html {
     let lang = data.to_lang();
 
     // Accessory slot uses inventory slot index
-    let inventory = save.get().save().inventory.slots(ItemType::Accessory);
+    let inventory = save.get_save().inventory.slots(ItemType::Accessory);
     let inventory: Options<_> = inventory
         .iter()
         .filter_map(|slot| {
@@ -127,7 +127,7 @@ pub fn AccessoryInput(props: &AccessorySlotProps) -> Html {
         .collect();
 
     let current = props
-        .save_slot(save.get().save())
+        .save_slot(save.get_save())
         .get()
         .map(|acc| acc.slot_index() as usize);
 

@@ -97,7 +97,7 @@ pub fn UniqueMonsterRow(props: &UniqueMonsterProps) -> Html {
 fn TimeInput(props: &TimeInputProps) -> Html {
     let save_context = use_context::<SaveContext>().unwrap();
 
-    let seconds = props.editor.get(save_context.get().get().save());
+    let seconds = props.editor.get(save_context.get().get_save());
     let iso = format!("00:{:02}:{:02}", seconds / 60, seconds % 60);
 
     let update = {

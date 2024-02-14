@@ -17,7 +17,7 @@ pub fn Settings() -> Html {
     let data = use_context::<Data>().unwrap();
     let save = use_context::<SaveContext>().unwrap();
     let flags = &data.game().manual.flags;
-    let dlc4 = save.get().get().save().is_dlc4();
+    let dlc4 = save.get().get_save().is_dlc4();
 
     let ngp_editor = ToBool(flags.new_game_plus.into());
     let game_clear_editor = ToBool(flags.game_clear.into());

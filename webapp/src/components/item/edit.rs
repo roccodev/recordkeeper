@@ -51,7 +51,7 @@ pub fn ItemRow(props: &ItemEditorProps) -> Html {
         options,
     } = props.clone();
 
-    let slot = &save.get().save().inventory.slots(item_type)[index];
+    let slot = &save.get_save().inventory.slots(item_type)[index];
     let current = items
         .binary_search_by_key(&(slot.item_id() as u32), |i| i.id)
         .ok();

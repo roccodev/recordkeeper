@@ -26,10 +26,41 @@ enum MenuItem {
 #[function_component]
 pub fn Sidebar() -> Html {
     let save = use_context::<SaveContext>().unwrap();
+    let save = save.get();
+
+    let is_save = save.is_save();
+
+    html! {
+      <aside class="aside is-placed-left is-expanded">
+            <div class="aside-tools">
+                <div class="aside-tools-label buttons">
+                    <UploadButton>
+                        <Icon><FilePlus /></Icon>
+                        <span><Text path="open" /></span>
+                    </UploadButton>
+                    <DownloadButton />
+                </div>
+            </div>
+            {if save.is_loaded() {
+                if is_save {
+                    html!(<SaveSidebar />)
+                } else {
+                    html!(<SystemSidebar />)
+                }
+            } else {
+                html!()
+            }}
+      </aside>
+    }
+}
+
+#[function_component]
+fn SaveSidebar() -> Html {
+    let save = use_context::<SaveContext>().unwrap();
     let route = use_route::<Route>();
     let save = save.get();
 
-    let is_dlc4 = save.is_loaded() && save.get().save().is_dlc4();
+    let is_dlc4 = save.is_loaded() && save.get_save().is_dlc4();
 
     let mut base_menu = vec![
         Tab("base_characters", html!(<Users />), Route::Characters),
@@ -100,23 +131,15 @@ pub fn Sidebar() -> Html {
     ];
 
     html! {
-      <aside class="aside is-placed-left is-expanded">
-            <div class="aside-tools">
-                <div class="aside-tools-label buttons">
-                    <UploadButton>
-                        <Icon><FilePlus /></Icon>
-                        <span><Text path="open" /></span>
-                    </UploadButton>
-                    <DownloadButton />
-                </div>
-            </div>
-            {if save.is_loaded() {
-                html!(<Menu>{menu.into_iter().map(|i| i.into_html(route)).collect::<Html>()}</Menu>)
-            } else {
-                html!()
-            }}
-      </aside>
+        <>
+            {menu.into_iter().map(|i| i.into_html(route)).collect::<Html>()}
+        </>
     }
+}
+
+#[function_component]
+pub fn SystemSidebar() -> Html {
+    html! {}
 }
 
 #[function_component]

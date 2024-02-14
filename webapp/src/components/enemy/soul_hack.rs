@@ -84,7 +84,7 @@ where
     };
 
     let is_upgraded =
-        progress_editor.get(save_context.get().get().save()).0 == Achievement::Completed;
+        progress_editor.get(save_context.get().get_save()).0 == Achievement::Completed;
 
     let upgrade_callback = {
         let save_context = save_context.clone();

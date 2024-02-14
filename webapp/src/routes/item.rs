@@ -56,7 +56,7 @@ pub fn ItemInventory() -> Html {
     let page = use_state(|| 0);
     let save = use_context::<SaveContext>().unwrap();
     let data = use_context::<Data>().unwrap();
-    let num_slots = save.get().get().save().inventory.slots(*item_type).len();
+    let num_slots = save.get().get_save().inventory.slots(*item_type).len();
 
     // Reset page when item type changes
     let page_state = page.clone();
@@ -151,7 +151,7 @@ fn ItemFinder(props: &PageChangeProps) -> Html {
     let options = props.options.clone();
     let on_select = Callback::from(move |i: usize| {
         let item = &options.get(i).0;
-        if let Some(index) = index_of_item(&save.get().get().save().inventory, item_type, |slot| {
+        if let Some(index) = index_of_item(&save.get().get_save().inventory, item_type, |slot| {
             u32::from(slot.item_id()) == item.id
         }) {
             let next_page = index / (PAGES_PER_VIEW * ROWS_PER_PAGE);
@@ -177,7 +177,7 @@ fn FirstEmptySlot(props: &FirstEmptyProps) -> Html {
     let save = use_context::<SaveContext>().unwrap();
 
     let on_click = Callback::from(move |_: MouseEvent| {
-        if let Some(index) = index_of_item(&save.get().get().save().inventory, item_type, |slot| {
+        if let Some(index) = index_of_item(&save.get().get_save().inventory, item_type, |slot| {
             !slot.is_valid()
         }) {
             let next_page = index / (PAGES_PER_VIEW * ROWS_PER_PAGE);

@@ -18,7 +18,7 @@ pub fn PowAugmentPage() -> Html {
     let data = use_context::<Data>().unwrap();
     let save_context = use_context::<SaveContext>().unwrap();
 
-    let dlc4 = save_context.get().get().save().is_dlc4();
+    let dlc4 = save_context.get().get_save().is_dlc4();
     let char_id_state = use_state(|| {
         if dlc4 {
             36 // Matthew

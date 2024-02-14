@@ -86,5 +86,5 @@ where
         Callback::from(move |i| save.edit(move |save| editor.set(save, i)))
     };
 
-    html!(<UpdateSelector<F> update={update} values={props.values} current={editor.get(save_context.get().get().save())} />)
+    html!(<UpdateSelector<F> update={update} values={props.values} current={editor.get(save_context.get().get_save())} />)
 }

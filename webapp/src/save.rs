@@ -6,7 +6,7 @@ use std::{
 use anyhow::{anyhow, Result};
 use gloo::file::{Blob, FileReadError, ObjectUrl};
 use log::info;
-use recordkeeper::{SaveData, SaveFile, SaveResult};
+use recordkeeper::{DataFile, SaveData, SaveFile, SaveResult};
 use wasm_bindgen::JsCast;
 use web_sys::HtmlAnchorElement;
 use yew::prelude::*;
@@ -21,7 +21,7 @@ pub struct SaveManager {
 }
 
 struct SaveEntry {
-    file: SaveFile,
+    file: DataFile,
     name: String,
 }
 
@@ -73,12 +73,38 @@ pub fn SaveProvider(props: &SaveProviderProps) -> Html {
 }
 
 impl SaveManager {
-    pub fn get(&self) -> &SaveFile {
-        self.save_buffers[0].as_ref().map(|s| &s.file).unwrap()
+    pub fn get_save(&self) -> &SaveData {
+        self.save_buffers[0]
+            .as_ref()
+            .map(|s| match &s.file {
+                DataFile::Save(save) => save.save(),
+                _ => panic!("current file is not a save"),
+            })
+            .unwrap()
     }
 
-    pub fn get_mut(&mut self) -> &mut SaveFile {
-        self.save_buffers[0].as_mut().map(|s| &mut s.file).unwrap()
+    pub fn get_save_mut(&mut self) -> &mut SaveData {
+        self.save_buffers[0]
+            .as_mut()
+            .map(|s| match &mut s.file {
+                DataFile::Save(save) => save.save_mut(),
+                _ => panic!("current file is not a save"),
+            })
+            .unwrap()
+    }
+
+    pub fn is_system(&self) -> bool {
+        self.save_buffers[0]
+            .as_ref()
+            .is_some_and(|f| f.file.is_system())
+    }
+
+    /// Returns whether the save file is loaded and whether it is a
+    /// save file, as opposed to a system file.
+    pub fn is_save(&self) -> bool {
+        self.save_buffers[0]
+            .as_ref()
+            .is_some_and(|f| f.file.is_save())
     }
 
     pub fn is_loaded(&self) -> bool {
@@ -86,13 +112,16 @@ impl SaveManager {
     }
 
     fn load(&mut self, bytes: &[u8], file_name: String) -> SaveResult<()> {
-        let save = SaveFile::from_bytes(bytes)?;
+        let save = DataFile::from_bytes(bytes)?;
 
-        info!(
-            "Loaded save file, last saved {} {}",
-            save.save().timestamp.to_iso_date(),
-            save.save().timestamp.to_iso_time()
-        );
+        match &save {
+            DataFile::Save(save) => info!(
+                "Loaded save file, last saved {} {}",
+                save.save().timestamp.to_iso_date(),
+                save.save().timestamp.to_iso_time()
+            ),
+            DataFile::System(_) => info!("Loaded system file."),
+        }
 
         self.save_buffers.fill_with(|| None); // TODO replace with fill with Clone
         self.save_buffers[0] = Some(SaveEntry {
@@ -174,12 +203,12 @@ impl Reducible for SaveReducer {
             EditAction::Load(bytes, name) => handle.load(&bytes, name).map_err(Into::into),
             EditAction::Save => handle.back_up_and_save().map_err(Into::into),
             EditAction::Edit(callback) => {
-                callback(handle.get_mut().save_mut());
+                callback(handle.get_save_mut());
                 handle.mark_change();
                 Ok(())
             }
             EditAction::TryEdit(callback) => {
-                callback(handle.get_mut().save_mut()).map(|_| handle.mark_change())
+                callback(handle.get_save_mut()).map(|_| handle.mark_change())
             }
             EditAction::ClearError => Ok(()),
             EditAction::Download => handle.download(),

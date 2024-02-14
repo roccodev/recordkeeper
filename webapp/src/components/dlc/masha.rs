@@ -103,7 +103,7 @@ editor!(
 pub fn MashaModal(props: &MashaModalProps) -> Html {
     let save_context = use_context::<SaveContext>().unwrap();
     let save = save_context.get();
-    let save = save.get().save();
+    let save = save.get_save();
     let data = use_context::<Data>().unwrap();
     let lang = data.to_lang();
 
@@ -112,7 +112,9 @@ pub fn MashaModal(props: &MashaModalProps) -> Html {
         None => return html!(),
     };
 
-    let Some(craft_data) = save.inventory.slots(ItemType::Accessory)[slot].craft_data(save) else { return html!() };
+    let Some(craft_data) = save.inventory.slots(ItemType::Accessory)[slot].craft_data(save) else {
+        return html!();
+    };
 
     let level_editor = LevelEditor {
         item_slot: props.item_slot.unwrap(),

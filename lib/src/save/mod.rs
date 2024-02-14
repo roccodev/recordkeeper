@@ -32,6 +32,7 @@ pub mod item;
 pub mod menu;
 
 pub(crate) const SAVE_VERSION: u8 = 10;
+pub(crate) const SAVE_MAGIC: [u8; 4] = [0x6a, 0xfa, 0x68, 0xb3];
 
 /// Defines the save file binary structure.
 ///
@@ -42,8 +43,8 @@ pub(crate) const SAVE_VERSION: u8 = 10;
 /// [`SaveFile::from_bytes`]: crate::SaveFile::from_bytes
 #[derive(SaveBin, Debug)]
 pub struct SaveData {
-    #[assert(0xb368fa6a)]
-    _magic: u32,
+    #[assert(SAVE_MAGIC)]
+    _magic: [u8; 4],
     #[assert(SAVE_VERSION, SaveError::UnsupportedVersion(ACTUAL as u32, SAVE_VERSION as u32))]
     save_version: u8,
 

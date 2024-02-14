@@ -3,6 +3,8 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum SaveError {
+    #[error("Data file is unknown or unsupported.")]
+    UnrecognizedFormat,
     #[error(
         "Unsupported version {0}. Please update the game to the latest version, \
     then save again in the new version. (Only version {1} is supported.)"

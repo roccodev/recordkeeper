@@ -124,7 +124,7 @@ fn TaskButton(props: &TaskProps) -> Html {
         flag_index: props.task.flag,
     };
 
-    let flag_value = flag_editor.get(save.get().save());
+    let flag_value = flag_editor.get(save.get_save());
     let button_class = classes!(
         "button",
         match u8::try_from(flag_value).unwrap() {

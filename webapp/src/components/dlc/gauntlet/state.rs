@@ -208,7 +208,7 @@ fn WhimsySelect() -> Html {
     let whimsy = Options::from(data.game().dlc.challenge.whimsy.as_ref());
     let get_whimsy = |i| {
         let editor = WhimsyEditor { index: i };
-        editor.get(save_context.get().get().save())
+        editor.get(save_context.get().get_save())
     };
     let update_whimsy = |i| {
         let save_context = save_context.clone();

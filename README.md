@@ -29,7 +29,7 @@ Base game features:
 | Save file settings | :white_check_mark: | :white_check_mark: |
 | Party formations | :white_check_mark: | :white_check_mark: |
 | Chronological data (sorting, etc.) | :white_check_mark: | |
-| System file (`bf3system.sav`) | :white_check_mark: | |
+| System file (`bf3system00.sav`) | :white_check_mark: | |
 | Colony affinity | :wrench: | :wrench: |
 | NPC affinity & Collectopedia | :wrench: | :wrench: |
 

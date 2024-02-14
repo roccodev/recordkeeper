@@ -19,7 +19,7 @@ where
 {
     let save_context = use_context::<SaveContext>().unwrap();
 
-    let current = props.editor.get(save_context.get().get().save());
+    let current = props.editor.get(save_context.get().get_save());
     let current_color = props.colors[current];
 
     let back = current.wrapping_sub(1).clamp(

@@ -62,7 +62,7 @@ pub fn CharacterEditor(props: &CharacterProps) -> Html {
     let save = use_context::<SaveContext>().unwrap();
 
     let char_idx = props.char_id.checked_sub(1).unwrap();
-    let class_id = save.get().get().save().characters[char_idx].selected_class;
+    let class_id = save.get().get_save().characters[char_idx].selected_class;
 
     let accessor = CharacterAccessor::Save { idx: char_idx };
 

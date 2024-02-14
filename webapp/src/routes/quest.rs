@@ -21,7 +21,7 @@ pub fn Quests() -> Html {
     let data = use_context::<Data>().unwrap();
 
     let quests = &data.game().quests;
-    let is_dlc4 = save.get().get().save().is_dlc4();
+    let is_dlc4 = save.get().get_save().is_dlc4();
     let start = quests.start(is_dlc4);
     let end = quests.end(is_dlc4);
 

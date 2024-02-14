@@ -3,11 +3,12 @@ use recordkeeper_macros::SaveBin;
 use crate::{error::SaveError, flags::BitFlags};
 
 pub(crate) const SYSTEM_VERSION: u32 = 2;
+pub(crate) const SYSTEM_MAGIC: [u8; 4] = [0x74, 0x60, 0xab, 0xe6];
 
 #[derive(SaveBin, Debug)]
 pub struct SystemData {
-    #[assert(0xe6ab6074)]
-    _magic: u32,
+    #[assert(SYSTEM_MAGIC)]
+    _magic: [u8; 4],
     #[assert(SYSTEM_VERSION, SaveError::UnsupportedVersion(ACTUAL, SYSTEM_VERSION))]
     version: u32,
 

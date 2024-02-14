@@ -56,7 +56,7 @@ pub fn Formations() -> Html {
                     let end = (start + CARDS_PER_ROW).min(PARTY_FORMATION_MAX);
                     html! {
                         <Tile classes="is-parent">
-                            {for (start..end).map(|i| if save.get().save().party_formations[i].is_valid() {
+                            {for (start..end).map(|i| if save.get_save().party_formations[i].is_valid() {
                                 html! {
                                     <Tile classes={child_classes.clone()}>
                                         <FormationCardPresent id={i} state={current_state.clone()} />

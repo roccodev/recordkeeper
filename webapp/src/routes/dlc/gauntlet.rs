@@ -149,7 +149,7 @@ pub fn SaveState() -> Html {
 
     html! {
         <Container>
-            {if save.get().get().save().has_gauntlet_save() {
+            {if save.get().get_save().has_gauntlet_save() {
                 html!(<GauntletSaveState />)
             } else {
                 html!()

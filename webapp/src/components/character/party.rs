@@ -36,7 +36,7 @@ where
     let data = use_context::<Data>().unwrap();
     let save = save_context.get();
 
-    let party = &props.editor.get(save.get().save());
+    let party = &props.editor.get(save.get_save());
     let len = party.len();
     let characters = data.game().characters.characters();
 
