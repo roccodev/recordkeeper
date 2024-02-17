@@ -1,9 +1,20 @@
+use log::info;
 use ybc::{Icon, NavbarDropdown, NavbarFixed, NavbarItem, Size};
 use yew::prelude::*;
 use yew_feather::{Github, Info, Key};
 use yew_router::prelude::Link;
 
-use crate::{lang::Text, routes::Route, BRAND_NAME, GITHUB_URL, GIT_SHA, LICENSE_URL};
+use crate::{
+    data::{Data, DataAction},
+    lang::{Lang, Text},
+    routes::Route,
+    BRAND_NAME, GITHUB_URL, GIT_SHA, LICENSE_URL,
+};
+
+#[derive(Properties, PartialEq)]
+pub struct NavbarProps {
+    pub game_lang_state: UseStateHandle<String>,
+}
 
 #[derive(Properties, PartialEq)]
 struct IconTextProps {
@@ -11,16 +22,84 @@ struct IconTextProps {
     name: Html,
 }
 
+#[derive(Properties, PartialEq)]
+struct LangSelectProps {
+    ui: bool,
+    change_callback: Callback<String>,
+}
+
+#[derive(Properties, PartialEq)]
+struct FlagProps {
+    id: AttrValue,
+}
+
 #[function_component]
-pub fn Navbar() -> Html {
+pub fn Navbar(props: &NavbarProps) -> Html {
+    let lang_state = props.game_lang_state.clone();
+
     html! {
         <ybc::Navbar fixed={NavbarFixed::Top} classes={classes!("has-shadow")}
             navend={html! {
                 <>
+                    <LangSelect ui={true} change_callback={Callback::default()} />
+                    <LangSelect ui={false} change_callback={Callback::from(move |id| {
+                        lang_state.set(id);
+                    })} />
                     <Brand />
                 </>
             }}
         />
+    }
+}
+
+#[function_component]
+fn LangSelect(props: &LangSelectProps) -> Html {
+    let lang = use_context::<Lang>().unwrap();
+    let data = use_context::<Data>().unwrap();
+
+    let (options, meta, label) = if props.ui {
+        (
+            &lang.ui_meta,
+            lang.ui_meta(),
+            html!(<Text path="lang_ui" />),
+        )
+    } else {
+        (
+            &lang.game_meta,
+            lang.game_meta(data.lang_id()),
+            html!(<Text path="lang_game" />),
+        )
+    };
+
+    let label = html! {
+        <span class="is-flex">
+            {label}
+            {": \u{00a0}"}
+            <Flag id={meta.flag.clone()} />
+        </span>
+    };
+
+    let callback = props.change_callback.clone();
+
+    html! {
+        <NavbarItem>
+            <NavbarDropdown navlink={label}>
+                {for options.iter().map(|meta| {
+                    let callback = callback.clone();
+                    let id = meta.file.to_string();
+                    html! {
+                        <a class={classes!("navbar-item")} onclick={Callback::from(move |_| {
+                            callback.emit(id.clone());
+                        })}>
+                            <span class="is-flex">
+                                <Flag id={meta.flag.clone()} />
+                                <span class="ml-2">{&meta.name}</span>
+                            </span>
+                        </a>
+                    }
+                })}
+            </NavbarDropdown>
+        </NavbarItem>
     }
 }
 
@@ -52,4 +131,10 @@ fn IconText(props: &IconTextProps) -> Html {
             <span>{name.clone()}</span>
         </span>
     )
+}
+
+#[function_component]
+fn Flag(props: &FlagProps) -> Html {
+    let cls = format!("fi fi-{}", props.id);
+    html!(<span class={cls}>{"\u{00a0}"}</span>)
 }

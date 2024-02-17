@@ -18,10 +18,11 @@ fn App() -> Html {
     let lang = LangManager::DEFAULT_LANG;
     let lang = use_memo(|lang| LangManager::load(lang.clone()), lang);
 
-    let game_lang = data::DEFAULT_GAME_LANG;
+    let game_lang_state = use_state(|| data::DEFAULT_GAME_LANG.to_string());
     let for_future = data.clone();
+    let game_lang = (*game_lang_state).clone();
     wasm_bindgen_futures::spawn_local(async move {
-        let lang = data::load_lang(game_lang).await.expect("extra lang load");
+        let lang = data::load_lang(&game_lang).await.expect("extra lang load");
         for_future.dispatch(DataAction::ChangeLanguage(lang, game_lang));
     });
 
@@ -34,7 +35,7 @@ fn App() -> Html {
                     <SaveProvider>
                         <Router history={(*router_history).clone()} basename="/">
                             <Sidebar />
-                            <Navbar />
+                            <Navbar game_lang_state={game_lang_state} />
                             <Switch<Route> render={crate::routes::render} />
                         </Router>
                     </SaveProvider>

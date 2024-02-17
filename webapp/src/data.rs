@@ -19,13 +19,13 @@ static RES_DEFAULT_LANG: &[u8] = include_bytes!(concat!(
 pub struct DataManager {
     game_data: &'static GameData,
     current_language_data: Rc<LanguageData>,
-    lang_id: &'static str,
+    lang_id: String,
 }
 
 pub type Data = UseReducerHandle<DataManager>;
 
 pub enum DataAction {
-    ChangeLanguage(LanguageData, &'static str),
+    ChangeLanguage(LanguageData, String),
 }
 
 impl DataManager {
@@ -39,7 +39,7 @@ impl DataManager {
         Self {
             game_data: Box::leak(Box::new(game_data)),
             current_language_data: Rc::new(lang_data),
-            lang_id: DEFAULT_GAME_LANG,
+            lang_id: DEFAULT_GAME_LANG.to_string(),
         }
     }
 
@@ -53,6 +53,10 @@ impl DataManager {
 
     pub fn to_lang(&self) -> Rc<LanguageData> {
         Rc::clone(&self.current_language_data)
+    }
+
+    pub fn lang_id(&self) -> &str {
+        &self.lang_id
     }
 }
 
@@ -77,7 +81,7 @@ fn load_default_lang() -> Result<LanguageData, Box<dyn Error>> {
 
 impl PartialEq for DataManager {
     fn eq(&self, other: &Self) -> bool {
-        std::ptr::eq(self.game_data, other.game_data) && self.lang_id.eq(other.lang_id)
+        std::ptr::eq(self.game_data, other.game_data) && self.lang_id.eq(&other.lang_id)
     }
 }
 

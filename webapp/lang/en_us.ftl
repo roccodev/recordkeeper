@@ -1,3 +1,6 @@
+lang_ui = Interface
+lang_game = Game
+
 open = Open
 save = Save
 undo = Undo

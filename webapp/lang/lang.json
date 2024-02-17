@@ -1,0 +1,56 @@
+{
+    "ui": [
+        {
+            "name": "English (United Kingdom)",
+            "file": "en_us",
+            "flag": "gb"
+        }
+    ],
+    "game": [
+        {
+            "name": "English",
+            "file": "gb",
+            "flag": "gb"
+        },
+        {
+            "name": "日本語",
+            "file": "jp",
+            "flag": "jp"
+        },
+        {
+            "name": "CN_cn",
+            "file": "cn",
+            "flag": "cn"
+        },
+        {
+            "name": "CN_tw",
+            "file": "tw",
+            "flag": "tw"
+        },
+        {
+            "name": "한국어",
+            "file": "kr",
+            "flag": "kr"
+        },
+        {
+            "name": "Deutsch",
+            "file": "ge",
+            "flag": "de"
+        },
+        {
+            "name": "Español",
+            "file": "sp",
+            "flag": "es"
+        },
+        {
+            "name": "Français",
+            "file": "fr",
+            "flag": "fr"
+        },
+        {
+            "name": "Italiano",
+            "file": "it",
+            "flag": "it"
+        }
+    ]
+}

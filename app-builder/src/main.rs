@@ -26,8 +26,6 @@ pub struct LangBdatRegistry<'b> {
     tables: HashMap<Label, ModernTable<'b>>,
 }
 
-const LANG_IDS: &[&str] = &["gb"];
-
 fn main() {
     let bdat_path = std::env::args().nth(1).unwrap();
     let out_path = std::env::args().nth(2).unwrap();
@@ -39,8 +37,15 @@ fn main() {
     let out_game_data = File::create(Path::new(&out_path).join("game_data.bin")).unwrap();
     game_data::save_game_data(&game_data, out_game_data).unwrap();
 
-    for lang in LANG_IDS {
-        let lang_bdat = LangBdatRegistry::load(bdat, &bdat_path, lang);
+    let lang_dirs = std::fs::read_dir(&bdat_path)
+        .unwrap()
+        .flatten()
+        .filter(|dir| dir.path().is_dir())
+        .collect::<Vec<_>>();
+
+    for lang in lang_dirs {
+        let lang = lang.file_name().into_string().unwrap();
+        let lang_bdat = LangBdatRegistry::load(bdat, &bdat_path, &lang);
         let lang_data = read_lang_data(&lang_bdat);
         let out_lang_data =
             File::create(Path::new(&out_path).join(format!("lang_{lang}.bin"))).unwrap();
