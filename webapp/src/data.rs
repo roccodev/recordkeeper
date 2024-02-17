@@ -58,6 +58,11 @@ impl DataManager {
     pub fn lang_id(&self) -> &str {
         &self.lang_id
     }
+
+    pub fn lang_hash(&self) -> u32 {
+        let chars = self.lang_id.as_bytes();
+        (chars[0] as u32) << 8 | chars[1] as u32
+    }
 }
 
 pub async fn load_lang(lang_id: &str) -> Result<LanguageData, Box<dyn Error>> {

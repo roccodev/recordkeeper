@@ -11,6 +11,7 @@ use game_data::lang::{Filterable, Id, Nameable};
 use game_data::LanguageData;
 
 use super::{HtmlName, Options};
+use crate::data::Data;
 use crate::lang::{Lang, LangManager, Text};
 
 #[derive(Properties)]
@@ -42,18 +43,20 @@ pub fn SearchSelect<O>(props: &SearchSelectProps<O>) -> Html
 where
     O: HtmlName + Clone + 'static,
 {
+    let data = use_context::<Data>().unwrap();
     let lang = use_context::<Lang>().unwrap();
 
     let value = use_state(|| props.current);
     let value_state = value.clone();
+    let lang_id = data.lang_hash();
     use_effect_with_deps(
-        move |(_, new)| value_state.set(*new),
-        (props.options.id(), props.current),
+        move |(_, new, _)| value_state.set(*new),
+        (props.options.id(), props.current, lang_id),
     );
 
     let default_search = use_memo(
         |_| props.search_query(*value, &lang),
-        (props.options.id(), *value),
+        (props.options.id(), *value, lang_id),
     );
 
     let search_query = use_state(|| (*default_search).clone());
@@ -63,7 +66,7 @@ where
     // Refresh search query when current value is changed as a prop
     use_effect_with_deps(
         move |_| search_state.set((*default_search).clone()),
-        (props.options.id(), *value),
+        (props.options.id(), *value, lang_id),
     );
 
     if value.is_some_and(|v| v >= props.options.len()) {

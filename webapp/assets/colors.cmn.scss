@@ -44,7 +44,10 @@ $menu-item-hover-color: $text-light;
 
 $navbar-background-color: $body-bg;
 $navbar-item-hover-background-color: $body-bg;
+$navbar-item-hover-color: $link-hover;
 $navbar-dropdown-background-color: $bg-dark;
+$navbar-dropdown-item-hover-color: $link-hover;
+$navbar-dropdown-item-hover-background-color: lighten($body-bg, 10%);
 $navbar-box-shadow-color: $surface-alt;
 
 $card-background-color: $bg-dark;

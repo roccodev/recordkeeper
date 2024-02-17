@@ -8,22 +8,33 @@ use crate::save::SaveProvider;
 use crate::data;
 use crate::data::{Data, DataAction, DataManager};
 use gloo::storage::{LocalStorage, Storage};
-use unic_langid::{langid_slice, LanguageIdentifier};
+use serde::{Deserialize, Serialize};
 use yew::prelude::*;
 use yew_router::history::{AnyHistory, MemoryHistory};
 use yew_router::{Router, Switch};
+
+#[derive(Serialize, Deserialize, Clone, Default)]
+struct Preferences {
+    ui_lang: Option<String>,
+    game_lang: Option<String>,
+}
 
 #[function_component]
 fn App() -> Html {
     let data = use_reducer_eq(DataManager::load);
 
-    let ui_lang = LocalStorage::get("rkp_ui_lang")
-        .map(|s: String| s.parse().unwrap())
-        .unwrap_or(LangManager::DEFAULT_LANG);
-    let lang = use_memo(|lang| LangManager::load(lang.clone()), ui_lang);
+    let prefs_src: Preferences = LocalStorage::get("rkp_preferences").unwrap_or_default();
+    let prefs = prefs_src.clone();
 
-    let game_lang =
-        LocalStorage::get("rkp_game_lang").unwrap_or_else(|_| data::DEFAULT_GAME_LANG.to_string());
+    let lang = prefs
+        .ui_lang
+        .map(|s| s.parse().unwrap())
+        .unwrap_or(LangManager::DEFAULT_LANG);
+    let lang = use_memo(|lang| LangManager::load(lang.clone()), lang);
+
+    let game_lang = prefs
+        .game_lang
+        .unwrap_or_else(|| data::DEFAULT_GAME_LANG.to_string());
     let game_lang_state = use_state(|| game_lang);
     let for_future = data.clone();
     let game_lang = (*game_lang_state).clone();
@@ -34,8 +45,15 @@ fn App() -> Html {
 
     let router_history = use_state(|| AnyHistory::from(MemoryHistory::new()));
 
-    let game_lang_callback = Callback::from(move |id| {
-        LocalStorage::set("rkp_game_lang", &id).unwrap();
+    let prefs_callback = Callback::from(move |prefs: Preferences| {
+        LocalStorage::set("rkp_preferences", prefs).unwrap()
+    });
+
+    let game_lang_callback = Callback::from(move |id: String| {
+        prefs_callback.emit(Preferences {
+            game_lang: Some(id.clone()),
+            ..prefs_src.clone()
+        });
         game_lang_state.set(id);
     });
 
