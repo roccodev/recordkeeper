@@ -21,6 +21,7 @@ web-sys = { version = "0.3.64", default-features = false, features = [
 js-sys = "0.3.64"
 gloo = "0.9.0"
 gloo-net = "0.4.0"
+gloo-storage = "0.3.0"
 yew-router = "0.17"
 wasm-bindgen = "0.2"
 wasm-bindgen-futures = "0.4.37"

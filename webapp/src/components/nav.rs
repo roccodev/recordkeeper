@@ -1,11 +1,10 @@
-use log::info;
 use ybc::{Icon, NavbarDropdown, NavbarFixed, NavbarItem, Size};
 use yew::prelude::*;
 use yew_feather::{Github, Info, Key};
 use yew_router::prelude::Link;
 
 use crate::{
-    data::{Data, DataAction},
+    data::Data,
     lang::{Lang, Text},
     routes::Route,
     BRAND_NAME, GITHUB_URL, GIT_SHA, LICENSE_URL,
@@ -13,7 +12,7 @@ use crate::{
 
 #[derive(Properties, PartialEq)]
 pub struct NavbarProps {
-    pub game_lang_state: UseStateHandle<String>,
+    pub game_lang_callback: Callback<String>,
 }
 
 #[derive(Properties, PartialEq)]
@@ -35,7 +34,7 @@ struct FlagProps {
 
 #[function_component]
 pub fn Navbar(props: &NavbarProps) -> Html {
-    let lang_state = props.game_lang_state.clone();
+    let lang_callback = props.game_lang_callback.clone();
 
     html! {
         <ybc::Navbar fixed={NavbarFixed::Top} classes={classes!("has-shadow")}
@@ -43,7 +42,7 @@ pub fn Navbar(props: &NavbarProps) -> Html {
                 <>
                     <LangSelect ui={true} change_callback={Callback::default()} />
                     <LangSelect ui={false} change_callback={Callback::from(move |id| {
-                        lang_state.set(id);
+                        lang_callback.emit(id);
                     })} />
                     <Brand />
                 </>
