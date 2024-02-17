@@ -13,11 +13,12 @@ pub fn Home() -> Html {
                 <p class="subtitle"><Text path="home_subtitle" /></p>
                 <div class={classes!("is-flex", "is-align-items-center")}>
                     <span><Text path="home_upload" /></span>
-                    {" "}
-                    <UploadButton>
-                        <Icon><FilePlus /></Icon>
-                        <span><Text path="open" /></span>
-                    </UploadButton>
+                    <div class="ml-2">
+                        <UploadButton>
+                            <Icon><FilePlus /></Icon>
+                            <span><Text path="open" /></span>
+                        </UploadButton>
+                    </div>
                 </div>
             </Content>
         </Container>
