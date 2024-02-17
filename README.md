@@ -59,7 +59,7 @@ Future Redeemed features:
 
 ## Webapp translations
 
-The webapp is translated on [Weblate](). I am currently looking for translations for [all
+The webapp is translated on [Weblate](https://hosted.weblate.org/engage/recordkeeper/). I am currently looking for translations for [all
 languages](https://switchbrew.org/wiki/Settings_services#Language) supported by the Nintendo Switch. 
 
 I'd appreciate if you could join the effort if you have some time to spare!
