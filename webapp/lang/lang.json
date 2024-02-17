@@ -18,14 +18,14 @@
             "flag": "jp"
         },
         {
-            "name": "CN_cn",
+            "name": "汉语",
             "file": "cn",
             "flag": "cn"
         },
         {
-            "name": "CN_tw",
-            "file": "tw",
-            "flag": "tw"
+            "name": "漢語",
+            "file": "cn",
+            "flag": "cn"
         },
         {
             "name": "한국어",
