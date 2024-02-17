@@ -1,9 +1,9 @@
 {
     "ui": [
         {
-            "name": "English (United Kingdom)",
+            "name": "English (United States)",
             "file": "en_us",
-            "flag": "gb"
+            "flag": "us"
         }
     ],
     "game": [
