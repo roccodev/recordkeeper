@@ -70,7 +70,10 @@ pub async fn load_lang(lang_id: &str) -> Result<LanguageData, Box<dyn Error>> {
         return load_default_lang();
     }
 
-    let http_res = Request::get(&format!("/res/lang_{lang_id}.bin"))
+    let win = web_sys::window().unwrap();
+    let base = win.document().unwrap().base_uri().unwrap().unwrap();
+
+    let http_res = Request::get(&format!("{base}/res/lang_{lang_id}.bin"))
         .send()
         .await?;
     if !http_res.ok() && http_res.status() != 304 {

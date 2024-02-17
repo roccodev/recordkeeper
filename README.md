@@ -1,4 +1,9 @@
 # Recordkeeper
+
+![License LIB](https://img.shields.io/badge/license--lib-LGPL--3.0-orange)
+![License App](https://img.shields.io/badge/license--webapp-GPL--3.0-orange)
+[![Translation status](https://hosted.weblate.org/widget/recordkeeper/webapp/svg-badge.svg)](https://hosted.weblate.org/engage/recordkeeper/)
+
 Recordkeeper is a save editor for Xenoblade Chronicles 3. It aims to support
 the latest version of the game, along with the latest version of each DLC.
 
@@ -58,6 +63,8 @@ The webapp is translated on [Weblate](). I am currently looking for translations
 languages](https://switchbrew.org/wiki/Settings_services#Language) supported by the Nintendo Switch. 
 
 I'd appreciate if you could join the effort if you have some time to spare!
+
+[![Translation banner](https://hosted.weblate.org/widget/recordkeeper/webapp/287x66-black.png)](https://hosted.weblate.org/engage/recordkeeper/)
 
 ## License
 
