@@ -5,7 +5,7 @@ use yew_router::prelude::Link;
 
 use crate::{
     data::Data,
-    lang::{Lang, Text},
+    lang::{Lang, LangMeta, Text},
     routes::Route,
     BRAND_NAME, GITHUB_URL, GIT_SHA, LICENSE_URL,
 };
@@ -13,6 +13,7 @@ use crate::{
 #[derive(Properties, PartialEq)]
 pub struct NavbarProps {
     pub game_lang_callback: Callback<String>,
+    pub ui_lang_callback: Callback<String>,
 }
 
 #[derive(Properties, PartialEq)]
@@ -24,7 +25,7 @@ struct IconTextProps {
 #[derive(Properties, PartialEq)]
 struct LangSelectProps {
     ui: bool,
-    change_callback: Callback<String>,
+    change_callback: Callback<LangMeta>,
 }
 
 #[derive(Properties, PartialEq)]
@@ -34,15 +35,18 @@ struct FlagProps {
 
 #[function_component]
 pub fn Navbar(props: &NavbarProps) -> Html {
-    let lang_callback = props.game_lang_callback.clone();
+    let ui_lang_cb = props.ui_lang_callback.clone();
+    let game_lang_cb = props.game_lang_callback.clone();
 
     html! {
         <ybc::Navbar fixed={NavbarFixed::Top} classes={classes!("has-shadow")}
             navend={html! {
                 <>
-                    <LangSelect ui={true} change_callback={Callback::default()} />
-                    <LangSelect ui={false} change_callback={Callback::from(move |id| {
-                        lang_callback.emit(id);
+                    <LangSelect ui={true} change_callback={Callback::from(move |meta: LangMeta| {
+                        ui_lang_cb.emit(meta.lang_id.unwrap());
+                    })} />
+                    <LangSelect ui={false} change_callback={Callback::from(move |meta: LangMeta| {
+                        game_lang_cb.emit(meta.file.to_string());
                     })} />
                     <Brand />
                 </>
@@ -85,10 +89,10 @@ fn LangSelect(props: &LangSelectProps) -> Html {
             <NavbarDropdown navlink={label}>
                 {for options.iter().map(|meta| {
                     let callback = callback.clone();
-                    let id = meta.file.to_string();
+                    let cb_meta = meta.clone();
                     html! {
                         <a class={classes!("navbar-item")} onclick={Callback::from(move |_| {
-                            callback.emit(id.clone());
+                            callback.emit(cb_meta.clone());
                         })}>
                             <span class="is-flex">
                                 <Flag id={meta.flag.clone()} />

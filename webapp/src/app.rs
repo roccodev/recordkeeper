@@ -1,7 +1,7 @@
 use crate::components::nav::Navbar;
 use crate::components::sidebar::Sidebar;
 use crate::dialog::DialogRenderer;
-use crate::lang::{Lang, LangManager};
+use crate::lang::{Lang, LangManager, LangMeta};
 use crate::routes::Route;
 use crate::save::SaveProvider;
 
@@ -9,6 +9,7 @@ use crate::data;
 use crate::data::{Data, DataAction, DataManager};
 use gloo::storage::{LocalStorage, Storage};
 use serde::{Deserialize, Serialize};
+use unic_langid::LanguageIdentifier;
 use yew::prelude::*;
 use yew_router::history::{AnyHistory, MemoryHistory};
 use yew_router::{Router, Switch};
@@ -29,7 +30,9 @@ fn App() -> Html {
     let lang = prefs
         .ui_lang
         .map(|s| s.parse().unwrap())
-        .unwrap_or(LangManager::DEFAULT_LANG);
+        .unwrap_or_else(|| LangManager::get_preferred_language());
+    let lang_state = use_state(|| lang);
+    let lang = (*lang_state).clone();
     let lang = use_memo(|lang| LangManager::load(lang.clone()), lang);
 
     let game_lang = prefs
@@ -49,6 +52,19 @@ fn App() -> Html {
         LocalStorage::set("rkp_preferences", prefs).unwrap()
     });
 
+    let ui_lang_callback = {
+        let prefs_callback = prefs_callback.clone();
+        let prefs_src = prefs_src.clone();
+        Callback::from(move |lang_id: String| {
+            let id: LanguageIdentifier = lang_id.parse().unwrap();
+            prefs_callback.emit(Preferences {
+                ui_lang: Some(lang_id),
+                ..prefs_src.clone()
+            });
+            lang_state.set(id);
+        })
+    };
+
     let game_lang_callback = Callback::from(move |id: String| {
         prefs_callback.emit(Preferences {
             game_lang: Some(id.clone()),
@@ -64,7 +80,7 @@ fn App() -> Html {
                     <SaveProvider>
                         <Router history={(*router_history).clone()} basename="/">
                             <Sidebar />
-                            <Navbar game_lang_callback={game_lang_callback} />
+                            <Navbar game_lang_callback={game_lang_callback} ui_lang_callback={ui_lang_callback} />
                             <Switch<Route> render={crate::routes::render} />
                         </Router>
                     </SaveProvider>

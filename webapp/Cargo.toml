@@ -17,8 +17,7 @@ web-sys = { version = "0.3.64", default-features = false, features = [
     "File", 
     "HtmlInputElement", 
     "HtmlAnchorElement",
-    "Document",
-    "Window"
+    "Navigator",
 ] }
 js-sys = "0.3.64"
 gloo = "0.9.0"

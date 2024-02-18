@@ -1,13 +1,8 @@
-use std::borrow::Cow;
-use std::rc::Rc;
+use std::{borrow::Cow, rc::Rc};
 
-use fluent::FluentArgs;
-use fluent::FluentBundle;
-use fluent::FluentResource;
-use fluent::FluentValue;
+use fluent::{FluentArgs, FluentBundle, FluentResource, FluentValue};
 use serde::Deserialize;
-use unic_langid::langid;
-use unic_langid::LanguageIdentifier;
+use unic_langid::{langid, LanguageIdentifier};
 
 use yew::prelude::*;
 
@@ -16,12 +11,13 @@ const LANGUAGE_FILES: [(LanguageIdentifier, &str); 1] =
 static LANG_META: &str = include_str!("../lang/lang.json");
 
 pub type Lang = Rc<LangManager>;
+type Bundle = FluentBundle<FluentResource>;
 
 pub struct LangManager {
-    bundle: FluentBundle<FluentResource>,
+    bundle: Bundle,
     pub ui_meta: Vec<LangMeta>,
     pub game_meta: Vec<LangMeta>,
-    cur_ui: usize,
+    lang_id: usize,
 }
 
 #[derive(Properties, PartialEq)]
@@ -37,11 +33,12 @@ struct MetaFile {
     game: Vec<LangMeta>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct LangMeta {
     pub name: String,
     pub file: String,
     pub flag: String,
+    pub lang_id: Option<String>,
 }
 
 #[function_component]
@@ -57,31 +54,15 @@ impl LangManager {
     pub const DEFAULT_LANG: LanguageIdentifier = langid!("en-US");
 
     pub fn load(lang_id: LanguageIdentifier) -> Self {
-        let locales = if lang_id != Self::DEFAULT_LANG {
-            vec![lang_id.clone(), Self::DEFAULT_LANG]
-        } else {
-            vec![Self::DEFAULT_LANG]
-        };
-
-        let resource_text = LANGUAGE_FILES
-            .iter()
-            .find(|(lang, _)| lang == &lang_id)
-            .expect("lang file not found")
-            .1
-            .to_string();
-
-        let mut bundle = FluentBundle::new(locales);
-        bundle
-            .add_resource(FluentResource::try_new(resource_text).expect("invalid lang file"))
-            .unwrap();
-
+        let lang_id = LANGUAGE_FILES.iter().position(|l| l.0 == lang_id).unwrap();
+        let bundle = Self::create_bundle(lang_id);
         let meta: MetaFile = serde_json::from_str(LANG_META).unwrap();
 
         Self {
             bundle,
             ui_meta: meta.ui,
             game_meta: meta.game,
-            cur_ui: 0,
+            lang_id,
         }
     }
 
@@ -105,7 +86,7 @@ impl LangManager {
     }
 
     pub fn ui_meta(&self) -> &LangMeta {
-        &self.ui_meta[self.cur_ui]
+        &self.ui_meta[self.lang_id]
     }
 
     pub fn game_meta(&self, lang_id: &str) -> &LangMeta {
@@ -113,6 +94,59 @@ impl LangManager {
             .iter()
             .find(|m| m.file == lang_id)
             .expect("data lang not registered")
+    }
+
+    /// Returns the user's supported language if it is supported.
+    ///
+    /// If the user's language is not supported, [`Self::DEFAULT_LANG`]
+    /// is returned instead.
+    ///
+    /// The language preference is read from `navigator.languages`.
+    pub fn get_preferred_language() -> LanguageIdentifier {
+        let win = web_sys::window().unwrap();
+
+        for lang in win.navigator().languages() {
+            let Some(lang): Option<LanguageIdentifier> =
+                lang.as_string().and_then(|s| s.parse().ok())
+            else {
+                continue;
+            };
+            if LANGUAGE_FILES.iter().any(|l| l.0 == lang) {
+                return lang;
+            }
+        }
+
+        Self::DEFAULT_LANG
+    }
+
+    fn create_bundle(lang_id: usize) -> Bundle {
+        let language = &LANGUAGE_FILES[lang_id].0;
+        let locales = if language != &Self::DEFAULT_LANG {
+            vec![LANGUAGE_FILES[lang_id].0.clone(), Self::DEFAULT_LANG]
+        } else {
+            vec![Self::DEFAULT_LANG]
+        };
+
+        let fallback_res = FluentResource::try_new(
+            LANGUAGE_FILES
+                .iter()
+                .find(|(lang, _)| lang == &Self::DEFAULT_LANG)
+                .expect("fallback lang file not found")
+                .1
+                .to_string(),
+        )
+        .expect("invalid fallback lang file");
+
+        let mut bundle = FluentBundle::new(locales);
+        bundle.add_resource(fallback_res).unwrap();
+
+        if language != &Self::DEFAULT_LANG {
+            let resource_text = LANGUAGE_FILES[lang_id].1.to_string();
+            let res = FluentResource::try_new(resource_text).expect("invalid lang file");
+            bundle.add_resource_overriding(res);
+        }
+
+        bundle
     }
 }
 

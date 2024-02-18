@@ -3,7 +3,56 @@
         {
             "name": "English (United States)",
             "file": "en_us",
-            "flag": "us"
+            "flag": "us",
+            "lang_id": "en-US"
+        },
+        {
+            "name": "日本語",
+            "file": "jp",
+            "flag": "jp",
+            "lang_id": "jp"
+        },
+        {
+            "name": "汉语",
+            "file": "zh-Hans",
+            "flag": "cn",
+            "lang_id": "zh-Hans"
+        },
+        {
+            "name": "漢語",
+            "file": "zh-Hant",
+            "flag": "cn",
+            "lang_id": "zh-Hant"
+        },
+        {
+            "name": "한국어",
+            "file": "kr",
+            "flag": "kr",
+            "lang_id": "kr"
+        },
+        {
+            "name": "Deutsch",
+            "file": "de",
+            "flag": "de",
+            "lang_id": "de"
+        },
+        {
+            "name": "Español",
+            "file": "es",
+            "flag": "es",
+            "lang_id": "es"
+        },
+        {
+            "name": "Français",
+            "file": "fr",
+            "flag": "fr",
+            "lang_id": "fr"
+        },
+        {
+            "name": "Italiano",
+            "file": "it",
+            "flag": "it",
+            "lang_id": "it"
         }
     ],
     "game": [
