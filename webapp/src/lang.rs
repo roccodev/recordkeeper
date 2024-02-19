@@ -6,12 +6,17 @@ use unic_langid::{langid, LanguageIdentifier};
 
 use yew::prelude::*;
 
-const LANGUAGE_FILES: [(LanguageIdentifier, &str); 1] =
-    [(langid!("en-US"), include_str!("../lang/en_us.ftl"))];
 static LANG_META: &str = include_str!("../lang/lang.json");
 
 pub type Lang = Rc<LangManager>;
 type Bundle = FluentBundle<FluentResource>;
+
+mod imported {
+    // Created by build.rs
+    include!(concat!(env!("CARGO_TARGET_DIR"), "/lang_in.rs"));
+}
+
+use imported::LANGUAGE_FILES;
 
 pub struct LangManager {
     bundle: Bundle,
