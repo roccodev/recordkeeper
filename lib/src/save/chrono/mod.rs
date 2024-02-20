@@ -184,7 +184,7 @@ impl ChronologicalOrder for Inventory {
         self.chronological_id_max = max;
         // Assume item has already been registered.
         let slot = self
-            .slots_mut(ItemType::get_by_item_id(id.try_into().unwrap()))
+            .slots_mut(ItemType::get_by_item_id(id))
             .iter_mut()
             .find(|s| s.item_id() == id)
             .expect("item not yet registered");
@@ -194,21 +194,21 @@ impl ChronologicalOrder for Inventory {
 
 impl<K: ChronologicalKey> PartialOrd for NullsLastReverse<K> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self.0 != other.0 {
-            if self.0.is_null() {
-                return Some(Ordering::Greater);
-            }
-            if other.0.is_null() {
-                return Some(Ordering::Less);
-            }
-        }
-        other.0.partial_cmp(&self.0)
+        Some(self.cmp(other))
     }
 }
 
 impl<K: ChronologicalKey> Ord for NullsLastReverse<K> {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        if self.0 != other.0 {
+            if self.0.is_null() {
+                return Ordering::Greater;
+            }
+            if other.0.is_null() {
+                return Ordering::Less;
+            }
+        }
+        other.0.cmp(&self.0)
     }
 }
 

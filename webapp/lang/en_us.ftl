@@ -1,9 +1,13 @@
 lang_ui = Interface
 lang_game = Game
 
+# Button text, as in "Open a file"
 open = Open
+# Button text, as in "Save the file"
 save = Save
+# Button text, as in "Undo an action"
 undo = Undo
+# Button text, as in "Redo an action"
 redo = Redo
 download = Save & Download
 ok = OK
@@ -17,13 +21,10 @@ nav_source = Source
 # The project's software license
 nav_license = License
 
-# Home page translations
+# Home page subtitle, description
 home_subtitle = Xenoblade 3/Future Redeemed save editor
+# Home page subtitle, file upload guide
 home_upload = To start, open a save file with this button.
-
--arts = Arts
--skills = Skills
--class = Class
 
 # Objects without a registered name.
 # $id: the ID of the object
@@ -68,6 +69,7 @@ menu_danger_flags = Flags
 
 ## Save info translations
 
+# Save info time measurement
 hours = Hours
 minutes = Minutes
 seconds = Seconds
@@ -97,7 +99,7 @@ meta_fr_complete = Future Redeemed Cleared
 ## Ouroboros translations
 
 ouroboros_sp = SP
-ouroboros_linked_skills = Linked { -skills }
+ouroboros_linked_skills = Linked Skills
 ouroboros_skill_tree = Skill Tree
 
 ## Flag screen

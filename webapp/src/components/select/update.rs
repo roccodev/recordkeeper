@@ -79,7 +79,7 @@ where
     F: Filterable + PartialEq + Id + 'static,
 {
     let save_context = use_context::<SaveContext>().unwrap();
-    let editor = props.editor.clone();
+    let editor = props.editor;
 
     let update = {
         let save = save_context.clone();

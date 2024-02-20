@@ -1,10 +1,5 @@
-use game_data::{
-    character::Class,
-    lang::{Filterable, Id},
-};
-use recordkeeper::{character::class::CharacterClass, flags::BitFlags, SaveData};
+use recordkeeper::{flags::BitFlags, SaveData};
 use strum::{EnumIter, IntoEnumIterator};
-use web_sys::HtmlSelectElement;
 use ybc::{Control, Field, Notification, Tile};
 use yew::prelude::*;
 
@@ -13,14 +8,10 @@ use crate::{
     components::{
         character::class::ClassAccessor,
         edit::{editor, CheckboxInput},
-        select::HtmlSelect,
     },
-    data::Data,
     lang::Text,
     save::SaveContext,
 };
-
-use super::edit::Editor;
 
 mod appearance;
 pub mod class;
@@ -34,7 +25,7 @@ mod util;
 editor!(
     CharacterSetEditor, 
     bool,
-    get |editor, save| editor.set.get(&save).get(editor.char_idx).unwrap() != 0,
+    get |editor, save| editor.set.get(save).get(editor.char_idx).unwrap() != 0,
     set |editor, save, new| editor.set.get_mut(save).set(editor.char_idx, u8::from(new).into()),
     capture set: CharacterSet, char_idx: usize
 );

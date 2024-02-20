@@ -1,20 +1,16 @@
-use std::fmt::Debug;
-
 use game_data::character::{Attachment, Costume};
 use recordkeeper::character::CharacterFlag;
 use strum::IntoEnumIterator;
-use ybc::{Button, Control, Field, Icon, Tile};
+use ybc::{Control, Field, Tile};
 use yew::prelude::*;
-use yew_feather::X;
 
 use crate::{
     components::{
-        edit::{editor, CheckboxInput, Editor, NumberInput, SearchInput},
-        select::{HtmlName, Options, SearchSelect},
+        edit::{editor, CheckboxInput, NumberInput, SearchInput},
+        select::Options,
     },
     data::Data,
     lang::Text,
-    save::SaveContext,
 };
 
 use super::CharacterAccessor;
@@ -106,14 +102,12 @@ pub fn Appearance(props: &AppearanceProps) -> Html {
                 html! {
                     <Tile>
                         <Field classes={classes!("is-grouped", "is-grouped-multiline")}>
-                            {for CharacterFlag::iter().filter_map(|flag| {
-                                Some(html! {
-                                    <Control>
-                                        <CheckboxInput<CharacterFlagEditor> editor={CharacterFlagEditor { char_idx: idx, flag }}>
-                                            {" "}<Text path={flag.lang_id()} />
-                                        </CheckboxInput<CharacterFlagEditor>>
-                                    </Control>
-                                })
+                            {for CharacterFlag::iter().map(|flag| html!{
+                                <Control>
+                                    <CheckboxInput<CharacterFlagEditor> editor={CharacterFlagEditor { char_idx: idx, flag }}>
+                                        {" "}<Text path={flag.lang_id()} />
+                                    </CheckboxInput<CharacterFlagEditor>>
+                                </Control>
                             })}
                         </Field>
                     </Tile>
@@ -142,9 +136,6 @@ impl FlagBox for CharacterFlag {
     }
 
     fn is_dlc4(&self) -> bool {
-        match self {
-            Self::HasEyepatch | Self::UnloadDlcCostume => false,
-            _ => true,
-        }
+        !matches!(self, Self::HasEyepatch | Self::UnloadDlcCostume)
     }
 }

@@ -152,7 +152,7 @@ impl TryFrom<u32> for Type {
     type Error = <ItemType as TryFrom<u32>>::Error;
 
     fn try_from(value: u32) -> Result<Self, Self::Error> {
-        ItemType::try_from(value).map(|t| Self(t))
+        ItemType::try_from(value).map(Self)
     }
 }
 

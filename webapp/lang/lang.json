@@ -26,9 +26,9 @@
         },
         {
             "name": "한국어",
-            "file": "kr",
+            "file": "ko",
             "flag": "kr",
-            "lang_id": "kr"
+            "lang_id": "ko"
         },
         {
             "name": "Deutsch",

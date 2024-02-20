@@ -1,7 +1,7 @@
 use crate::components::nav::Navbar;
 use crate::components::sidebar::Sidebar;
 use crate::dialog::DialogRenderer;
-use crate::lang::{Lang, LangManager, LangMeta};
+use crate::lang::{Lang, LangManager};
 use crate::routes::Route;
 use crate::save::SaveProvider;
 
@@ -30,7 +30,7 @@ fn App() -> Html {
     let lang = prefs
         .ui_lang
         .map(|s| s.parse().unwrap())
-        .unwrap_or_else(|| LangManager::get_preferred_language());
+        .unwrap_or_else(LangManager::get_preferred_language);
     let lang_state = use_state(|| lang);
     let lang = (*lang_state).clone();
     let lang = use_memo(|lang| LangManager::load(lang.clone()), lang);

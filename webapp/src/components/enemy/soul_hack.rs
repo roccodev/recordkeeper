@@ -6,7 +6,7 @@ use game_data::{
     lang::{Id, Nameable},
 };
 use recordkeeper::{enemy::Achievement, flags::FlagType};
-use ybc::{Button, Container, Control, Field, Table, Tag};
+use ybc::{Button, Container, Control, Field, Table};
 use yew::prelude::*;
 
 use crate::{

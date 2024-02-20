@@ -50,7 +50,7 @@ pub fn FlagList() -> Html {
                     <Field>
                         <label class="label"><Text path="flag_bits" /></label>
                         <Buttons classes={classes!("has-addons")}>
-                            {for FLAG_TYPES.into_iter().map(|flag| {
+                            {for FLAG_TYPES.iter().map(|flag| {
                                 let page = page.clone();
                                 let flag_type = flag_type.clone();
                                 let classes = if flag == &*flag_type {
@@ -104,7 +104,7 @@ fn TablePage(props: &TableProps) -> Html {
             <tbody>
                 {for (props.start..=props.end).map(|index| {
                     let editor = FlagEditor {
-                        flag_type: flag_type,
+                        flag_type,
                         flag_index: index
                     };
 

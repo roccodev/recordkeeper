@@ -6,12 +6,11 @@ use yew::prelude::*;
 use super::MetaFlagEditor;
 use crate::{
     components::{
-        edit::{editor, CheckboxInput, Editor, NumberInput, StringInput},
-        select::{EditorSelector, UpdateSelector},
+        edit::{editor, CheckboxInput, NumberInput, StringInput},
+        select::EditorSelector,
     },
     data::Data,
     lang::Text,
-    save::SaveContext,
     util::FiniteF32,
 };
 

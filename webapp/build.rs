@@ -1,3 +1,4 @@
+use std::fmt::Write;
 use std::path::Path;
 
 use serde::Deserialize;
@@ -25,13 +26,14 @@ pub fn main() {
     let files = lang_info
         .ui
         .into_iter()
-        .map(|l| {
-            format!(
+        .fold(String::new(), |mut output, l| {
+            let _ = write!(
+                output,
                 r#" (langid!("{}"), include_str!("{lang_dir}/{}.ftl")), "#,
                 l.lang_id, l.file
-            )
-        })
-        .collect::<String>();
+            );
+            output
+        });
 
     let contents = format!(
         r#"

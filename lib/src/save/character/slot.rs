@@ -17,7 +17,7 @@ where
 {
     /// Returns the current value, or [`None`] if the slot is empty.
     pub fn get(&self) -> Option<N> {
-        (!self.is_empty()).then(|| self.0)
+        (!self.is_empty()).then_some(self.0)
     }
 }
 
@@ -28,7 +28,7 @@ where
 {
     /// Returns the current value, or [`None`] if the slot is empty.
     pub fn get(&self) -> Option<N> {
-        (!self.is_empty()).then(|| *self.0)
+        (!self.is_empty()).then_some(*self.0)
     }
 
     /// Updates the current value. Accepts [`Some`] for a valid entry

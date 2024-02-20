@@ -100,7 +100,6 @@ pub fn FormationCharacters(props: &FormationProps) -> Html {
         let id = props.id;
         move |class_id: usize, import: bool| {
             let save_context = save_context.clone();
-            let id = id;
             Callback::from(move |_| {
                 save_context.edit(move |save| {
                     // Transfer new class data from save file

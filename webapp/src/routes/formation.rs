@@ -1,6 +1,6 @@
 use recordkeeper::character::formation::PARTY_FORMATION_MAX;
 use strum::{EnumIter, IntoEnumIterator};
-use ybc::{Breadcrumb, Button, Container, Tabs, Tile};
+use ybc::{Breadcrumb, Container, Tabs, Tile};
 use yew::prelude::*;
 
 use crate::{

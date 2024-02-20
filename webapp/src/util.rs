@@ -4,7 +4,7 @@ use std::{
     str::FromStr,
 };
 
-#[derive(Clone, Copy, Debug, PartialOrd, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct FiniteF32(f32);
 
 #[derive(Clone, Copy, Debug)]
@@ -20,13 +20,25 @@ impl TryFrom<f32> for FiniteF32 {
     type Error = FromFloatError;
 
     fn try_from(value: f32) -> Result<Self, Self::Error> {
-        value.is_finite().then(|| Self(value)).ok_or(FromFloatError)
+        value
+            .is_finite()
+            .then_some(Self(value))
+            .ok_or(FromFloatError)
     }
 }
 
 impl Ord for FiniteF32 {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        let Some(ord) = self.0.partial_cmp(&other.0) else {
+            unreachable!()
+        };
+        ord
+    }
+}
+
+impl PartialOrd for FiniteF32 {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 

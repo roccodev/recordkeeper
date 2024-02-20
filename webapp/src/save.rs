@@ -6,7 +6,7 @@ use std::{
 use anyhow::{anyhow, Result};
 use gloo::file::{Blob, FileReadError, ObjectUrl};
 use log::info;
-use recordkeeper::{DataFile, SaveData, SaveFile, SaveResult};
+use recordkeeper::{DataFile, SaveData, SaveResult};
 use wasm_bindgen::JsCast;
 use web_sys::HtmlAnchorElement;
 use yew::prelude::*;

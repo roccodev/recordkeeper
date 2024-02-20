@@ -1,7 +1,6 @@
 use std::borrow::Cow;
 
-use recordkeeper::flags::FlagType;
-use ybc::{Control, Field, Select, Tile, Title};
+use ybc::{Control, Field, Tile, Title};
 use yew::prelude::*;
 
 use crate::{

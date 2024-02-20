@@ -1,5 +1,5 @@
 use crate::{
-    dlc::{AccessoryCrafting, CraftItemData, CRAFTED_ITEM_ID},
+    dlc::{AccessoryCrafting, CraftItemData},
     SaveData, SaveResult,
 };
 

@@ -5,7 +5,7 @@ use game_data::{
     quest::{PurposeTask, QuestPurpose},
 };
 use recordkeeper::flags::FlagType;
-use ybc::{Button, Buttons, Modal, Table};
+use ybc::{Button, Buttons, Table};
 use yew::prelude::*;
 
 use crate::{

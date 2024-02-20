@@ -50,7 +50,7 @@ pub struct LangMeta {
 pub fn Text(props: &TextProps) -> Html {
     let lang = use_context::<Lang>().unwrap();
     let key = props.path.as_cow().to_string(); // TODO
-    let args = FluentArgs::from(props.args.iter().cloned().collect());
+    let args = props.args.iter().cloned().collect();
     let translated = lang.translate_with_args(key, Some(&args));
     html! {translated}
 }
@@ -75,10 +75,10 @@ impl LangManager {
         self.translate_with_args(key, None)
     }
 
-    pub fn translate_with_args<'args, 'bundle>(
+    pub fn translate_with_args<'bundle>(
         &'bundle self,
         key: impl Into<Cow<'static, str>>,
-        args: Option<&'bundle FluentArgs<'args>>,
+        args: Option<&'bundle FluentArgs<'_>>,
     ) -> Cow<str> {
         let key = key.into();
         let message = match self.bundle.get_message(&key) {

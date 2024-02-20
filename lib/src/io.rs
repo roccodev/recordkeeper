@@ -225,7 +225,7 @@ where
     }
 
     fn write(&self, bytes: &mut [u8]) -> Result<(), Self::WriteError> {
-        let values: &[T; N] = &*self;
+        let values: &[T; N] = self;
         values.write(bytes)
     }
 

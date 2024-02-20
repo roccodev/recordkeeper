@@ -65,7 +65,7 @@ pub fn ItemInventory() -> Html {
     let page_organizer = PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, num_slots);
 
     let items: &'static [Item] = data.game().items.items_by_type(*item_type);
-    let options: Options<HtmlItem> = items.into_iter().copied().map(HtmlItem).collect();
+    let options: Options<HtmlItem> = items.iter().copied().map(HtmlItem).collect();
 
     html! {
         <Container>

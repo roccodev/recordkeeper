@@ -1,8 +1,8 @@
 use std::{borrow::Cow, rc::Rc};
 
-use fluent::{FluentArgs, FluentValue};
+use fluent::FluentValue;
 use wasm_bindgen::JsCast;
-use web_sys::{Element, EventTarget, HtmlInputElement, HtmlSelectElement};
+use web_sys::{Element, EventTarget, HtmlInputElement};
 use ybc::*;
 use yew::prelude::*;
 use yew_feather::ChevronDown;
@@ -105,14 +105,13 @@ where
 
     let update_focus = |has_focus: bool| {
         let focus_state = focused.clone();
+        let is_dropdown_entry = |e: EventTarget| {
+            let html = e.dyn_into::<Element>().unwrap();
+            let tag = html.tag_name();
+            tag == "A" || tag == "DIV"
+        };
         Callback::from(move |e: FocusEvent| {
-            if !has_focus
-                && e.related_target().is_some_and(|e| {
-                    let html = e.dyn_into::<Element>().unwrap();
-                    let tag = html.tag_name();
-                    tag == "A" || tag == "DIV"
-                })
-            {
+            if !has_focus && e.related_target().is_some_and(is_dropdown_entry) {
                 return;
             }
             e.prevent_default();
@@ -194,8 +193,8 @@ impl<O: 'static> Options<O> {
 
     fn as_slice(&self) -> &[O] {
         match self {
-            Self::Owned(v) => &v,
-            Self::Borrowed(s) => &s,
+            Self::Owned(v) => v,
+            Self::Borrowed(s) => s,
         }
     }
 }
@@ -288,11 +287,9 @@ where
             self.get_filter(language)
                 .map(|t| t.text().into())
                 .unwrap_or_else(|| {
-                    let args = FluentArgs::from(
-                        [(Cow::from("id"), FluentValue::from(self.id()))]
-                            .into_iter()
-                            .collect(),
-                    );
+                    let args = [(Cow::from("id"), FluentValue::from(self.id()))]
+                        .into_iter()
+                        .collect();
                     html_lang
                         .translate_with_args("unnamed", Some(&args))
                         .to_string()
@@ -310,11 +307,9 @@ where
             self.get_filter(language)
                 .map(|t| t.text_lower().into())
                 .unwrap_or_else(|| {
-                    let args = FluentArgs::from(
-                        [(Cow::from("id"), FluentValue::from(self.id()))]
-                            .into_iter()
-                            .collect(),
-                    );
+                    let args = [(Cow::from("id"), FluentValue::from(self.id()))]
+                        .into_iter()
+                        .collect();
                     html_lang
                         .translate_with_args("unnamed", Some(&args))
                         .to_lowercase()

@@ -62,7 +62,7 @@ pub fn PowAugmentEditor(props: &PowAugmentProps) -> Html {
                     <Control>
                         <CheckboxInput<NodeEditor> editor={NodeEditor { char_idx, index: NonZeroUsize::new(index.checked_add(1).unwrap()).unwrap() }}>
                             {" "}
-                            <b>{node_lang(&node)}</b>
+                            <b>{node_lang(node)}</b>
                             {": "}
                             {node.get_param_name(data.game(), data.lang())}
                         </CheckboxInput<NodeEditor>>

@@ -126,7 +126,7 @@ pub fn MashaModal(props: &MashaModalProps) -> Html {
         .dlc
         .masha
         .type_names
-        .into_iter()
+        .iter()
         .map(|t| DisplayType(t.clone()))
         .collect();
 

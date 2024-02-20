@@ -25,10 +25,7 @@ use crate::{
 };
 
 use super::{
-    character::{
-        formation::{FormationOuroArt, FormationOuroSkill},
-        CharacterProps,
-    },
+    character::formation::{FormationOuroArt, FormationOuroSkill},
     edit::{editor, Editor},
 };
 
@@ -181,10 +178,10 @@ fn get_enable_flag(data: &GameData, ouroboros: &Ouroboros) -> FlagEditor {
         return data.manual.flags.ouro_enable_noah.into();
     }
     let flag = data.manual.flags.ouro_enable;
-    return FlagEditor {
+    FlagEditor {
         flag_type: FlagType::from_bits(flag.bits),
         flag_index: flag.index + ouroboros.id - 2,
-    };
+    }
 }
 
 impl Editor for ArtEditor {

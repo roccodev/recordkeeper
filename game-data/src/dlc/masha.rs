@@ -46,6 +46,6 @@ impl LangCraftItems {
 
 impl CraftEnhance {
     pub fn get_enhance_for_level<'g>(&self, game: &'g GameData, level: u32) -> Option<&'g Enhance> {
-        game.enhance.get_instance(self.0[level as usize - 1] as u32)
+        game.enhance.get_instance(self.0[level as usize - 1])
     }
 }

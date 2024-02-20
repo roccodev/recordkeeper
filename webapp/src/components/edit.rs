@@ -234,7 +234,7 @@ where
         props.editor.get(save.get_save())
     };
 
-    let input = use_state(|| String::new());
+    let input = use_state(String::new);
     let valid = use_state_eq(|| true);
     {
         let input = input.clone();

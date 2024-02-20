@@ -152,7 +152,7 @@ fn LocationRow(props: &LocationProps) -> Html {
         location.map_point.map(|point| {
             Callback::from(move |_: MouseEvent| {
                 save_context.edit(move |save| {
-                    map.set(save, map_id.try_into().unwrap());
+                    map.set(save, map_id);
                     x.set(save, point.x.try_into().unwrap());
                     y.set(save, point.y.try_into().unwrap());
                     z.set(save, point.z.try_into().unwrap());

@@ -1,5 +1,5 @@
 use game_data::{
-    character::{Art, Class, Skill},
+    character::{Art, Skill},
     item::GemCategory,
 };
 use recordkeeper::{

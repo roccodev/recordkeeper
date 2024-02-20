@@ -48,7 +48,7 @@ pub struct ItemSlot {
     flags: u8,
 }
 
-enum SlotFlags {
+pub enum SlotFlags {
     /// The slot has an item inside
     Active = 1,
     /// The player has marked the item as favorite
