@@ -1,3 +1,5 @@
+use std::num::NonZeroUsize;
+
 use recordkeeper_macros::SaveBin;
 use thiserror::Error;
 
@@ -25,7 +27,7 @@ pub struct TombstoneTime {
 
 #[derive(SaveBin, Debug)]
 pub struct SoulHackAchievements {
-    /// Indices from `BTL_Achievement`
+    /// Indices from `BTL_Achievement` (ID - 1)
     progress: Box<[u32; SOUL_HACK_ACHIEVEMENT_MAX]>,
 }
 
@@ -83,12 +85,12 @@ impl EnemyTombstone {
 }
 
 impl SoulHackAchievements {
-    pub fn get(&self, index: usize) -> Achievement {
-        Achievement::from(self.progress[index])
+    pub fn get(&self, id: NonZeroUsize) -> Achievement {
+        Achievement::from(self.progress[id.get() - 1])
     }
 
-    pub fn set(&mut self, index: usize, new: Achievement) {
-        self.progress[index] = new.into();
+    pub fn set(&mut self, id: NonZeroUsize, new: Achievement) {
+        self.progress[id.get() - 1] = new.into();
     }
 }
 

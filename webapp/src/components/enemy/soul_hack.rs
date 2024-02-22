@@ -1,4 +1,4 @@
-use std::{fmt::Display, str::FromStr};
+use std::{fmt::Display, num::NonZeroUsize, str::FromStr};
 
 use game_data::{
     character::SoulHack,
@@ -33,7 +33,7 @@ editor!(
     ParseAchievement,
     get |editor, save| ParseAchievement(save.soul_hack_achievements.get(editor.id)),
     set |editor, save, new| save.soul_hack_achievements.set(editor.id, new.0),
-    capture id: usize
+    capture id: NonZeroUsize
 );
 
 #[derive(Clone, PartialEq, Eq)]
@@ -80,7 +80,7 @@ where
     });
 
     let progress_editor = AchievementEditor {
-        id: props.soul_hack.achievement_flag.get(),
+        id: props.soul_hack.achievement_flag,
     };
 
     let is_upgraded =
