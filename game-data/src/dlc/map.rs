@@ -1,9 +1,10 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
+use strum::FromRepr;
 
 use crate::{
-    lang::{Nameable, TextEntry, TextTable},
+    lang::{FilterEntry, Filterable, Id, Nameable, TextEntry, TextTable},
     manual::{Flag, FlagRange},
     LanguageData,
 };
@@ -11,6 +12,7 @@ use crate::{
 #[derive(Deserialize, Serialize)]
 pub struct Dlc4Map {
     map_achievements: [Box<[MapAchievement]>; 5],
+    pub regions: [Dlc4Region; 5],
 }
 
 #[derive(Deserialize, Serialize)]
@@ -36,6 +38,12 @@ pub struct Enemypedia {
     sort_id: u32,
 }
 
+#[derive(Deserialize, Serialize, PartialEq)]
+pub struct Dlc4Region {
+    pub id: usize,
+    pub name: usize,
+}
+
 #[derive(Deserialize, Serialize)]
 pub struct Architecture {
     ty: ArchitectureType,
@@ -43,7 +51,8 @@ pub struct Architecture {
     end_flag: Flag,
 }
 
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, FromRepr)]
+#[repr(u8)]
 pub enum ArchitectureType {
     Elevator = 0,
     Ladder = 1,
@@ -73,7 +82,7 @@ pub enum AchievementName {
         name_id: u32,
     },
     Npc {
-        id: u32,
+        name_id: u32,
     },
     Location {
         name_id: u32,
@@ -134,12 +143,32 @@ pub struct MapAchievementFlags {
 }
 
 impl Dlc4Map {
-    pub fn new(map_achievements: [Box<[MapAchievement]>; 5]) -> Self {
-        Self { map_achievements }
+    pub fn new(map_achievements: [Box<[MapAchievement]>; 5], regions: [Dlc4Region; 5]) -> Self {
+        Self {
+            map_achievements,
+            regions,
+        }
     }
 
     pub fn achievements(&self, region: usize) -> &[MapAchievement] {
         &self.map_achievements[region]
+    }
+
+    pub fn regions(&self) -> &[Dlc4Region] {
+        &self.regions
+    }
+}
+
+impl ArchitectureType {
+    pub fn lang_id(&self) -> &'static str {
+        match self {
+            ArchitectureType::Elevator => "elevator",
+            ArchitectureType::Ladder => "ladder",
+            ArchitectureType::Slide => "slide",
+            ArchitectureType::Lift => "lift",
+            ArchitectureType::Tower => "tower",
+            ArchitectureType::ComSpot => "com",
+        }
     }
 }
 
@@ -147,5 +176,17 @@ impl Nameable for MapAchievement {
     fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l TextEntry> {
         let name_id = language.dlc.map.achievement_type_map.get(&self.ty)?;
         language.dlc.map.map.get(*name_id as usize)
+    }
+}
+
+impl Filterable for Dlc4Region {
+    fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
+        language.field.locations.get(self.name as usize)
+    }
+}
+
+impl Id for Dlc4Region {
+    fn id(&self) -> usize {
+        self.id
     }
 }

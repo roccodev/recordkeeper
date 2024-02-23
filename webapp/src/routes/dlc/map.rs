@@ -1,15 +1,18 @@
 use std::borrow::Cow;
 
 use game_data::{
-    dlc::map::{AchievementName, AchievementSearch},
+    dlc::map::{AchievementName, AchievementSearch, Dlc4Region},
     lang::{FilterEntry, Nameable, TextEntry},
     LanguageData,
 };
-use ybc::{Button, Buttons, Field, Notification, Tile};
+use ybc::{Button, Buttons, Control, Field};
 use yew::prelude::*;
 
 use crate::{
-    components::edit::{Editor, FlagEditor},
+    components::{
+        edit::{Editor, FlagEditor},
+        select::Selector,
+    },
     data::Data,
     lang::Text,
     save::SaveContext,
@@ -31,16 +34,24 @@ pub struct AchievementProps {
 #[function_component]
 pub fn MapPage() -> Html {
     let data = use_context::<Data>().unwrap();
+    let region = use_state(|| 1);
 
     html! {
-        <RegionAchievements region={3} />
+        <>
+            <Field>
+                <label class="label"><Text path="dlc4_map_region" /></label>
+                <Control>
+                    <Selector<Dlc4Region> state={region.clone()} values={data.game().dlc.map.regions()} />
+                </Control>
+            </Field>
+            <RegionAchievements region={*region - 1} />
+        </>
     }
 }
 
 #[function_component]
 pub fn RegionAchievements(props: &RegionProps) -> Html {
     let data = use_context::<Data>().unwrap();
-
     let achievements = data.game().dlc.map.achievements(props.region);
 
     html! {
@@ -106,6 +117,7 @@ fn achievement_lang(lang: &LanguageData, achievement: &AchievementSearch) -> Htm
             .get(*name_id as usize)
             .map(TextEntry::text)
             .map(Into::into),
+        AchievementName::Npc { name_id } => lang.characters.npcs.get(&name_id).map(Into::into),
         AchievementName::Location { name_id } => lang
             .field
             .locations
@@ -118,8 +130,15 @@ fn achievement_lang(lang: &LanguageData, achievement: &AchievementSearch) -> Htm
             .get(*name_id as usize)
             .map(TextEntry::text)
             .map(Into::into),
+        AchievementName::Architecture { ty, x, y, z } => {
+            return html! {
+                <>
+                    <Text path={format!("dlc4_map_arch_{}", ty.lang_id())} />
+                    {": "}{format!("({x:.0}, {y:.0}, {z:.0})")}
+                </>
+            }
+        }
         AchievementName::Unknown { x, y, z } => Some(format!("({x:.0}, {y:.0}, {z:.0})").into()),
-        _ => None,
     }
     .unwrap_or_else(|| Cow::Owned(format!("{:?}", achievement.name)));
     html! (<>{text}</>)

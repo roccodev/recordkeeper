@@ -455,3 +455,35 @@ chrono_tab_classes = Classes
 chrono_tab_items = Items
 chrono_tab_quests = Quests
 chrono_tab_npc = NPC
+
+# DLC4 map completion page
+
+dlc4_map_region = Region
+dlc4_map_arch_elevator = Elevator
+dlc4_map_arch_ladder = Ladder
+# Ether slide
+dlc4_map_arch_slide = Slide
+# Ether lift
+dlc4_map_arch_lift = Lift
+# Ether mast
+dlc4_map_arch_tower = Mast
+dlc4_map_arch_com = Rest Spot
+
+dlc4_map_status_hidden = Hidden
+# Visible on the world map
+dlc4_map_status_visible = Visible
+dlc4_map_status_complete = Completed
+
+dlc4_map_bulk = Bulk Edit
+# We are building the text "Set {input} in {input} to {input}"
+# For example: "Set everything in all regions to Completed".
+# The order can't be changed. If it is a problem, this can be
+# translated as "Target" or "Old value"
+dlc4_map_bulk_target = Set
+# If order is a problem, this can be translated as "Source"
+dlc4_map_bulk_source = in
+# If order is a problem, this can be translated as "New value"
+dlc4_map_bulk_value = to
+# Everything as in, containers, relics, etc.
+dlc4_map_bulk_target_all = everything
+dlc4_map_bulk_source_all = all regions

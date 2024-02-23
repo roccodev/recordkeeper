@@ -1,6 +1,9 @@
-use bdat::{hash::murmur3_str, label_hash, Label};
+use bdat::{hash::murmur3_str, label_hash, Label, TableAccessor};
 use game_data::{
-    dlc::map::{AchievementName, AchievementSearch, Dlc4Map, Dlc4MapLang, MapAchievement},
+    dlc::map::{
+        AchievementName, AchievementSearch, ArchitectureType, Dlc4Map, Dlc4MapLang, Dlc4Region,
+        MapAchievement,
+    },
     manual::Flag,
 };
 
@@ -39,45 +42,59 @@ const ACHIEVEMENT_BASE_FLAGS: &[usize] = &[
     14017,                   // 14: fog rifts
 ];
 
+/// IDs for msg_mnu_map_ms (type category names)
+const ACHIEVEMENT_NAME_MAP: &[(u32, u32)] = &[
+    // (Message ID, achievement type)
+    (0x1729fe77, 1),
+    (0xe2bb89d6, 2),
+    (0xb1c9ca4f, 3),
+    (0x947ee7df, 4),
+    (0x34d3c504, 5),
+    (0x648ab23, 6),
+    (0xe8428146, 7),
+    (0x515f1496, 8),
+    (0x26f7df25, 9),
+    (0x9591fd9f, 10),
+    (0x3f44fa87, 11),
+    (0xdc087a84, 12),
+    (0x19bff09f, 13),
+    (0x921c87db, 14),
+];
+
 pub fn read_game(bdat: &BdatRegistry) -> Dlc4Map {
     let achievements = bdat.table(label_hash!("FLD_MapAchievementSearch"));
+    let locations = bdat.table(label_hash!("ma40a_GMK_Location"));
 
     let mut maps = {
         const V: Vec<MapAchievement> = Vec::new();
         [V; 5]
     };
 
+    let locations = [1, 2, 3, 4, 5].map(|id| Dlc4Region {
+        id,
+        name: locations
+            .row(id)
+            .get(label_hash!("LocationName"))
+            .get_as::<u16>() as usize,
+    });
+
     for row in achievements.rows() {
         let achievement = read_achievement(bdat, row);
-        maps[achievement.region as usize - 1].push(achievement);
+        if !achievement.searches.is_empty() {
+            maps[achievement.region as usize - 1].push(achievement);
+        }
     }
 
-    Dlc4Map::new(maps.map(Vec::into_boxed_slice))
+    Dlc4Map::new(maps.map(Vec::into_boxed_slice), locations)
 }
 
 pub fn read_lang(lang: &LangBdatRegistry) -> Dlc4MapLang {
     let map = lang.table(label_hash!("msg_mnu_map_ms"));
 
-    let type_map = [
-        // IDs for msg_mnu_map_ms (type category names)
-        (0x1729fe77, 1),
-        (0xe2bb89d6, 2),
-        (0xb1c9ca4f, 3),
-        (0x947ee7df, 4),
-        (0x34d3c504, 5),
-        (0x648ab23, 6),
-        (0xe8428146, 7),
-        (0x515f1496, 8),
-        (0x26f7df25, 9),
-        (0x9591fd9f, 10),
-        (0x3f44fa87, 11),
-        (0xdc087a84, 12),
-        (0x19bff09f, 13),
-        (0x921c87db, 14),
-    ]
-    .into_iter()
-    .map(|(hash, id)| (id, map.row_by_hash(hash).id() as u32))
-    .collect();
+    let type_map = ACHIEVEMENT_NAME_MAP
+        .into_iter()
+        .map(|(hash, id)| (*id, map.row_by_hash(*hash).id() as u32))
+        .collect();
 
     Dlc4MapLang {
         map: text_table_from_bdat(map),
@@ -98,6 +115,8 @@ fn read_achievement(bdat: &BdatRegistry, row: ModernRow) -> MapAchievement {
 fn read_searches(bdat: &BdatRegistry, row: ModernRow, ty: u32) -> Box<[AchievementSearch]> {
     let enemies = bdat.table(label_hash!("FLD_EnemyData"));
     let npc_rescues = bdat.table(Label::Hash(0x46B9A047));
+    let npcs = bdat.table(label_hash!("FLD_NpcList"));
+    let npc_resources = bdat.table(label_hash!("FLD_NpcResource"));
 
     [
         0x0413A76D, 0x57943DB0, 0x7D81DF13, 0x0F1AB3D0, 0x7BB8F985, 0xB5B04756, 0x29C606AD,
@@ -133,13 +152,16 @@ fn read_searches(bdat: &BdatRegistry, row: ModernRow, ty: u32) -> Box<[Achieveme
             8 => {
                 // NPC
                 let rescue = npc_rescues.row_by_hash(gmk);
+                let npc = npcs.row(rescue.get(label_hash!("NpcID")).get_as::<u16>() as usize);
+                let res =
+                    npc_resources.row(npc.get(Label::Hash(0x7F0A3296)).get_as::<u16>() as usize);
                 AchievementSearch {
                     flag: Flag {
                         bits: 2,
                         index: rescue.get(Label::Hash(0x0DEC588C)).get_as::<u16>() as usize,
                     },
                     name: AchievementName::Npc {
-                        id: rescue.get(label_hash!("NpcID")).get_as::<u16>() as u32,
+                        name_id: res.get(label_hash!("Name")).get_as(),
                     },
                 }
             }
@@ -154,7 +176,7 @@ fn gimmick_search<'a>(
     mut gmk: &'a GimmickData,
     ty: u32,
 ) -> AchievementSearch {
-    if gmk.type_hash == murmur3_str("Architecture") {
+    let arch_type = if gmk.type_hash == murmur3_str("Architecture") {
         let arch = bdat
             .table(label_hash!("FLD_Architecture"))
             .row_by_hash(gmk.external_id);
@@ -165,14 +187,22 @@ fn gimmick_search<'a>(
                 .get(&arch.get(Label::Hash(0x8B6F5AD3)).get_as())
                 .expect("unknown external gimmick");
         }
-    }
+        Some(AchievementName::Architecture {
+            ty: ArchitectureType::from_repr(discrim).unwrap(),
+            x: gmk.x,
+            y: gmk.y,
+            z: gmk.z,
+        })
+    } else {
+        None
+    };
 
     let flag;
-    let mut name = AchievementName::Unknown {
+    let mut name = arch_type.unwrap_or(AchievementName::Unknown {
         x: gmk.x,
         y: gmk.y,
         z: gmk.z,
-    };
+    });
 
     match gmk.type_hash {
         h if h == murmur3_str("Architecture") => {

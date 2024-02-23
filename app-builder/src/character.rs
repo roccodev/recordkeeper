@@ -5,7 +5,7 @@ use game_data::character::{
     Art, Attachment, Character, CharacterData, CharacterLang, Class, Costume, Skill, SoulHack,
 };
 
-use crate::lang::filter_table_from_bdat;
+use crate::lang::{filter_table_from_bdat, hash_table_from_bdat};
 use crate::{dlc, BdatRegistry, LangBdatRegistry, ModernRow};
 
 const UI_NAME_HASHES: [Label; 6] = [
@@ -74,6 +74,7 @@ pub fn read_lang(bdat: &LangBdatRegistry) -> CharacterLang {
     let skills = bdat.table(label_hash!("msg_btl_skill_name"));
     let classes = bdat.table(label_hash!("msg_btl_talent_name"));
     let misc = bdat.table(label_hash!("msg_mnu_char_ms"));
+    let npcs = bdat.table(label_hash!("msg_npc_name"));
 
     CharacterLang {
         characters: filter_table_from_bdat(characters),
@@ -81,6 +82,7 @@ pub fn read_lang(bdat: &LangBdatRegistry) -> CharacterLang {
         skills: filter_table_from_bdat(skills),
         classes: filter_table_from_bdat(classes),
         misc: filter_table_from_bdat(misc),
+        npcs: hash_table_from_bdat(npcs),
     }
 }
 
