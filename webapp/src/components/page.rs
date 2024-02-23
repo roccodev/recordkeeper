@@ -86,6 +86,10 @@ impl<const PER_VIEW: usize> PageOrganizer<PER_VIEW> {
         }
     }
 
+    pub fn bounds(&self) -> impl Iterator<Item = (usize, usize)> {
+        self.current_bounds.into_iter().filter(|(s, e)| s <= e)
+    }
+
     pub fn page_display_id(&self) -> usize {
         1 + self.current_page / PER_VIEW
     }

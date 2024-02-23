@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
-use strum::FromRepr;
+use strum::{EnumIter, FromRepr};
 
 use crate::{
     lang::{FilterEntry, Filterable, Id, Nameable, TextEntry, TextTable},
@@ -103,7 +103,9 @@ pub enum AchievementName {
     },
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(
+    Deserialize, Serialize, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, FromRepr, EnumIter,
+)]
 pub enum MapAchievementProgress {
     Hidden = 0,
     Visible = 1,
@@ -152,6 +154,12 @@ impl Dlc4Map {
 
     pub fn achievements(&self, region: usize) -> &[MapAchievement] {
         &self.map_achievements[region]
+    }
+
+    pub fn all_achievements(&self) -> impl Iterator<Item = &MapAchievement> {
+        self.map_achievements
+            .iter()
+            .flat_map(|region| region.iter())
     }
 
     pub fn regions(&self) -> &[Dlc4Region] {

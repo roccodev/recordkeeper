@@ -459,6 +459,12 @@ chrono_tab_npc = NPC
 # DLC4 map completion page
 
 dlc4_map_region = Region
+dlc4_map_category = Category
+# Save flag
+dlc4_map_ach_flag = Flag
+dlc4_map_ach_desc = Description
+dlc4_map_ach_status = Status
+
 dlc4_map_arch_elevator = Elevator
 dlc4_map_arch_ladder = Ladder
 # Ether slide
@@ -475,15 +481,9 @@ dlc4_map_status_visible = Visible
 dlc4_map_status_complete = Completed
 
 dlc4_map_bulk = Bulk Edit
-# We are building the text "Set {input} in {input} to {input}"
-# For example: "Set everything in all regions to Completed".
-# The order can't be changed. If it is a problem, this can be
-# translated as "Target" or "Old value"
-dlc4_map_bulk_target = Set
-# If order is a problem, this can be translated as "Source"
-dlc4_map_bulk_source = in
-# If order is a problem, this can be translated as "New value"
-dlc4_map_bulk_value = to
-# Everything as in, containers, relics, etc.
-dlc4_map_bulk_target_all = everything
-dlc4_map_bulk_source_all = all regions
+dlc4_map_bulk_state_category = Category
+dlc4_map_bulk_state_region = Region
+dlc4_map_bulk_state_all = All
+dlc4_map_bulk_on = All Completed
+dlc4_map_bulk_progress = All Visible
+dlc4_map_bulk_off = All Hidden
