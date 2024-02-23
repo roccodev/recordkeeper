@@ -1,6 +1,6 @@
 use recordkeeper::character::formation::PARTY_FORMATION_MAX;
 use strum::{EnumIter, IntoEnumIterator};
-use ybc::{Breadcrumb, Container, Tabs, Tile};
+use ybc::{Breadcrumb, Tabs, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -39,13 +39,13 @@ pub fn Formations() -> Html {
 
     if let Some(current) = *current_state {
         html! {
-            <Container>
+            <>
                 <Breadcrumb>
                     <li><a onclick={back_callback}><Text path="formation_back" /></a></li>
                     <li class="is-active"><a><Text path="formation_current" args={vec![("id".into(), (current + 1).into())]} /></a></li>
                 </Breadcrumb>
                 <FormationEditor id={current} />
-            </Container>
+            </>
         }
     } else {
         let child_classes = classes!("is-child", "pr-2");

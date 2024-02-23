@@ -1,6 +1,8 @@
 use yew::prelude::*;
 use yew_router::Routable;
 
+use crate::components::FluidContainer;
+
 mod about;
 mod character;
 mod chrono;
@@ -54,7 +56,7 @@ pub enum Route {
 }
 
 pub fn render(route: Route) -> Html {
-    match route {
+    let contents = match route {
         Route::Home => html!(<home::Home />),
         Route::About => html!(<about::About />),
         Route::Meta => html!(<meta::SaveMeta />),
@@ -72,5 +74,10 @@ pub fn render(route: Route) -> Html {
         Route::Dlc4Enemypedia => html!(),
         Route::Flags => html!(<flags::FlagList />),
         Route::ChronoData => html!(<chrono::ChronoPage />),
+    };
+    html! {
+        <FluidContainer>
+            {contents}
+        </FluidContainer>
     }
 }

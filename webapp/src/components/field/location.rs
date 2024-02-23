@@ -4,7 +4,7 @@ use game_data::{
     GameData,
 };
 use recordkeeper::SaveData;
-use ybc::{Button, Buttons, Container, Control, Field, Table};
+use ybc::{Button, Buttons, Control, Field, Table};
 use yew::prelude::*;
 
 use crate::{
@@ -72,7 +72,7 @@ pub fn LocationsPage() -> Html {
     };
 
     html! {
-        <Container>
+        <>
             <Field classes={classes!("is-grouped")}>
                 <Control>
                     <Selector<Map> state={map_state} values={data.game().field.maps()} />
@@ -112,7 +112,7 @@ pub fn LocationsPage() -> Html {
                     })}
                 </tbody>
             </Table>
-        </Container>
+        </>
     }
 }
 

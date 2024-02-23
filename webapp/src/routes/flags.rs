@@ -1,7 +1,7 @@
 use recordkeeper::flags::FlagType;
 use wasm_bindgen::JsCast;
 use web_sys::{EventTarget, HtmlInputElement};
-use ybc::{Button, Buttons, Container, Field, Table, Tile};
+use ybc::{Button, Buttons, Field, Table, Tile};
 use yew::prelude::*;
 
 use crate::components::page::{PageControls, PageOrganizer};
@@ -44,7 +44,7 @@ pub fn FlagList() -> Html {
         PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, flag_type.num_flags());
 
     html! {
-        <Container>
+        <>
             <Tile classes={classes!("is-align-items-end", "mb-2")}>
                 <Tile>
                     <Field>
@@ -84,7 +84,7 @@ pub fn FlagList() -> Html {
             </Tile>
 
             <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
-        </Container>
+        </>
     }
 }
 

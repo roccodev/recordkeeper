@@ -1,6 +1,6 @@
 use game_data::character::Character;
 use recordkeeper::character::PARTY_MAX;
-use ybc::{Container, Control, Field, Tile};
+use ybc::{Control, Field, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -21,7 +21,7 @@ pub fn Characters() -> Html {
     let data = use_context::<Data>().unwrap();
 
     html! {
-        <Container>
+        <>
             <Tile classes={classes!("mb-2")}>
                 <Tile>
                     <Field>
@@ -38,6 +38,6 @@ pub fn Characters() -> Html {
             <div>
                 <CharacterEditor char_id={*char_id} />
             </div>
-        </Container>
+        </>
     }
 }

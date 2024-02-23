@@ -7,7 +7,7 @@ use crate::lang::{Lang, Text};
 use crate::save::SaveContext;
 use game_data::item::Item;
 use recordkeeper::item::{Inventory, ItemSlot, ItemType};
-use ybc::{Button, Buttons, Container, Control, Field, Table, Tile};
+use ybc::{Button, Buttons, Control, Field, Table, Tile};
 use yew::prelude::*;
 
 /// List of supported item types, in order of importance
@@ -68,7 +68,7 @@ pub fn ItemInventory() -> Html {
     let options: Options<HtmlItem> = items.iter().copied().map(HtmlItem).collect();
 
     html! {
-        <Container>
+        <>
             <Tile classes={classes!("is-align-items-end", "mb-2")}>
                 <Tile>
                     <Field>
@@ -111,7 +111,7 @@ pub fn ItemInventory() -> Html {
             </Tile>
 
             <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
-        </Container>
+        </>
     }
 }
 

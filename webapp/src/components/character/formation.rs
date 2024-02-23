@@ -7,7 +7,7 @@ use recordkeeper::character::{
     formation::{FormationName, PartyFormation},
     PARTY_MAX,
 };
-use ybc::{Card, CardContent, CardFooter, Container, Control, Field, Notification, Tile};
+use ybc::{Card, CardContent, CardFooter, Control, Field, Notification, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -130,7 +130,7 @@ pub fn FormationCharacters(props: &FormationProps) -> Html {
     };
 
     html! {
-        <Container>
+        <>
             <Tile classes={classes!("mb-2")}>
                 <Tile>
                     <Field>
@@ -166,7 +166,7 @@ pub fn FormationCharacters(props: &FormationProps) -> Html {
                     <ClassEditor accessor={accessor.into_class(0)} stats={false} />
                 </Notification>
             </div>
-        </Container>
+        </>
     }
 }
 
@@ -179,7 +179,7 @@ pub fn FormationOuroboros(props: &FormationProps) -> Html {
     let data = use_context::<Data>().unwrap();
 
     html! {
-        <Container>
+        <>
             <Tile classes={classes!("mb-2")}>
                 <Field>
                     <label class="label"><Text path="ouroboros_character" /></label>
@@ -197,7 +197,7 @@ pub fn FormationOuroboros(props: &FormationProps) -> Html {
                     art: Callback::from(move |i| ouroboros::ArtEditor::Formation(FormationOuroArt { formation, char_id: char_id as u16, slot_idx: i })),
                 }} />
             </div>
-        </Container>
+        </>
     }
 }
 

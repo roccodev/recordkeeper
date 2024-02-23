@@ -1,5 +1,5 @@
 use game_data::ouroboros::Ouroboros;
-use ybc::{Container, Control, Field, Tile};
+use ybc::{Control, Field, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -22,7 +22,7 @@ pub fn OuroborosPage() -> Html {
     let data = use_context::<Data>().unwrap();
 
     html! {
-        <Container>
+        <>
             <Tile classes={classes!("mb-2")}>
                 <Field>
                     <label class="label"><Text path="ouroboros_character" /></label>
@@ -40,6 +40,6 @@ pub fn OuroborosPage() -> Html {
                     art: Callback::from(move |i| ArtEditor::Save(SaveArt { char_idx, slot_idx: i })),
                 }} />
             </div>
-        </Container>
+        </>
     }
 }

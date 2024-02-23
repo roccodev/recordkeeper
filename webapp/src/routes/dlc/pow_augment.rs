@@ -1,5 +1,5 @@
 use game_data::character::Character;
-use ybc::{Container, Control, Field, Notification, Tile};
+use ybc::{Control, Field, Notification, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -36,7 +36,7 @@ pub fn PowAugmentPage() -> Html {
         .expect("no pow augment");
 
     html! {
-        <Container>
+        <>
             <Tile classes={classes!("mb-2")}>
                 <Field classes="is-grouped">
                     <Control>
@@ -66,6 +66,6 @@ pub fn PowAugmentPage() -> Html {
             <Notification>
                 <PowAugmentEditor char_id={u8::try_from(char_id).unwrap()} pow_augment={pow_augment} />
             </Notification>
-        </Container>
+        </>
     }
 }

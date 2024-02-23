@@ -1,8 +1,8 @@
 use ybc::{Button, Icon, MenuList, Size};
 use yew::prelude::*;
 use yew_feather::{
-    BookOpen, Clock, Crosshair, Download, FilePlus, Flag, HelpCircle, Info, LifeBuoy, Map,
-    ShoppingBag, Target, TrendingUp, Triangle, Users, Watch,
+    BookOpen, Crosshair, Download, FilePlus, Flag, HelpCircle, Info, LifeBuoy, Map, ShoppingBag,
+    Target, TrendingUp, Triangle, Users, Watch,
 };
 use yew_router::prelude::{use_route, Link};
 

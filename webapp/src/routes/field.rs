@@ -1,5 +1,5 @@
 use strum::{EnumIter, IntoEnumIterator};
-use ybc::{Container, Tabs, Tile};
+use ybc::{Tabs, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -52,7 +52,7 @@ pub fn FieldPage() -> Html {
 #[function_component]
 fn TabPlayer() -> Html {
     html! {
-        <Container>
+        <>
             <Tile>
                 <Tile classes={classes!("is-parent")}>
                     <PlayerLoc />
@@ -69,7 +69,7 @@ fn TabPlayer() -> Html {
                     <Environment />
                 </Tile>
             </Tile>
-        </Container>
+        </>
     }
 }
 

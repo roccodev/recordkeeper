@@ -1,6 +1,6 @@
 use recordkeeper::{dlc::ChallengeDifficulty, enemy::Difficulty};
 use strum::IntoEnumIterator;
-use ybc::{Container, Control, Field, Table, Tile};
+use ybc::{Control, Field, Table, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -49,7 +49,7 @@ pub fn ChallengePage() -> Html {
         PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, challenges.len());
 
     html! {
-        <Container>
+        <>
             <Field classes="is-grouped">
                 <Control>
                     <Field>
@@ -78,7 +78,7 @@ pub fn ChallengePage() -> Html {
             </Tile>
 
             <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
-        </Container>
+        </>
     }
 }
 

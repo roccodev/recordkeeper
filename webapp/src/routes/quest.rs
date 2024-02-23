@@ -3,7 +3,7 @@ use crate::components::quest::QuestRow;
 use crate::data::Data;
 use crate::lang::Text;
 use crate::save::SaveContext;
-use ybc::{Container, Table, Tile};
+use ybc::{Table, Tile};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
@@ -30,7 +30,7 @@ pub fn Quests() -> Html {
         PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, end + 1 - start);
 
     html! {
-        <Container>
+        <>
             <Tile classes="mb-2">
                 {for page_organizer.current_bounds.into_iter().map(|(s, e)| html! {
                     <Tile>
@@ -40,7 +40,7 @@ pub fn Quests() -> Html {
             </Tile>
 
             <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
-        </Container>
+        </>
     }
 }
 

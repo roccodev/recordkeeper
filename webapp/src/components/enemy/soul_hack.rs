@@ -6,7 +6,7 @@ use game_data::{
     lang::{Id, Nameable},
 };
 use recordkeeper::{enemy::Achievement, flags::FlagType};
-use ybc::{Button, Container, Control, Field, Table};
+use ybc::{Button, Control, Field, Table};
 use yew::prelude::*;
 
 use crate::{
@@ -45,7 +45,7 @@ where
     T: PartialEq + SoulLearnable + Id + Nameable + 'static,
 {
     html! {
-        <Container>
+        <>
             <Table classes={classes!("is-fullwidth")}>
                 <thead>
                     <tr>
@@ -62,7 +62,7 @@ where
                     })}
                 </tbody>
             </Table>
-        </Container>
+        </>
     }
 }
 

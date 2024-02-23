@@ -1,7 +1,7 @@
 use game_data::character::{Art, Skill};
 use recordkeeper::enemy::Difficulty;
 use strum::{EnumIter, IntoEnumIterator};
-use ybc::{Container, Control, Field, Table, Tabs, Tile};
+use ybc::{Control, Field, Table, Tabs, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -78,7 +78,7 @@ pub fn UniqueMonsters() -> Html {
     let page_organizer = PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, enemies.len());
 
     html! {
-        <Container>
+        <>
             <Field>
                 <label class="label"><Text path="difficulty" /></label>
                 <Control>
@@ -95,7 +95,7 @@ pub fn UniqueMonsters() -> Html {
             </Tile>
 
             <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
-        </Container>
+        </>
     }
 }
 

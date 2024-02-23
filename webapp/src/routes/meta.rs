@@ -1,4 +1,4 @@
-use ybc::{Container, Tile};
+use ybc::Tile;
 use yew::prelude::*;
 
 use crate::components::meta::{
@@ -10,7 +10,7 @@ use crate::components::meta::{
 #[function_component]
 pub fn SaveMeta() -> Html {
     html! {
-        <Container>
+        <>
             <Tile>
                 <Tile classes={classes!("is-parent")}>
                     <PlayTime />
@@ -27,6 +27,6 @@ pub fn SaveMeta() -> Html {
                     <Settings />
                 </Tile>
             </Tile>
-        </Container>
+        </>
     }
 }

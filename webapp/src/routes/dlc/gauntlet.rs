@@ -1,6 +1,6 @@
 use recordkeeper::dlc::ChallengeDifficulty;
 use strum::{EnumIter, IntoEnumIterator};
-use ybc::{Container, Control, Field, Table, Tabs, Tile};
+use ybc::{Control, Field, Table, Tabs, Tile};
 use yew::prelude::*;
 
 use crate::{
@@ -83,7 +83,7 @@ pub fn Records() -> Html {
         PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE_RECORDS, *page, gauntlets.len());
 
     html! {
-        <Container>
+        <>
             <Field classes="is-grouped">
                 <Control>
                     <Field>
@@ -112,7 +112,7 @@ pub fn Records() -> Html {
             </Tile>
 
             <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
-        </Container>
+        </>
     }
 }
 
@@ -129,7 +129,7 @@ pub fn Emblems() -> Html {
     let max_level = emblems.iter().map(|e| e.levels).max().unwrap();
 
     html! {
-        <Container>
+        <>
             <Tile classes="mb-2">
                 {for page_organizer.current_bounds.into_iter().map(|(s, e)| html! {
                     <Tile>
@@ -139,7 +139,7 @@ pub fn Emblems() -> Html {
             </Tile>
 
             <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
-        </Container>
+        </>
     }
 }
 
@@ -148,13 +148,13 @@ pub fn SaveState() -> Html {
     let save = use_context::<SaveContext>().unwrap();
 
     html! {
-        <Container>
+        <>
             {if save.get().get_save().has_gauntlet_save() {
                 html!(<GauntletSaveState />)
             } else {
                 html!()
             }}
-        </Container>
+        </>
     }
 }
 
