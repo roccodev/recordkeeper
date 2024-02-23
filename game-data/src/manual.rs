@@ -34,3 +34,9 @@ pub struct Flag {
     pub bits: usize,
     pub index: usize,
 }
+
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+pub struct FlagRange {
+    pub flag: Flag,
+    pub count: usize,
+}

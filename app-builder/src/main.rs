@@ -1,5 +1,9 @@
-use bdat::{BdatFile, Label, ModernCell, ModernTable, RowRef, SwitchEndian, TableAccessor};
+use bdat::{
+    hash::PreHashedMap, label_hash, BdatFile, Label, ModernCell, ModernTable, RowRef, SwitchEndian,
+    TableAccessor,
+};
 use game_data::{GameData, LanguageData};
+use gimmick::GimmickData;
 use std::{borrow::Borrow, collections::HashMap, fs::File, io::BufReader, path::Path};
 
 mod character;
@@ -8,6 +12,7 @@ mod enemy;
 mod enhance;
 mod field;
 mod formation;
+mod gimmick;
 mod item;
 mod lang;
 mod manual;
@@ -19,6 +24,7 @@ pub type ModernRow<'a, 'b> = RowRef<'a, 'b, ModernCell<'a, 'b>>;
 
 pub struct BdatRegistry<'b> {
     game_tables: HashMap<Label, ModernTable<'b>>,
+    gimmicks: PreHashedMap<u32, GimmickData>,
 }
 
 pub struct LangBdatRegistry<'b> {
@@ -100,7 +106,17 @@ impl<'b> BdatRegistry<'b> {
             }
         }
 
-        Self { game_tables }
+        let gimmicks = game_tables[&label_hash!("SYS_GimmickLocation_dlc04")].clone();
+        let gimmicks = gimmicks
+            .rows()
+            .map(GimmickData::new)
+            .map(|gmk| (gmk.gimmick_id, gmk))
+            .collect();
+
+        Self {
+            game_tables,
+            gimmicks,
+        }
     }
 
     pub fn get_table(&self, label: impl Borrow<Label>) -> Option<&ModernTable<'b>> {
