@@ -45,6 +45,8 @@ pub enum Route {
     ChallengeBattle,
     #[at("/gauntlet")]
     Gauntlet,
+    #[at("/dlc4map")]
+    Dlc4Map,
     #[at("/dlc4colle")]
     Dlc4Collepedia,
     #[at("/dlc4enemy")]
@@ -70,6 +72,7 @@ pub fn render(route: Route) -> Html {
         Route::PowAugment => html!(<dlc::pow_augment::PowAugmentPage />),
         Route::ChallengeBattle => html!(<dlc::challenge::ChallengePage />),
         Route::Gauntlet => html!(<dlc::gauntlet::GauntletPage />),
+        Route::Dlc4Map => html!(<dlc::map::MapPage />),
         Route::Dlc4Collepedia => html!(),
         Route::Dlc4Enemypedia => html!(),
         Route::Flags => html!(<flags::FlagList />),

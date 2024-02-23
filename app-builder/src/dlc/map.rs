@@ -5,7 +5,7 @@ use game_data::{
 };
 
 use crate::{
-    gimmick::GimmickData, lang::filter_table_from_bdat, BdatRegistry, LangBdatRegistry, ModernRow,
+    gimmick::GimmickData, lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry, ModernRow,
 };
 
 const FLAG_BASE_NAMED: u16 = 5419;
@@ -15,7 +15,6 @@ const FLAG_BASE_RESCUE: usize = 12516;
 
 const FLAG_BASE_ARCH_LADDER: usize = 14118;
 const FLAG_BASE_ARCH_ELEVATOR: usize = 15119;
-// (Broken) rest spots that were repaired (unused?)
 const FLAG_BASE_ARCH_COM_SPOT: usize = 16120;
 // Ether masts ("towers")
 const FLAG_BASE_ARCH_TOWER: usize = 17121;
@@ -23,21 +22,21 @@ const FLAG_BASE_ARCH_SLIDE: usize = 17222;
 const FLAG_BASE_ARCH_LIFT: usize = 17323;
 
 const ACHIEVEMENT_BASE_FLAGS: &[usize] = &[
-    usize::MAX,         // 0: ignored
-    10055,              // 1: containers
-    11056,              // 2: relics
-    11157,              // 3: ether channels
-    FLAG_BASE_LOCATION, // 4: locations and rest spots
-    7851,               // 5: landmarks
-    8852,               // 6: secret areas
-    usize::MAX,         // 7: architecture (see above)
-    FLAG_BASE_RESCUE,   // 8: npc rescue
-    9853,               // 9: kizuna events
-    FLAG_BASE_LOCATION, // 10: rest spots (same as locations)
-    FLAG_BASE_ENEMY,    // 11: unique monsters
-    12415,              // 12: area battle
-    FLAG_BASE_RESCUE,   // 13: enemy affordance (?, seems related to npc rescue)
-    14017,              // 14: fog rifts
+    usize::MAX,              // 0: ignored
+    10055,                   // 1: containers
+    11056,                   // 2: relics
+    11157,                   // 3: ether channels
+    FLAG_BASE_LOCATION,      // 4: locations and rest spots
+    7851,                    // 5: landmarks
+    8852,                    // 6: secret areas
+    usize::MAX,              // 7: architecture (see above)
+    FLAG_BASE_RESCUE,        // 8: npc rescue
+    9853,                    // 9: kizuna events
+    FLAG_BASE_ARCH_COM_SPOT, // 10: rest spots
+    FLAG_BASE_ENEMY,         // 11: unique monsters
+    12415,                   // 12: area battle
+    FLAG_BASE_RESCUE,        // 13: enemy affordance (?, seems related to npc rescue)
+    14017,                   // 14: fog rifts
 ];
 
 pub fn read_game(bdat: &BdatRegistry) -> Dlc4Map {
@@ -59,8 +58,30 @@ pub fn read_game(bdat: &BdatRegistry) -> Dlc4Map {
 pub fn read_lang(lang: &LangBdatRegistry) -> Dlc4MapLang {
     let map = lang.table(label_hash!("msg_mnu_map_ms"));
 
+    let type_map = [
+        // IDs for msg_mnu_map_ms (type category names)
+        (0x1729fe77, 1),
+        (0xe2bb89d6, 2),
+        (0xb1c9ca4f, 3),
+        (0x947ee7df, 4),
+        (0x34d3c504, 5),
+        (0x648ab23, 6),
+        (0xe8428146, 7),
+        (0x515f1496, 8),
+        (0x26f7df25, 9),
+        (0x9591fd9f, 10),
+        (0x3f44fa87, 11),
+        (0xdc087a84, 12),
+        (0x19bff09f, 13),
+        (0x921c87db, 14),
+    ]
+    .into_iter()
+    .map(|(hash, id)| (id, map.row_by_hash(hash).id() as u32))
+    .collect();
+
     Dlc4MapLang {
-        map: filter_table_from_bdat(map),
+        map: text_table_from_bdat(map),
+        achievement_type_map: type_map,
     }
 }
 
@@ -104,7 +125,9 @@ fn read_searches(bdat: &BdatRegistry, row: ModernRow, ty: u32) -> Box<[Achieveme
                         bits: 2,
                         index: flag_offset as usize + FLAG_BASE_ENEMY,
                     },
-                    name: AchievementName::Enemy(enemy.id() as u32),
+                    name: AchievementName::Enemy {
+                        name_id: enemy.get(label_hash!("MsgName")).get_as::<u16>() as u32,
+                    },
                 }
             }
             8 => {
@@ -115,9 +138,9 @@ fn read_searches(bdat: &BdatRegistry, row: ModernRow, ty: u32) -> Box<[Achieveme
                         bits: 2,
                         index: rescue.get(Label::Hash(0x0DEC588C)).get_as::<u16>() as usize,
                     },
-                    name: AchievementName::Npc(
-                        rescue.get(label_hash!("NpcID")).get_as::<u16>() as u32
-                    ),
+                    name: AchievementName::Npc {
+                        id: rescue.get(label_hash!("NpcID")).get_as::<u16>() as u32,
+                    },
                 }
             }
             _ => gimmick_search(bdat, bdat.gimmicks.get(&gmk).expect("unknown gimmick"), ty),
@@ -145,7 +168,11 @@ fn gimmick_search<'a>(
     }
 
     let flag;
-    let name = AchievementName::Unknown(gmk.row_id);
+    let mut name = AchievementName::Unknown {
+        x: gmk.x,
+        y: gmk.y,
+        z: gmk.z,
+    };
 
     match gmk.type_hash {
         h if h == murmur3_str("Architecture") => {
@@ -156,7 +183,7 @@ fn gimmick_search<'a>(
             let base_flag = match discrim {
                 1 => FLAG_BASE_ARCH_LADDER,
                 4 => FLAG_BASE_ARCH_TOWER,
-                5 => FLAG_BASE_ARCH_COM_SPOT,
+                5 => FLAG_BASE_ARCH_COM_SPOT, // unused in the table
                 0 | 2 | 3 => unreachable!(),
                 d => panic!("unknown architecture type {d}"),
             };
@@ -184,6 +211,30 @@ fn gimmick_search<'a>(
         }
         _ => {
             flag = ACHIEVEMENT_BASE_FLAGS[ty as usize] + gmk.sequential_id as usize;
+        }
+    }
+
+    let name_providers: &[(_, _, _, Box<dyn Fn(u32) -> AchievementName>)] = &[
+        (
+            murmur3_str("Location"),
+            label_hash!("ma40a_GMK_Location"),
+            label_hash!("LocationName"),
+            Box::new(|name_id| AchievementName::Location { name_id }),
+        ),
+        (
+            murmur3_str("CommunicationSpot"),
+            label_hash!("GMK_ComSpot"),
+            label_hash!("SpotName"),
+            Box::new(|name_id| AchievementName::ComSpot { name_id }),
+        ),
+    ];
+
+    for (ty, table, col, fun) in name_providers {
+        if gmk.type_hash == *ty {
+            let entry = bdat.table(table).row_by_hash(gmk.external_id);
+            let id = entry.get(col).get_as::<u16>() as u32;
+            name = fun(id);
+            break;
         }
     }
 

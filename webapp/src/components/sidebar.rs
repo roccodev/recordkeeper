@@ -1,8 +1,8 @@
 use ybc::{Button, Icon, MenuList, Size};
 use yew::prelude::*;
 use yew_feather::{
-    BookOpen, Crosshair, Download, FilePlus, Flag, HelpCircle, Info, LifeBuoy, Map, ShoppingBag,
-    Target, TrendingUp, Triangle, Users, Watch,
+    BookOpen, Compass, Crosshair, Download, FilePlus, Flag, HelpCircle, Info, LifeBuoy, Map,
+    ShoppingBag, Target, TrendingUp, Triangle, Users, Watch,
 };
 use yew_router::prelude::{use_route, Link};
 
@@ -112,6 +112,7 @@ fn SaveSidebar() -> Html {
         if is_dlc4 {
             MenuItem::Tabs(vec![
                 Tab("dlc4_growth", html!(<TrendingUp />), Route::PowAugment),
+                Tab("dlc4_map_completion", html!(<Compass />), Route::Dlc4Map),
                 Tab(
                     "dlc4_collepedia",
                     html!(<BookOpen />),

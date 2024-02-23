@@ -60,6 +60,7 @@ menu_dlc_gauntlet = Archsage's Gauntlet
 menu_dlc_masha = Accessory Crafting
 
 menu_dlc4_growth = Affinity Growth
+menu_dlc4_map_completion = Map Completion
 menu_dlc4_collepedia = Collectopedia
 menu_dlc4_enemypedia = Enemypedia
 

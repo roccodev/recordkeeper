@@ -3,7 +3,10 @@ use std::{collections::HashMap, num::NonZeroU16};
 use bdat::{hash::murmur3_str, label_hash, Label, TableAccessor};
 use game_data::field::{FieldLang, FieldRegistry, Location, LocationType, Map, MapId, MapPoint};
 
-use crate::{lang::filter_table_from_bdat, BdatRegistry, LangBdatRegistry, ModernRow};
+use crate::{
+    lang::{filter_table_from_bdat, text_table_from_bdat},
+    BdatRegistry, LangBdatRegistry, ModernRow,
+};
 
 type GimmickTable = HashMap<u32, MapPoint>;
 type JumpTable = Vec<Option<MapPoint>>;
@@ -26,9 +29,11 @@ pub fn read_data(bdat: &BdatRegistry) -> FieldRegistry {
 
 pub fn read_lang(bdat: &LangBdatRegistry) -> FieldLang {
     let locations = bdat.table(label_hash!("msg_location_name"));
+    let com_spots = bdat.table(label_hash!("msg_comspot_name"));
 
     FieldLang {
         locations: filter_table_from_bdat(locations),
+        com_spots: text_table_from_bdat(com_spots),
     }
 }
 

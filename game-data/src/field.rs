@@ -3,7 +3,7 @@ use std::num::NonZeroU16;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    lang::{FilterEntry, FilterTable, Filterable, Id},
+    lang::{FilterEntry, FilterTable, Filterable, Id, TextTable},
     LanguageData,
 };
 
@@ -15,6 +15,7 @@ pub struct FieldRegistry {
 #[derive(Serialize, Deserialize)]
 pub struct FieldLang {
     pub locations: FilterTable,
+    pub com_spots: TextTable,
 }
 
 #[derive(Serialize, Deserialize, PartialEq)]

@@ -1,8 +1,11 @@
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    lang::FilterTable,
+    lang::{Nameable, TextEntry, TextTable},
     manual::{Flag, FlagRange},
+    LanguageData,
 };
 
 #[derive(Deserialize, Serialize)]
@@ -12,7 +15,8 @@ pub struct Dlc4Map {
 
 #[derive(Deserialize, Serialize)]
 pub struct Dlc4MapLang {
-    pub map: FilterTable,
+    pub map: TextTable,
+    pub achievement_type_map: HashMap<u32, u32>,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -39,34 +43,16 @@ pub struct Architecture {
     end_flag: Flag,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub enum ArchitectureType {
-    Repair = 0,
-    Make = 1,
+    Elevator = 0,
+    Ladder = 1,
+    Slide = 2,
+    Lift = 3,
+    Tower = 4,
+    ComSpot = 5,
 }
 
-/*
-MAP achievement text hashes (type 1 => ..., 2 => ...)
-
-    local_c0[1][0] = 0x1729fe77;
-    local_c0[2][0] = 0xe2bb89d6;
-    local_c0[3][0] = 0xb1c9ca4f;
-    local_c0[4][0] = 0x947ee7df;
-    local_c0[5][0] = 0x34d3c504;
-    local_c0[6][0] = 0x648ab23;
-    local_c0[7][0] = 0xe8428146;
-    local_c0[8][0] = 0x515f1496;
-    local_c0[9][0] = 0x26f7df25;
-    local_c0[10][0] = 0x9591fd9f;
-    local_c0[11][0] = 0x3f44fa87;
-    local_c0[12][0] = 0xdc087a84;
-    local_c0[13][0] = 0x19bff09f;
-    local_c0[14][0] = 0x921c87db;
-
-    0C37D405 and 85601D1A are mast IDs (FLD_Architecture),
-    they reveal their respective 20 achievement searches on the map
-
-*/
 /// A row from `FLD_MapAchievementSearch`
 #[derive(Deserialize, Serialize)]
 pub struct MapAchievement {
@@ -81,11 +67,31 @@ pub struct AchievementSearch {
     pub name: AchievementName,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub enum AchievementName {
-    Enemy(u32),
-    Npc(u32),
-    Unknown(u32),
+    Enemy {
+        name_id: u32,
+    },
+    Npc {
+        id: u32,
+    },
+    Location {
+        name_id: u32,
+    },
+    ComSpot {
+        name_id: u32,
+    },
+    Architecture {
+        ty: ArchitectureType,
+        x: f32,
+        y: f32,
+        z: f32,
+    },
+    Unknown {
+        x: f32,
+        y: f32,
+        z: f32,
+    },
 }
 
 #[derive(Deserialize, Serialize)]
@@ -130,5 +136,16 @@ pub struct MapAchievementFlags {
 impl Dlc4Map {
     pub fn new(map_achievements: [Box<[MapAchievement]>; 5]) -> Self {
         Self { map_achievements }
+    }
+
+    pub fn achievements(&self, region: usize) -> &[MapAchievement] {
+        &self.map_achievements[region]
+    }
+}
+
+impl Nameable for MapAchievement {
+    fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l TextEntry> {
+        let name_id = language.dlc.map.achievement_type_map.get(&self.ty)?;
+        language.dlc.map.map.get(*name_id as usize)
     }
 }
