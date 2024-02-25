@@ -11,7 +11,7 @@ use crate::BdatRegistry;
 
 pub fn read_collepedia(bdat: &BdatRegistry) -> Regional<Dlc4Collepedia> {
     let table = bdat.table(Label::Hash(0x947C9B0C));
-    table
+    let mut entries = table
         .rows()
         .map(|row| {
             let region: u16 = row.get(Label::Hash(0x7A94A94B)).get_as();
@@ -27,13 +27,15 @@ pub fn read_collepedia(bdat: &BdatRegistry) -> Regional<Dlc4Collepedia> {
             };
             (region - 1, row)
         })
-        .collect()
+        .collect::<Vec<_>>();
+    entries.sort_by_key(|&(region, e)| (region, e.category, e.sort_id));
+    entries.into_iter().collect()
 }
 
 pub fn read_enemypedia(bdat: &BdatRegistry) -> Regional<Enemypedia> {
     let table = bdat.table(Label::Hash(0xB4158056));
     let locations = bdat.table(label_hash!("ma40a_GMK_Location"));
-    table
+    let mut entries = table
         .rows()
         .map(|row| {
             let region: u32 = row.get(Label::Hash(0x7A94A94B)).get_as();
@@ -53,5 +55,7 @@ pub fn read_enemypedia(bdat: &BdatRegistry) -> Regional<Enemypedia> {
             };
             (region - 1, row)
         })
-        .collect()
+        .collect::<Vec<_>>();
+    entries.sort_by_key(|&(region, e)| (region, e.sort_id));
+    entries.into_iter().collect()
 }
