@@ -30,7 +30,7 @@ Base game features:
 | Quest progress | :white_check_mark: | :white_check_mark: |
 | Unique Monster records | :white_check_mark: | :white_check_mark: |
 | Map locations | :white_check_mark: | :white_check_mark: |
-| Map visibility (fog of war) | :white_check_mark: | |
+| Map visibility (fog of war) | :heavy_check_mark: | |
 | Save file settings | :white_check_mark: | :white_check_mark: |
 | Party formations | :white_check_mark: | :white_check_mark: |
 | Chronological data (sorting, etc.) | :white_check_mark: | |
@@ -53,9 +53,10 @@ Future Redeemed features:
 | Feature | Library support | Webapp support |
 | ------- | --------------- | -------------- |
 | Affinity Growth | :white_check_mark: | :white_check_mark: (missing APs) |
-| Collectopedia | | |
-| Enemypedia | | |
-| Map progress | | |
+| Collectopedia | :wrench: | :white_check_mark: |
+| Enemypedia | :wrench: | :white_check_mark: |
+| Map completion | :wrench: | :white_check_mark: |
+| Community | | |
 
 ## Webapp translations
 

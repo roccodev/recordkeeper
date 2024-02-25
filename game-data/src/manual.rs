@@ -29,13 +29,13 @@ pub struct Flags {
     pub dx_cylinder_level: Flag,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub struct Flag {
     pub bits: usize,
     pub index: usize,
 }
 
-#[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
 pub struct FlagRange {
     pub flag: Flag,
     pub count: usize,

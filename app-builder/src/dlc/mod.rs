@@ -5,6 +5,7 @@ use crate::{BdatRegistry, LangBdatRegistry};
 mod challenge;
 mod map;
 mod masha;
+mod pedia;
 pub mod pow_augment;
 
 pub fn read_dlc_game(bdat: &BdatRegistry) -> DlcData {
@@ -12,6 +13,8 @@ pub fn read_dlc_game(bdat: &BdatRegistry) -> DlcData {
         masha: masha::read_game(bdat),
         challenge: challenge::read_game(bdat),
         map: map::read_game(bdat),
+        collepedia: pedia::read_collepedia(bdat),
+        enemypedia: pedia::read_enemypedia(bdat),
     }
 }
 

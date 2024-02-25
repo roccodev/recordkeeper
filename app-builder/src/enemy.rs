@@ -1,5 +1,5 @@
 use bdat::{label_hash, TableAccessor};
-use game_data::enemy::{EnemyLang, EnemyRegistry, UniqueMonster};
+use game_data::enemy::{Enemy, EnemyLang, EnemyRegistry, UniqueMonster};
 
 use crate::{lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry};
 
@@ -25,7 +25,16 @@ pub fn read_data(bdat: &BdatRegistry) -> EnemyRegistry {
         })
         .collect();
 
+    let enemies = enemies
+        .rows()
+        .map(|row| Enemy {
+            id: row.id(),
+            name_id: row.get(label_hash!("MsgName")).to_integer() as usize,
+        })
+        .collect();
+
     EnemyRegistry {
+        enemies,
         unique_monsters: uniques,
     }
 }

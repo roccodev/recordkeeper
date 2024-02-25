@@ -73,8 +73,8 @@ pub fn render(route: Route) -> Html {
         Route::ChallengeBattle => html!(<dlc::challenge::ChallengePage />),
         Route::Gauntlet => html!(<dlc::gauntlet::GauntletPage />),
         Route::Dlc4Map => html!(<dlc::map::MapPage />),
-        Route::Dlc4Collepedia => html!(),
-        Route::Dlc4Enemypedia => html!(),
+        Route::Dlc4Collepedia => html!(<dlc::pedia::CollepediaPage />),
+        Route::Dlc4Enemypedia => html!(<dlc::pedia::EnemypediaPage />),
         Route::Flags => html!(<flags::FlagList />),
         Route::ChronoData => html!(<chrono::ChronoPage />),
     };

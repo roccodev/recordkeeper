@@ -21,23 +21,6 @@ pub struct Dlc4MapLang {
     pub achievement_type_map: HashMap<u32, u32>,
 }
 
-#[derive(Deserialize, Serialize)]
-pub struct Collepedia {
-    location_id: u32,
-    category: u32,
-    item: u32,
-    flag: Flag,
-    sort_id: u32,
-}
-
-#[derive(Deserialize, Serialize)]
-pub struct Enemypedia {
-    location_id: u32,
-    enemies: Box<[u32]>,
-    flag: Flag,
-    sort_id: u32,
-}
-
 #[derive(Deserialize, Serialize, PartialEq)]
 pub struct Dlc4Region {
     pub id: usize,

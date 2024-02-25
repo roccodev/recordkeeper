@@ -1,5 +1,5 @@
 use ybc::Container;
-use yew::*;
+use yew::prelude::*;
 
 pub mod edit;
 pub mod nav;

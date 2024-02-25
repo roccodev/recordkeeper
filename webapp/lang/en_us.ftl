@@ -487,3 +487,16 @@ dlc4_map_bulk_state_all = All
 dlc4_map_bulk_on = All Completed
 dlc4_map_bulk_progress = All Visible
 dlc4_map_bulk_off = All Hidden
+
+# DLC4 collectopedia/enemypedia
+
+dlc4_pedia_desc = Description
+dlc4_pedia_status = Status
+dlc4_pedia_status_unknown = Unregistered
+dlc4_pedia_status_progress = In Progress
+dlc4_pedia_status_complete = Registered
+dlc4_pedia_bulk = Bulk Edit
+dlc4_pedia_bulk_coll_on = Register all
+dlc4_pedia_bulk_coll_off = Unregister all
+dlc4_pedia_bulk_ene_on = Complete all
+dlc4_pedia_bulk_ene_on = Reset all
