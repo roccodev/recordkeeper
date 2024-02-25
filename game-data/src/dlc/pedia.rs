@@ -45,6 +45,15 @@ pub trait PediaItem {
     fn get_name<'d>(&self, game: &GameData, lang: &'d LanguageData) -> Option<&'d str>;
 }
 
+impl PediaValue {
+    pub const fn flag_max(&self) -> u32 {
+        match self {
+            PediaValue::Number { max } => *max as u32,
+            PediaValue::TriState => 2,
+        }
+    }
+}
+
 impl PediaItem for Dlc4Collepedia {
     fn flag(&self) -> Flag {
         self.flag

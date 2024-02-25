@@ -2,26 +2,35 @@ use game_data::dlc::map::Dlc4Region;
 use game_data::dlc::pedia::{CollepediaStatus, Dlc4Collepedia, Enemypedia, PediaItem, PediaValue};
 use game_data::dlc::Regional;
 use recordkeeper::SaveData;
-use ybc::{Control, Field, Table, Tile};
+use ybc::{Button, Control, Field, Table, Tile};
 use yew::prelude::*;
 
 use crate::components::edit::{EnumInput, FlagEditor, NumberInput};
 use crate::components::page::{PageControls, PageOrganizer};
-use crate::ToHtml;
+use crate::save::SaveContext;
 use crate::{
     components::{edit::Editor, select::Selector},
     data::Data,
     lang::Text,
+    ToHtml,
 };
 
 #[derive(Properties, PartialEq)]
 pub struct PediaProps<T: PartialEq + 'static> {
     items: &'static Regional<T>,
+    is_collepedia: bool,
 }
 
 #[derive(Properties, PartialEq)]
 struct PediaRowProps<T: PartialEq + 'static> {
     item: &'static T,
+}
+
+#[derive(Properties, PartialEq)]
+pub struct PediaBulkProps<T: PartialEq + 'static> {
+    items: &'static [T],
+    on: bool,
+    is_collepedia: bool,
 }
 
 #[derive(PartialEq, Copy, Clone)]
@@ -33,13 +42,13 @@ const ROWS_PER_PAGE: usize = 12;
 #[function_component]
 pub fn CollepediaPage() -> Html {
     let data = use_context::<Data>().unwrap();
-    html!(<PediaPage<Dlc4Collepedia> items={&data.game().dlc.collepedia} />)
+    html!(<PediaPage<Dlc4Collepedia> items={&data.game().dlc.collepedia} is_collepedia={true} />)
 }
 
 #[function_component]
 pub fn EnemypediaPage() -> Html {
     let data = use_context::<Data>().unwrap();
-    html!(<PediaPage<Enemypedia> items={&data.game().dlc.enemypedia} />)
+    html!(<PediaPage<Enemypedia> items={&data.game().dlc.enemypedia} is_collepedia={false} />)
 }
 
 #[function_component]
@@ -56,10 +65,20 @@ fn PediaPage<T: PartialEq + PediaItem + 'static>(props: &PediaProps<T>) -> Html 
 
     html! {
         <>
-            <Field>
-                <label class="label"><Text path="dlc4_map_region" /></label>
+            <Field classes={classes!("is-grouped", "is-align-items-end")}>
+                <Control classes="is-flex-grow-1">
+                    <Field>
+                        <label class="label"><Text path="dlc4_map_region" /></label>
+                        <Control>
+                            <Selector<Dlc4Region> state={region_state.clone()} values={data.game().dlc.map.regions()} />
+                        </Control>
+                    </Field>
+                </Control>
                 <Control>
-                    <Selector<Dlc4Region> state={region_state.clone()} values={data.game().dlc.map.regions()} />
+                    <PediaBulkEdit<T> items={items} on={true} is_collepedia={props.is_collepedia} />
+                </Control>
+                <Control>
+                    <PediaBulkEdit<T> items={items} on={false} is_collepedia={props.is_collepedia} />
                 </Control>
             </Field>
             <Tile classes="mb-2">
@@ -112,6 +131,32 @@ fn PediaRow<T: PartialEq + PediaItem + 'static>(props: &PediaRowProps<T>) -> Htm
             <td>{props.item.get_name(data.game(), data.lang())}</td>
             {type_display}
         </tr>
+    }
+}
+
+#[function_component]
+fn PediaBulkEdit<T: PartialEq + PediaItem + 'static>(props: &PediaBulkProps<T>) -> Html {
+    let save = use_context::<SaveContext>().unwrap();
+
+    let lang_path = format!(
+        "dlc4_pedia_bulk_{}_{}",
+        if props.is_collepedia { "coll" } else { "ene" },
+        if props.on { "on" } else { "off" }
+    );
+
+    let PediaBulkProps { on, items, .. } = *props;
+    let bulk_set = Callback::from(move |_: MouseEvent| {
+        for item in items {
+            let editor = FlagEditor::from(item.flag());
+            let value = if on { item.item().flag_max() } else { 0 };
+            save.edit(move |save| editor.set(save, value));
+        }
+    });
+
+    html! {
+        <Button onclick={bulk_set}>
+            <Text path={lang_path} />
+        </Button>
     }
 }
 

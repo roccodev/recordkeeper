@@ -499,4 +499,4 @@ dlc4_pedia_bulk = Bulk Edit
 dlc4_pedia_bulk_coll_on = Register all
 dlc4_pedia_bulk_coll_off = Unregister all
 dlc4_pedia_bulk_ene_on = Complete all
-dlc4_pedia_bulk_ene_on = Reset all
+dlc4_pedia_bulk_ene_off = Reset all
