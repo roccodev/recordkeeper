@@ -22,10 +22,11 @@ pub struct Enemypedia {
     pub flag: Flag,
     pub sort_id: u16,
     pub max: u8,
+    pub slot_id: usize,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, EnumIter, FromRepr)]
-pub enum CollepediaStatus {
+pub enum PediaStatus {
     /// Never had the item in inventory
     Unknown = 0,
     /// Item has been picked up at least once (even if amount is currently 0)
@@ -35,7 +36,7 @@ pub enum CollepediaStatus {
 }
 
 pub enum PediaValue {
-    Number { max: u8 },
+    Number { max: u8, slot_id: usize },
     TriState,
 }
 
@@ -48,7 +49,7 @@ pub trait PediaItem {
 impl PediaValue {
     pub const fn flag_max(&self) -> u32 {
         match self {
-            PediaValue::Number { max } => *max as u32,
+            PediaValue::Number { max, .. } => *max as u32,
             PediaValue::TriState => 2,
         }
     }
@@ -77,7 +78,10 @@ impl PediaItem for Enemypedia {
     }
 
     fn item(&self) -> PediaValue {
-        PediaValue::Number { max: self.max }
+        PediaValue::Number {
+            max: self.max,
+            slot_id: self.slot_id,
+        }
     }
 
     fn get_name<'d>(&self, game: &GameData, lang: &'d LanguageData) -> Option<&'d str> {

@@ -1,11 +1,11 @@
 use game_data::dlc::map::Dlc4Region;
-use game_data::dlc::pedia::{CollepediaStatus, Dlc4Collepedia, Enemypedia, PediaItem, PediaValue};
+use game_data::dlc::pedia::{Dlc4Collepedia, Enemypedia, PediaItem, PediaStatus, PediaValue};
 use game_data::dlc::Regional;
 use recordkeeper::SaveData;
 use ybc::{Button, Control, Field, Table, Tile};
 use yew::prelude::*;
 
-use crate::components::edit::{EnumInput, FlagEditor, NumberInput};
+use crate::components::edit::{editor, EnumInput, FlagEditor, NumberInput};
 use crate::components::page::{PageControls, PageOrganizer};
 use crate::save::SaveContext;
 use crate::{
@@ -30,11 +30,19 @@ struct PediaRowProps<T: PartialEq + 'static> {
 pub struct PediaBulkProps<T: PartialEq + 'static> {
     items: &'static [T],
     on: bool,
-    is_collepedia: bool,
 }
 
 #[derive(PartialEq, Copy, Clone)]
-pub struct CollepediaStatusEditor(FlagEditor);
+pub struct PediaStatusEditor(FlagEditor);
+
+#[rustfmt::skip]
+editor!(
+    EnemypediaEditor,
+    u8,
+    get |editor, save| save.dlc4.get_enemypedia_count(editor.index),
+    set |editor, save, new| save.dlc4.set_enemypedia_count(editor.index, new),
+    capture index: usize
+);
 
 const PAGES_PER_VIEW: usize = 2;
 const ROWS_PER_PAGE: usize = 12;
@@ -75,10 +83,10 @@ fn PediaPage<T: PartialEq + PediaItem + 'static>(props: &PediaProps<T>) -> Html 
                     </Field>
                 </Control>
                 <Control>
-                    <PediaBulkEdit<T> items={items} on={true} is_collepedia={props.is_collepedia} />
+                    <PediaBulkEdit<T> items={items} on={true} />
                 </Control>
                 <Control>
-                    <PediaBulkEdit<T> items={items} on={false} is_collepedia={props.is_collepedia} />
+                    <PediaBulkEdit<T> items={items} on={false} />
                 </Control>
             </Field>
             <Tile classes="mb-2">
@@ -88,6 +96,9 @@ fn PediaPage<T: PartialEq + PediaItem + 'static>(props: &PediaProps<T>) -> Html 
                             <thead>
                                 <tr>
                                     <th><Text path="dlc4_pedia_desc" /></th>
+                                    {if !props.is_collepedia {
+                                        html!(<th><Text path="dlc4_pedia_ene_count" /></th>)
+                                    } else { html!() }}
                                     <th><Text path="dlc4_pedia_status" /></th>
                                 </tr>
                             </thead>
@@ -113,23 +124,25 @@ fn PediaRow<T: PartialEq + PediaItem + 'static>(props: &PediaRowProps<T>) -> Htm
     let editor = FlagEditor::from(props.item.flag());
 
     let type_display = match props.item.item() {
-        PediaValue::Number { max } => html! {
-            <td class={classes!("is-flex", "is-align-items-center")}>
-                <NumberInput<FlagEditor> editor={editor} max={max as u32} />
-                <span class="ml-2">{"/"}{max}</span>
-            </td>
-        },
-        PediaValue::TriState => html! {
-            <td>
-                <EnumInput<CollepediaStatusEditor> editor={CollepediaStatusEditor(editor)} />
-            </td>
-        },
+        PediaValue::Number { max, slot_id } => {
+            let count_editor = EnemypediaEditor { index: slot_id };
+            html! {
+                <td class={classes!("is-flex", "is-align-items-center")}>
+                    <NumberInput<EnemypediaEditor> editor={count_editor} max={max} />
+                    <span class="ml-2">{"/"}{max}</span>
+                </td>
+            }
+        }
+        PediaValue::TriState => html!(),
     };
 
     html! {
         <tr>
             <td>{props.item.get_name(data.game(), data.lang())}</td>
             {type_display}
+            <td>
+                <EnumInput<PediaStatusEditor> editor={PediaStatusEditor(editor)} />
+            </td>
         </tr>
     }
 }
@@ -138,18 +151,29 @@ fn PediaRow<T: PartialEq + PediaItem + 'static>(props: &PediaRowProps<T>) -> Htm
 fn PediaBulkEdit<T: PartialEq + PediaItem + 'static>(props: &PediaBulkProps<T>) -> Html {
     let save = use_context::<SaveContext>().unwrap();
 
-    let lang_path = format!(
-        "dlc4_pedia_bulk_{}_{}",
-        if props.is_collepedia { "coll" } else { "ene" },
-        if props.on { "on" } else { "off" }
-    );
+    let lang_path = format!("dlc4_pedia_bulk_{}", if props.on { "on" } else { "off" });
 
     let PediaBulkProps { on, items, .. } = *props;
     let bulk_set = Callback::from(move |_: MouseEvent| {
         for item in items {
             let editor = FlagEditor::from(item.flag());
-            let value = if on { item.item().flag_max() } else { 0 };
-            save.edit(move |save| editor.set(save, value));
+            let value = if on {
+                PediaStatus::Complete as u32
+            } else {
+                PediaStatus::Unknown as u32
+            };
+            let count_editor = match item.item() {
+                PediaValue::Number { max, slot_id } => {
+                    Some((EnemypediaEditor { index: slot_id }, max))
+                }
+                _ => None,
+            };
+            save.edit(move |save| {
+                editor.set(save, value);
+                if let Some((editor, max)) = count_editor {
+                    editor.set(save, if on { max } else { 0 });
+                }
+            });
         }
     });
 
@@ -160,11 +184,11 @@ fn PediaBulkEdit<T: PartialEq + PediaItem + 'static>(props: &PediaBulkProps<T>) 
     }
 }
 
-impl Editor for CollepediaStatusEditor {
-    type Target = CollepediaStatus;
+impl Editor for PediaStatusEditor {
+    type Target = PediaStatus;
 
     fn get(&self, save: &SaveData) -> Self::Target {
-        CollepediaStatus::from_repr(self.0.get(save) as usize).expect("unknown status")
+        PediaStatus::from_repr(self.0.get(save) as usize).expect("unknown status")
     }
 
     fn set(&self, save: &mut SaveData, new: Self::Target) {
@@ -172,12 +196,12 @@ impl Editor for CollepediaStatusEditor {
     }
 }
 
-impl ToHtml for CollepediaStatus {
+impl ToHtml for PediaStatus {
     fn to_html(&self) -> Html {
         let id = match self {
-            CollepediaStatus::Unknown => "unknown",
-            CollepediaStatus::InProgress => "progress",
-            CollepediaStatus::Complete => "complete",
+            PediaStatus::Unknown => "unknown",
+            PediaStatus::InProgress => "progress",
+            PediaStatus::Complete => "complete",
         };
         html!(<Text path={format!("dlc4_pedia_status_{id}")} />)
     }

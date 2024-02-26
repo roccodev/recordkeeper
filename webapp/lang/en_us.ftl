@@ -491,12 +491,12 @@ dlc4_map_bulk_off = All Hidden
 # DLC4 collectopedia/enemypedia
 
 dlc4_pedia_desc = Description
+# Number of defeated enemies (enemypedia)
+dlc4_pedia_ene_count = Defeated
 dlc4_pedia_status = Status
 dlc4_pedia_status_unknown = Unregistered
 dlc4_pedia_status_progress = In Progress
 dlc4_pedia_status_complete = Registered
 dlc4_pedia_bulk = Bulk Edit
-dlc4_pedia_bulk_coll_on = Register all
-dlc4_pedia_bulk_coll_off = Unregister all
-dlc4_pedia_bulk_ene_on = Complete all
-dlc4_pedia_bulk_ene_off = Reset all
+dlc4_pedia_bulk_on = Complete all
+dlc4_pedia_bulk_off = Reset all
