@@ -4,6 +4,7 @@ use yew_feather::{Github, Info, Key};
 use yew_router::prelude::Link;
 
 use crate::{
+    components::NON_BREAKING_SPACE,
     data::Data,
     lang::{Lang, LangMeta, Text},
     routes::Route,
@@ -77,7 +78,7 @@ fn LangSelect(props: &LangSelectProps) -> Html {
     let label = html! {
         <span class="is-flex">
             {label}
-            {": \u{00a0}"}
+            {": "}{NON_BREAKING_SPACE}
             <Flag id={meta.flag.clone()} />
         </span>
     };
@@ -139,5 +140,5 @@ fn IconText(props: &IconTextProps) -> Html {
 #[function_component]
 fn Flag(props: &FlagProps) -> Html {
     let cls = format!("fi fi-{}", props.id);
-    html!(<span class={cls}>{"\u{00a0}"}</span>)
+    html!(<span class={cls}>{NON_BREAKING_SPACE}</span>)
 }

@@ -7,6 +7,7 @@ use yew::prelude::*;
 
 use crate::components::edit::{editor, EnumInput, FlagEditor, NumberInput};
 use crate::components::page::{PageControls, PageOrganizer};
+use crate::components::NON_BREAKING_SPACE;
 use crate::save::SaveContext;
 use crate::{
     components::{edit::Editor, select::Selector},
@@ -129,7 +130,7 @@ fn PediaRow<T: PartialEq + PediaItem + 'static>(props: &PediaRowProps<T>) -> Htm
             html! {
                 <td class={classes!("is-flex", "is-align-items-center")}>
                     <NumberInput<EnemypediaEditor> editor={count_editor} max={max} />
-                    <span class="ml-2">{"/"}{max}</span>
+                    <span class="ml-2">{"/"}{NON_BREAKING_SPACE}{max}</span>
                 </td>
             }
         }

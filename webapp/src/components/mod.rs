@@ -17,6 +17,8 @@ pub mod meta;
 pub mod ouroboros;
 pub mod quest;
 
+pub const NON_BREAKING_SPACE: char = '\u{00a0}';
+
 #[derive(Properties, PartialEq)]
 pub struct FluidContainerProps {
     pub children: Children,

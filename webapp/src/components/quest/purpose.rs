@@ -12,6 +12,7 @@ use crate::{
     components::{
         edit::{Editor, EnumInput, FlagEditor},
         quest::StatusEditor,
+        NON_BREAKING_SPACE,
     },
     data::Data,
     lang::Text,
@@ -149,7 +150,7 @@ fn TaskButton(props: &TaskProps) -> Html {
                     {props.task.get_name_str(data.lang()).map(Cow::from)
                         .unwrap_or_else(|| format!("#{}", props.task.id).into())}
                 </span>
-                {"\u{00a0}"}
+                {NON_BREAKING_SPACE}
                 <span>
                     {" ("}<Text path={type_lang} />{")"}
                 </span>
