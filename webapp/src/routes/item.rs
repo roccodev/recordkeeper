@@ -155,7 +155,7 @@ fn ItemFinder(props: &PageChangeProps) -> Html {
             u32::from(slot.item_id()) == item.id
         }) {
             let next_page = index / (PAGES_PER_VIEW * ROWS_PER_PAGE);
-            page_state.set(next_page * PAGES_PER_VIEW);
+            page_state.set(next_page);
         }
     });
 
@@ -181,7 +181,7 @@ fn FirstEmptySlot(props: &FirstEmptyProps) -> Html {
             !slot.is_valid()
         }) {
             let next_page = index / (PAGES_PER_VIEW * ROWS_PER_PAGE);
-            page_state.set(next_page * PAGES_PER_VIEW);
+            page_state.set(next_page);
         }
     });
 

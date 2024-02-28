@@ -134,7 +134,7 @@ fn GoToFlag(props: &PageChangeProps) -> Html {
                 Ok(flag_index) => {
                     if flag_index < flag_type.num_flags() {
                         let next_page = flag_index / (PAGES_PER_VIEW * ROWS_PER_PAGE);
-                        page_state.set(next_page * PAGES_PER_VIEW);
+                        page_state.set(next_page);
                     }
                 }
                 Err(_) => {
