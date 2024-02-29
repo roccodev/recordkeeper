@@ -3,6 +3,7 @@ use game_data::dlc::{DlcData, DlcLang};
 use crate::{BdatRegistry, LangBdatRegistry};
 
 mod challenge;
+mod community;
 mod map;
 mod masha;
 mod pedia;
@@ -15,6 +16,7 @@ pub fn read_dlc_game(bdat: &BdatRegistry) -> DlcData {
         map: map::read_game(bdat),
         collepedia: pedia::read_collepedia(bdat),
         enemypedia: pedia::read_enemypedia(bdat),
+        community: community::read_game(bdat),
     }
 }
 
@@ -23,5 +25,6 @@ pub fn read_dlc_lang(bdat: &LangBdatRegistry) -> DlcLang {
         masha: masha::read_lang(bdat),
         challenge: challenge::read_lang(bdat),
         map: map::read_lang(bdat),
+        community: community::read_lang(bdat),
     }
 }

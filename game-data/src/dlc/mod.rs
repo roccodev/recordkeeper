@@ -2,12 +2,14 @@ use serde::{Deserialize, Serialize};
 
 use self::{
     challenge::{ChallengeGame, ChallengeLang},
+    community::{DlcCommunity, DlcCommunityLang},
     map::{Dlc4Map, Dlc4MapLang},
     masha::{GameCraftItems, LangCraftItems},
     pedia::{Dlc4Collepedia, Enemypedia},
 };
 
 pub mod challenge;
+pub mod community;
 pub mod map;
 pub mod masha;
 pub mod pedia;
@@ -20,6 +22,7 @@ pub struct DlcData {
     pub map: Dlc4Map,
     pub collepedia: Regional<Dlc4Collepedia>,
     pub enemypedia: Regional<Enemypedia>,
+    pub community: DlcCommunity,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -27,6 +30,7 @@ pub struct DlcLang {
     pub masha: LangCraftItems,
     pub challenge: ChallengeLang,
     pub map: Dlc4MapLang,
+    pub community: DlcCommunityLang,
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
