@@ -69,6 +69,13 @@ pub struct SaveData {
     /// 0-100: at 100 a new cylinder is generated when harvesting ether.
     pub ether_cylinder_dx_progress: u16,
 
+    /// Max chronological ID for Future Redeemed NPC community entries.
+    ///
+    /// The next community entry is given this chronological ID, which is then
+    /// incremented by one.
+    #[loc(0x54)]
+    pub(crate) dlc4_community_order_max: u16,
+
     #[loc(0x664)]
     save_flags: BitFlags<1, 1>,
 

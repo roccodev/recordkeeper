@@ -116,7 +116,11 @@ fn achievement_lang(lang: &LanguageData, achievement: &AchievementSearch) -> Htm
             .get(*name_id as usize)
             .map(TextEntry::text)
             .map(Into::into),
-        AchievementName::Npc { name_id } => lang.characters.npcs.get(&name_id).map(Into::into),
+        AchievementName::Npc { name_id } => lang
+            .npcs
+            .get_npc_name(*name_id)
+            .map(FilterEntry::text)
+            .map(Into::into),
         AchievementName::Location { name_id } => lang
             .field
             .locations

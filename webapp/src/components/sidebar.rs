@@ -123,6 +123,7 @@ fn SaveSidebar() -> Html {
                     html!(<BookOpen />),
                     Route::Dlc4Enemypedia,
                 ),
+                Tab("dlc4_community", html!(<Target />), Route::Dlc4Community),
             ])
         } else {
             MenuItem::None

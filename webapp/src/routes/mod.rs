@@ -51,6 +51,8 @@ pub enum Route {
     Dlc4Collepedia,
     #[at("/dlc4enemy")]
     Dlc4Enemypedia,
+    #[at("/dlc4comm")]
+    Dlc4Community,
     #[at("/flags")]
     Flags,
     #[at("/chrono")]
@@ -75,6 +77,7 @@ pub fn render(route: Route) -> Html {
         Route::Dlc4Map => html!(<dlc::map::MapPage />),
         Route::Dlc4Collepedia => html!(<dlc::pedia::CollepediaPage />),
         Route::Dlc4Enemypedia => html!(<dlc::pedia::EnemypediaPage />),
+        Route::Dlc4Community => html!(<dlc::community::CommunityPage />),
         Route::Flags => html!(<flags::FlagList />),
         Route::ChronoData => html!(<chrono::ChronoPage />),
     };

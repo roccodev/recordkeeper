@@ -1,4 +1,4 @@
-use std::{collections::HashMap, num::NonZeroUsize};
+use std::num::NonZeroUsize;
 
 use crate::{
     dlc::pow_augment::PowAugment,
@@ -27,7 +27,6 @@ pub struct CharacterLang {
     pub skills: FilterTable,
     pub classes: FilterTable,
     pub misc: FilterTable,
-    pub npcs: HashMap<u32, String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq)]

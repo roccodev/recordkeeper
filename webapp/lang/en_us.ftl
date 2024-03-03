@@ -63,6 +63,7 @@ menu_dlc4_growth = Affinity Growth
 menu_dlc4_map_completion = Map Completion
 menu_dlc4_collepedia = Collectopedia
 menu_dlc4_enemypedia = Enemypedia
+menu_dlc4_community = Community
 
 menu_meta_meta = Save Info
 
@@ -481,8 +482,13 @@ dlc4_map_status_visible = Visible
 dlc4_map_status_complete = Completed
 
 dlc4_map_bulk = Bulk Edit
+# The "bulk edit" buttons only affect entries from the
+# selected category (e.g. containers, relics, etc.)
 dlc4_map_bulk_state_category = Category
+# The "bulk edit" buttons only affect entries from the
+# selected region
 dlc4_map_bulk_state_region = Region
+# The "bulk edit" buttons affect all entries
 dlc4_map_bulk_state_all = All
 dlc4_map_bulk_on = All Completed
 dlc4_map_bulk_progress = All Visible
@@ -500,3 +506,19 @@ dlc4_pedia_status_complete = Registered
 dlc4_pedia_bulk = Bulk Edit
 dlc4_pedia_bulk_on = Complete all
 dlc4_pedia_bulk_off = Reset all
+
+# DLC4 community menu
+
+dlc4_comm_npc = NPC
+dlc4_comm_status = Completed
+dlc4_comm_type = Task Type
+dlc4_comm_desc = Task Description
+# Some condition tasks also show progress. Read only.
+dlc4_comm_progress = Task Progress
+# This task requires talking to an NPC multiple times
+dlc4_comm_task_talk = Talk
+# This task requires completing a quest
+dlc4_comm_task_quest = Finish Quest
+# This task requires satisfying some conditions. Can be translated
+# as "miscellaneous"
+dlc4_comm_task_condition = Misc

@@ -8,6 +8,7 @@ use field::{FieldLang, FieldRegistry};
 use formation::{FormationData, FormationLang};
 use item::{ItemLanguageRegistry, ItemRegistry};
 use manual::ManualData;
+use npc::{NpcLang, NpcRegistry};
 use ouroboros::OuroborosRegistry;
 use quest::{QuestLang, QuestRegistry};
 use scenario::ScenarioRanges;
@@ -23,6 +24,7 @@ pub mod formation;
 pub mod item;
 pub mod lang;
 pub mod manual;
+pub mod npc;
 pub mod ouroboros;
 pub mod quest;
 pub mod scenario;
@@ -39,6 +41,7 @@ pub struct GameData {
     pub field: FieldRegistry,
     pub enemies: EnemyRegistry,
     pub formation: FormationData,
+    pub npcs: NpcRegistry,
 
     /// Manually inputted data, that can't be read
     /// from game files.
@@ -55,6 +58,7 @@ pub struct LanguageData {
     pub field: FieldLang,
     pub enemies: EnemyLang,
     pub formation: FormationLang,
+    pub npcs: NpcLang,
 }
 
 pub fn save_game_data(data: &GameData, mut writer: impl Write) -> Result<(), Box<dyn Error>> {

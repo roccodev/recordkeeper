@@ -16,6 +16,7 @@ mod gimmick;
 mod item;
 mod lang;
 mod manual;
+mod npc;
 mod ouroboros;
 mod quest;
 mod scenario;
@@ -73,6 +74,7 @@ fn read_game_data(bdat: &BdatRegistry) -> GameData {
         field: field::read_data(bdat),
         enemies: enemy::read_data(bdat),
         formation: formation::read_data(bdat),
+        npcs: npc::read_data(bdat),
     }
 }
 
@@ -86,6 +88,7 @@ fn read_lang_data(bdat: &LangBdatRegistry) -> LanguageData {
         field: field::read_lang(bdat),
         enemies: enemy::read_lang(bdat),
         formation: formation::read_lang(bdat),
+        npcs: npc::read_lang(bdat),
     }
 }
 
