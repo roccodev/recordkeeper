@@ -3,6 +3,7 @@ use std::cmp::Ordering;
 use recordkeeper_macros::SaveBin;
 
 use crate::{
+    io::SaveBin,
     item::{Inventory, ItemType},
     util::FixVec,
 };
@@ -122,7 +123,7 @@ struct TableInner<const R: usize, const C: usize> {
 /// Comparator (descending order) for order keys, making null values greater than every other key.
 struct NullsLastReverse<K: ChronologicalKey>(K);
 
-trait ChronologicalKey: Ord + Copy + crate::io::SaveBin {
+trait ChronologicalKey: Ord + Copy + SaveBin {
     fn is_null(&self) -> bool;
 }
 

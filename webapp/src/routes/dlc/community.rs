@@ -1,5 +1,5 @@
 use game_data::npc::Npc;
-use recordkeeper::SaveData;
+use recordkeeper::{chrono::ChronologicalOrder, dlc::CommunityChrono, SaveData};
 use ybc::{Control, Field, Table};
 use yew::prelude::*;
 
@@ -94,17 +94,21 @@ impl Editor for StatusEditor {
     }
 
     fn set(&self, save: &mut SaveData, new: Self::Target) {
-        // TODO: if setting to or from 0, need to edit order flag
-        // (A flag value of 0 means task #1 is complete, while order flag = 0 means unstarted)
+        let mut chrono_editor = CommunityChrono::new(save, self.order.flag_type);
         if new {
+            chrono_editor.insert(self.order.flag_index);
             let old_val = self.progress.get(save);
             if old_val < self.target {
                 self.progress.set(save, self.target);
             }
         } else {
+            if self.target == 0 {
+                // Delete order entry if no task is completed
+                chrono_editor.delete(self.order.flag_index);
+            }
             // Undo progress thus far
             let new_val = self.target.saturating_sub(1);
-            self.progress.set(save, new_val)
+            self.progress.set(save, new_val);
         }
     }
 }

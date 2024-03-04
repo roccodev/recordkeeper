@@ -1,6 +1,13 @@
+use std::cmp::Ordering;
+
 use recordkeeper_macros::SaveBin;
 
-use crate::character::{class::ClassAccessory, CHARACTER_MAX};
+use crate::{
+    character::{class::ClassAccessory, CHARACTER_MAX},
+    chrono::ChronologicalOrder,
+    flags::FlagType,
+    SaveData,
+};
 
 pub const DLC4_ENEMYPEDIA_MAX_EACH: usize = 200;
 
@@ -23,6 +30,11 @@ pub struct Dlc4 {
 pub struct Dlc4ExtraInventory {
     /// Likely indexed by class ID
     battle_manual: Box<[ClassAccessory; 64]>,
+}
+
+pub struct CommunityChrono<'a> {
+    save: &'a mut SaveData,
+    flag_type: FlagType,
 }
 
 impl Dlc4 {
@@ -52,5 +64,57 @@ impl Dlc4 {
         } else {
             self.enemypedia_200_399[index - 200] = count;
         }
+    }
+}
+
+impl<'a> CommunityChrono<'a> {
+    pub fn new(save: &'a mut SaveData, flag_type: FlagType) -> Self {
+        Self { save, flag_type }
+    }
+
+    pub fn is_present(&self, flag: usize) -> bool {
+        self.save
+            .flags
+            .get(self.flag_type, flag)
+            .is_some_and(|f| f != 0)
+    }
+    pub fn delete(&mut self, flag: usize) {
+        self.save.flags.set(self.flag_type, flag, 0);
+    }
+}
+
+impl<'a> ChronologicalOrder for CommunityChrono<'a> {
+    fn cmp_entries(&self, id_a: usize, id_b: usize) -> Ordering {
+        self.save
+            .flags
+            .get(self.flag_type, id_a)
+            .cmp(&self.save.flags.get(self.flag_type, id_b))
+    }
+
+    fn swap(&mut self, id_a: usize, id_b: usize) {
+        let val_a = self
+            .save
+            .flags
+            .get(self.flag_type, id_a)
+            .expect("id_a out of bounds");
+        let val_b = self
+            .save
+            .flags
+            .get(self.flag_type, id_b)
+            .expect("id_b out of bounds");
+        self.save.flags.set(self.flag_type, id_a, val_b);
+        self.save.flags.set(self.flag_type, id_b, val_a);
+    }
+
+    fn insert(&mut self, id: usize) {
+        if self.is_present(id) {
+            return;
+        }
+        self.save.flags.set(
+            self.flag_type,
+            id,
+            self.save.dlc4_community_order_max as u32,
+        );
+        self.save.dlc4_community_order_max += 1;
     }
 }
