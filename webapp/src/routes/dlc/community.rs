@@ -41,7 +41,11 @@ pub fn CommunityPage() -> Html {
             <Field>
                 <label class="label"><Text path="dlc4_comm_npc" /></label>
                 <Control>
-                    <Selector<Npc> state={npc.clone()} values={&*data.game().dlc.community.npcs} />
+                    <Selector<Npc>
+                        state={npc.clone()}
+                        values={&*data.game().dlc.community.npcs}
+                        sort_key={data.lang().dlc.community.npc_sort.clone()}
+                    />
                 </Control>
             </Field>
             <Table classes={classes!("is-fullwidth")}>

@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::LanguageData;
 use serde::{Deserialize, Serialize};
 
@@ -19,6 +21,12 @@ pub struct TextEntry {
 pub struct FilterEntry {
     text: TextEntry,
     text_lower: Box<str>,
+}
+
+/// A key to sort entries based on their translated name
+#[derive(Serialize, Deserialize, PartialEq, Eq, Clone)]
+pub struct SortKey {
+    ids: Rc<[usize]>,
 }
 
 pub trait Nameable {
@@ -92,6 +100,22 @@ impl FilterEntry {
     }
 }
 
+impl SortKey {
+    /// Lists the items in the order given by the language sort key.
+    pub fn list<'i, T: Id>(&self, items: &'i [T]) -> Vec<&'i T> {
+        let mut items: Vec<_> = items.into_iter().collect();
+        items.sort_unstable_by_key(|i| i.id());
+        let mut sorted = Vec::with_capacity(items.len());
+        for id in self.ids.iter() {
+            let idx = items
+                .binary_search_by_key(id, |i| i.id())
+                .expect("id not found in items");
+            sorted.push(items[idx]);
+        }
+        sorted
+    }
+}
+
 impl<T> Nameable for T
 where
     T: Filterable,
@@ -125,5 +149,13 @@ impl From<TextEntry> for FilterEntry {
 impl<'a> From<&'a FilterEntry> for &'a TextEntry {
     fn from(value: &FilterEntry) -> &TextEntry {
         &value.text
+    }
+}
+
+impl FromIterator<usize> for SortKey {
+    fn from_iter<T: IntoIterator<Item = usize>>(iter: T) -> Self {
+        Self {
+            ids: iter.into_iter().collect(),
+        }
     }
 }

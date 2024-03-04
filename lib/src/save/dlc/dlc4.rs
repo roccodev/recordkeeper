@@ -72,18 +72,23 @@ impl<'a> CommunityChrono<'a> {
         Self { save, flag_type }
     }
 
+    /// Checks whether an NPC community entry is registered in the order.
+    /// If it is not registered, then no task from that entry was completed.
     pub fn is_present(&self, flag: usize) -> bool {
         self.save
             .flags
             .get(self.flag_type, flag)
             .is_some_and(|f| f != 0)
     }
+
+    /// Removes an NPC community entry from the order.
     pub fn delete(&mut self, flag: usize) {
         self.save.flags.set(self.flag_type, flag, 0);
     }
 }
 
 impl<'a> ChronologicalOrder for CommunityChrono<'a> {
+    /// Compares the order of two NPC community entries. Parameters are flag IDs
     fn cmp_entries(&self, id_a: usize, id_b: usize) -> Ordering {
         self.save
             .flags
@@ -91,6 +96,7 @@ impl<'a> ChronologicalOrder for CommunityChrono<'a> {
             .cmp(&self.save.flags.get(self.flag_type, id_b))
     }
 
+    /// Swaps the order of two NPC community entries. Parameters are flag IDs
     fn swap(&mut self, id_a: usize, id_b: usize) {
         let val_a = self
             .save
@@ -106,6 +112,8 @@ impl<'a> ChronologicalOrder for CommunityChrono<'a> {
         self.save.flags.set(self.flag_type, id_b, val_a);
     }
 
+    /// Inserts a new NPC community entry at the end of the order. Parameter is
+    /// a flag ID.
     fn insert(&mut self, id: usize) {
         if self.is_present(id) {
             return;

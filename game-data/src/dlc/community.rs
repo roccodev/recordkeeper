@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    lang::{FilterEntry, TextEntry, TextTable},
+    lang::{FilterEntry, SortKey, TextEntry, TextTable},
     manual::Flag,
     npc::Npc,
     GameData, LanguageData,
@@ -18,6 +18,7 @@ pub struct DlcCommunity {
 #[derive(Serialize, Deserialize)]
 pub struct DlcCommunityLang {
     pub condition_lang: TextTable,
+    pub npc_sort: SortKey,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

@@ -6,7 +6,11 @@ use game_data::{
     manual::Flag,
 };
 
-use crate::{lang::text_table_from_bdat, npc::read_npc, BdatRegistry, LangBdatRegistry};
+use crate::{
+    lang::{sort_key_from_bdat, text_table_from_bdat},
+    npc::read_npc,
+    BdatRegistry, LangBdatRegistry,
+};
 
 pub fn read_game(bdat: &BdatRegistry) -> DlcCommunity {
     let npcs = bdat.table(label_hash!("FLD_NpcList"));
@@ -66,8 +70,26 @@ pub fn read_game(bdat: &BdatRegistry) -> DlcCommunity {
 pub fn read_lang(bdat: &LangBdatRegistry) -> DlcCommunityLang {
     let conditions = bdat.table(&Label::Hash(0x68394577));
 
+    // Transform NPC name mapping from Hash-> to ID->
+    let names = bdat.table(label_hash!("msg_npc_name"));
+    let names_key = bdat.sort_keys.table(label_hash!("msg_npc_name"));
+    let resources = bdat.table(label_hash!("FLD_NpcResource"));
+    let npc_names = bdat
+        .table(label_hash!("FLD_NpcList"))
+        .rows()
+        .filter_map(|npc| {
+            let flag = npc.get(label_hash!("HitonowaFlag")).to_integer();
+            if flag == 0 {
+                return None;
+            }
+            let res = resources.row(npc.get(Label::Hash(0x7F0A3296)).get_as::<u16>() as usize);
+            let name_id_hash = res.get(label_hash!("Name")).to_integer();
+            Some((npc.id(), names.row_by_hash(name_id_hash).id()))
+        });
+
     DlcCommunityLang {
         condition_lang: text_table_from_bdat(conditions),
+        npc_sort: names_key.to_id_key(npc_names),
     }
 }
 

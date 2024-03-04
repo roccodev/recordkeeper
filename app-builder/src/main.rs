@@ -2,9 +2,11 @@ use bdat::{
     hash::PreHashedMap, label_hash, BdatFile, Label, ModernCell, ModernTable, RowRef, SwitchEndian,
     TableAccessor,
 };
+use binrw::BinReaderExt;
 use game_data::{GameData, LanguageData};
 use gimmick::GimmickData;
 use std::{borrow::Borrow, collections::HashMap, fs::File, io::BufReader, path::Path};
+use util::sort_key::SortKeys;
 
 mod character;
 mod dlc;
@@ -20,6 +22,7 @@ mod npc;
 mod ouroboros;
 mod quest;
 mod scenario;
+mod util;
 
 pub type ModernRow<'a, 'b> = RowRef<'a, 'b, ModernCell<'a, 'b>>;
 
@@ -31,6 +34,7 @@ pub struct BdatRegistry<'b> {
 pub struct LangBdatRegistry<'b> {
     game: BdatRegistry<'b>,
     tables: HashMap<Label, ModernTable<'b>>,
+    sort_keys: SortKeys,
 }
 
 fn main() {
@@ -149,9 +153,14 @@ impl<'b> LangBdatRegistry<'b> {
             }
         }
 
+        let mut sort_keys =
+            BufReader::new(File::open(base_path.join(format!("{lang_id}/sortkey.bin"))).unwrap());
+        let sort_keys = sort_keys.read_le().unwrap();
+
         Self {
             game,
             tables: all_tables,
+            sort_keys,
         }
     }
 
