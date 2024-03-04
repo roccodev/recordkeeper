@@ -1,4 +1,4 @@
-use ybc::{Button, Icon, MenuList, Size};
+use ybc::{Button, Icon, Menu, MenuList, Size};
 use yew::prelude::*;
 use yew_feather::{
     BookOpen, Compass, Crosshair, Download, FilePlus, Flag, HelpCircle, Info, LifeBuoy, Map,
@@ -133,9 +133,9 @@ fn SaveSidebar() -> Html {
     ];
 
     html! {
-        <>
+        <Menu>
             {menu.into_iter().map(|i| i.into_html(route)).collect::<Html>()}
-        </>
+        </Menu>
     }
 }
 
