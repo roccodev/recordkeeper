@@ -1,4 +1,4 @@
-use game_data::npc::Npc;
+use game_data::{dlc::community::CommunityTask, npc::Npc};
 use recordkeeper::{chrono::ChronologicalOrder, dlc::CommunityChrono, SaveData};
 use ybc::{Control, Field, Table};
 use yew::prelude::*;
@@ -75,10 +75,18 @@ fn TaskView(props: &TaskProps) -> Html {
         order: FlagEditor::from(challenges.order_flag),
         target: props.task as u32,
     };
+    let type_fmt = format!(
+        "dlc4_comm_task_{}",
+        match task {
+            CommunityTask::Talk { .. } => "talk",
+            CommunityTask::Quest { .. } => "quest",
+            CommunityTask::Condition { .. } => "condition",
+        }
+    );
     html! {
         <tr>
             <td><CheckboxInput<StatusEditor> editor={editor} /></td>
-            <td></td>
+            <td><Text path={type_fmt}/></td>
             <td>{task.get_desc(data.game(), data.lang()).unwrap_or("")}</td>
             <td></td>
         </tr>
