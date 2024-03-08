@@ -55,8 +55,12 @@ impl DlcCommunity {
         }
     }
 
-    pub fn get_challenges(&self, npc_id: u32) -> &NpcCommunity {
+    pub fn challenge(&self, npc_id: u32) -> &NpcCommunity {
         &self.npc_community[&npc_id]
+    }
+
+    pub fn npc_challenges(&self) -> impl Iterator<Item = (u32, &NpcCommunity)> {
+        self.npc_community.iter().map(|(k, v)| (*k, v))
     }
 }
 

@@ -68,8 +68,11 @@ impl Dlc4 {
 }
 
 impl<'a> CommunityChrono<'a> {
-    pub fn new(save: &'a mut SaveData, flag_type: FlagType) -> Self {
-        Self { save, flag_type }
+    pub fn new(save: &'a mut SaveData) -> Self {
+        Self {
+            save,
+            flag_type: FlagType::Byte,
+        }
     }
 
     /// Checks whether an NPC community entry is registered in the order.
@@ -83,6 +86,16 @@ impl<'a> CommunityChrono<'a> {
 
     /// Removes an NPC community entry from the order.
     pub fn delete(&mut self, flag: usize) {
+        let val = self
+            .save
+            .flags
+            .get(self.flag_type, flag)
+            .expect("flag out of bounds");
+        if val == self.save.dlc4_community_order_max.into() {
+            // Prevent the max value from growing too large
+            self.save.dlc4_community_order_max =
+                self.save.dlc4_community_order_max.saturating_sub(1);
+        }
         self.save.flags.set(self.flag_type, flag, 0);
     }
 }
@@ -118,11 +131,12 @@ impl<'a> ChronologicalOrder for CommunityChrono<'a> {
         if self.is_present(id) {
             return;
         }
-        self.save.flags.set(
-            self.flag_type,
-            id,
-            self.save.dlc4_community_order_max as u32,
-        );
-        self.save.dlc4_community_order_max += 1;
+        let val = self
+            .save
+            .dlc4_community_order_max
+            .checked_add(1)
+            .expect("community chrono reached max value");
+        self.save.flags.set(self.flag_type, id, val as u32);
+        self.save.dlc4_community_order_max = val;
     }
 }

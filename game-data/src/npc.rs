@@ -29,7 +29,7 @@ impl NpcRegistry {
     }
 
     pub fn get(&self, id: u32) -> &Npc {
-        &self.npcs[id as usize]
+        &self.npcs[self.npcs.binary_search_by_key(&id, |npc| npc.id).unwrap()]
     }
 }
 

@@ -513,6 +513,9 @@ dlc4_comm_npc = NPC
 dlc4_comm_status = Completed
 dlc4_comm_type = Task Type
 dlc4_comm_desc = Task Description
+# Allows users to change the order in which NPCs
+# are displayed in the community chart
+dlc4_comm_order = Change order
 # Some condition tasks also show progress. Read only.
 dlc4_comm_progress = Task Progress
 # This task requires talking to an NPC multiple times
