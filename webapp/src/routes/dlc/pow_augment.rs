@@ -60,7 +60,16 @@ pub fn PowAugmentPage() -> Html {
                                 </Control>
                             </>
                         }
-                    } else { html!() }}
+                    } else {
+                        html! {
+                            <>
+                                <Control>
+                                    <label class="label"><Text path="pow_augment_ap" /></label>
+                                    <NumberInput<FlagEditor> editor={FlagEditor::from(data.game().manual.flags.affinity_points)} />
+                                </Control>
+                            </>
+                        }
+                    }}
                 </Field>
             </Tile>
             <Notification>

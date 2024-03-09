@@ -393,6 +393,8 @@ pow_augment_node_skill_upgrade = Upgrade Skill
 pow_augment_node_art_upgrade = Upgrade Art
 pow_augment_cylinders = DX Ether Cylinders
 pow_augment_cylinder_level = DX Ether Cylinder Level
+# Future Redeemed affinity points (AP)
+pow_augment_ap = Affinity Points
 
 
 ## Challenge battle screen

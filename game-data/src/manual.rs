@@ -27,6 +27,7 @@ pub struct Flags {
     pub fr_complete: Flag,
     pub dx_cylinder_count: Flag,
     pub dx_cylinder_level: Flag,
+    pub affinity_points: Flag,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]

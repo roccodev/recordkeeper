@@ -46,5 +46,9 @@
     "dx_cylinder_level": {
         "bits": 4,
         "index": 2188
+    },
+    "affinity_points": {
+        "bits": 16,
+        "index": 1947
     }
 }

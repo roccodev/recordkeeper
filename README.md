@@ -52,11 +52,11 @@ Future Redeemed features:
 
 | Feature | Library support | Webapp support |
 | ------- | --------------- | -------------- |
-| Affinity Growth | :white_check_mark: | :white_check_mark: (missing APs) |
+| Affinity Growth | :white_check_mark: | :white_check_mark: |
 | Collectopedia | :wrench: | :white_check_mark: |
 | Enemypedia | :wrench: | :white_check_mark: |
 | Map completion | :wrench: | :white_check_mark: |
-| Community | | |
+| Community | :wrench: | :white_check_mark: |
 
 ## Webapp translations
 
