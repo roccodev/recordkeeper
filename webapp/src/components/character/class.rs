@@ -14,11 +14,12 @@ use yew::prelude::*;
 
 use crate::{
     components::{
-        character::slot::{AccessoryInput, SlotInput},
+        character::slot::{AccessoryInput, AccessorySlotIndex, SlotInput},
         edit::{editor, NumberInput},
     },
     data::Data,
     lang::Text,
+    save::SaveContext,
 };
 
 #[derive(Properties, PartialEq)]
@@ -97,6 +98,11 @@ pub enum ClassAccessor {
 #[function_component]
 pub fn ClassEditor(props: &ClassEditorProps) -> Html {
     let data = use_context::<Data>().unwrap();
+    let is_dlc4 = {
+        let save = use_context::<SaveContext>().unwrap();
+        let save = save.get();
+        save.get_save().is_dlc4()
+    };
 
     let arts = data.game().characters.arts();
     let skills = data.game().characters.skills();
@@ -175,9 +181,19 @@ pub fn ClassEditor(props: &ClassEditorProps) -> Html {
                     {for (0..CHARACTER_CLASS_ACCESSORY_MAX).map(|i| html! {
                         <Field>
                             <label class="label"><Text path={"character_accessory"} args={vec![("id".into(), i.into())]} /></label>
-                            <AccessoryInput char={accessor} slot_idx={i} />
+                            <AccessoryInput char={accessor} slot_idx={AccessorySlotIndex::Regular(i)} />
                         </Field>
                     })}
+                    {if is_dlc4 {
+                        html! {
+                            <Field>
+                                <label class="label"><Text path={"character_accessory_dlc4"}/></label>
+                                <AccessoryInput char={accessor} slot_idx={AccessorySlotIndex::Manual} />
+                            </Field>
+                        }
+                    } else {
+                        html!()
+                    }}
                 </Tile>
             </Tile>
         </>

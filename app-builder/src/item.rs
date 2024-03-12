@@ -2,7 +2,7 @@ use std::num::NonZeroUsize;
 
 use bdat::{label_hash, Label};
 use enum_map::enum_map;
-use game_data::item::{GemCategory, Item, ItemLanguageRegistry, Rarity};
+use game_data::item::{GemCategory, Item, ItemDetails, ItemLanguageRegistry, Rarity};
 use game_data::item::{ItemRegistry, Type};
 use recordkeeper::item::ItemType;
 
@@ -90,11 +90,22 @@ fn read_item(item_type: ItemType, row: ModernRow) -> Option<Item> {
         _ => {}
     }
 
+    let details = match item_type {
+        ItemType::Accessory => {
+            row.get_if_present(Label::Hash(0xF620E3C8))
+                .map(|cell| ItemDetails::Accessory {
+                    is_manual: cell.to_integer() != 0,
+                })
+        }
+        _ => None,
+    };
+
     Some(Item {
         id: row.id().try_into().unwrap(),
         name_id: NonZeroUsize::new(row.get(label_hash!("Name")).to_integer() as usize),
         item_type: Type(item_type),
         amount_max,
         rarity,
+        details,
     })
 }

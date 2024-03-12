@@ -255,6 +255,7 @@ character_accessory =
         [1] Accessory 2
         *[2] Accessory 3
     }
+character_accessory_dlc4 = Battle Manual
 
 character_class_cp = CP
 character_class_unlock = Unlock Points

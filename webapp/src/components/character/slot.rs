@@ -1,4 +1,4 @@
-use game_data::LanguageData;
+use game_data::{item::ItemDetails, LanguageData};
 use recordkeeper::{
     character::class::ClassAccessory,
     character::slot::{EmptySlotMut, Slot, SlotMut},
@@ -35,7 +35,14 @@ where
 #[derive(Properties, PartialEq, Clone, Copy)]
 pub struct AccessorySlotProps {
     pub char: ClassAccessor,
-    pub slot_idx: usize,
+    pub slot_idx: AccessorySlotIndex,
+}
+
+#[derive(PartialEq, Clone, Copy)]
+pub enum AccessorySlotIndex {
+    Regular(usize),
+    /// Future Redeemed manual-only slot
+    Manual,
 }
 
 #[derive(Clone)]
@@ -111,6 +118,8 @@ pub fn AccessoryInput(props: &AccessorySlotProps) -> Html {
     let data = use_context::<Data>().unwrap();
     let lang = data.to_lang();
 
+    let manuals = matches!(props.slot_idx, AccessorySlotIndex::Manual);
+
     // Accessory slot uses inventory slot index
     let inventory = save.get_save().inventory.slots(ItemType::Accessory);
     let inventory: Options<_> = inventory
@@ -119,6 +128,14 @@ pub fn AccessoryInput(props: &AccessorySlotProps) -> Html {
             slot.is_valid()
                 .then(|| slot.item_id())
                 .and_then(|id| data.game().items.get_item(ItemType::Accessory, id as u32))
+                .and_then(|item| {
+                    let Some(ItemDetails::Accessory { is_manual }) = item.details else {
+                        return Some(item);
+                    };
+                    // Only enable manuals for manual slots, and enable only manuals
+                    // in manual slots
+                    (is_manual == manuals).then_some(item)
+                })
                 .map(|&item| Accessory {
                     item: HtmlItem(item),
                     slot_index: slot.index(),
@@ -171,13 +188,31 @@ pub fn AccessoryInput(props: &AccessorySlotProps) -> Html {
 
 impl AccessorySlotProps {
     fn save_slot(&self, save: &SaveData) -> Slot<ClassAccessory> {
-        self.char.class_data(save).accessory_slot(self.slot_idx)
+        match self.slot_idx {
+            AccessorySlotIndex::Regular(i) => self.char.class_data(save).accessory_slot(i),
+            AccessorySlotIndex::Manual => {
+                let ClassAccessor::Character { char, class } = self.char else {
+                    panic!("must be a character accessor")
+                };
+                save.dlc4
+                    .battle_manual_slot((char + 1).try_into().unwrap(), class.try_into().unwrap())
+            }
+        }
     }
 
     fn save_slot_mut<'a>(&self, save: &'a mut SaveData) -> SlotMut<'a, ClassAccessory> {
-        self.char
-            .class_data_mut(save)
-            .accessory_slot_mut(self.slot_idx)
+        match self.slot_idx {
+            AccessorySlotIndex::Regular(i) => self.char.class_data_mut(save).accessory_slot_mut(i),
+            AccessorySlotIndex::Manual => {
+                let ClassAccessor::Character { char, class } = self.char else {
+                    panic!("must be a character accessor")
+                };
+                save.dlc4.battle_manual_slot_mut(
+                    (char + 1).try_into().unwrap(),
+                    class.try_into().unwrap(),
+                )
+            }
+        }
     }
 }
 

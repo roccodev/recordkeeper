@@ -1,9 +1,13 @@
-use std::cmp::Ordering;
+use std::{cmp::Ordering, num::NonZeroUsize};
 
 use recordkeeper_macros::SaveBin;
 
 use crate::{
-    character::{class::ClassAccessory, CHARACTER_MAX},
+    character::{
+        class::ClassAccessory,
+        slot::{Slot, SlotMut},
+        CHARACTER_MAX,
+    },
     chrono::ChronologicalOrder,
     flags::FlagType,
     SaveData,
@@ -27,8 +31,8 @@ pub struct Dlc4 {
 
 #[derive(SaveBin, Debug)]
 #[size(512)]
-pub struct Dlc4ExtraInventory {
-    /// Likely indexed by class ID
+struct Dlc4ExtraInventory {
+    /// Indexed by class ID
     battle_manual: Box<[ClassAccessory; 64]>,
 }
 
@@ -64,6 +68,28 @@ impl Dlc4 {
         } else {
             self.enemypedia_200_399[index - 200] = count;
         }
+    }
+
+    /// Returns the contents of the battle manual slot for the character and class ID pair.
+    ///
+    /// The IDs start at 1, for example Matthew is #36 with class #37.
+    pub fn battle_manual_slot(
+        &self,
+        chr_id: NonZeroUsize,
+        class_id: NonZeroUsize,
+    ) -> Slot<ClassAccessory> {
+        Slot(self.extra_inventory[chr_id.get() - 1].battle_manual[class_id.get() - 1])
+    }
+
+    /// Returns a mutable battle manual slot for the character and class ID pair.
+    ///
+    /// The IDs start at 1, for example Matthew is #36 with class #37.
+    pub fn battle_manual_slot_mut(
+        &mut self,
+        chr_id: NonZeroUsize,
+        class_id: NonZeroUsize,
+    ) -> SlotMut<ClassAccessory> {
+        SlotMut(&mut self.extra_inventory[chr_id.get() - 1].battle_manual[class_id.get() - 1])
     }
 }
 

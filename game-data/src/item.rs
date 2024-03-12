@@ -22,12 +22,18 @@ pub struct Item {
     pub item_type: Type,
     pub amount_max: u32,
     pub rarity: Rarity,
+    pub details: Option<ItemDetails>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy)]
 pub struct GemCategory {
     pub id: u32,
     pub name_id: usize,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
+pub enum ItemDetails {
+    Accessory { is_manual: bool },
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy)]
