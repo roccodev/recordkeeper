@@ -1,40 +1,36 @@
-use game_data::{dlc::community::CommunityTask, npc::Npc};
+use game_data::{dlc::community::CommunityStatus, lang::Nameable, npc::Npc};
 use recordkeeper::{chrono::ChronologicalOrder, dlc::CommunityChrono, SaveData};
-use ybc::{Button, Control, Field, Table};
+use ybc::{Button, Control, Field, Table, Tile};
 use yew::prelude::*;
 
 use crate::{
     components::{
         dlc::community::CommunityOrderModal,
-        edit::{CheckboxInput, Editor, FlagEditor},
-        select::Selector,
+        edit::{Editor, EnumInput, FlagEditor},
+        page::{PageControls, PageOrganizer},
     },
     data::Data,
     lang::Text,
+    ToHtml,
 };
 
 #[derive(Properties, PartialEq)]
 pub struct NpcProps {
-    npc_id: u32,
-}
-
-#[derive(Properties, PartialEq)]
-pub struct TaskProps {
-    npc_id: u32,
-    task: usize,
+    npc: &'static Npc,
 }
 
 #[derive(Clone, Copy, PartialEq)]
 struct StatusEditor {
     progress: FlagEditor,
     order: FlagEditor,
-    target: u32,
 }
+
+const PAGES_PER_VIEW: usize = 2;
+const ROWS_PER_PAGE: usize = 12;
 
 #[function_component]
 pub fn CommunityPage() -> Html {
     let data = use_context::<Data>().unwrap();
-    let npc = use_state(|| data.game().dlc.community.npcs[0].id as usize);
     let order_open = use_state(|| false);
     let order_change = |v: bool| {
         let order = order_open.clone();
@@ -43,24 +39,20 @@ pub fn CommunityPage() -> Html {
         })
     };
 
-    let npc_id = *npc as u32;
-    let comm_npc = data.game().dlc.community.challenge(npc_id);
+    let page = use_state(|| 0);
+    let sorted = data
+        .lang()
+        .dlc
+        .community
+        .npc_sort
+        .list(&data.game().dlc.community.npcs);
+    let page_organizer = PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, sorted.len());
 
     html! {
         <>
             <CommunityOrderModal open={*order_open} close_callback={order_change(false)} />
             <Field classes={classes!("is-grouped", "is-align-items-end")}>
                 <Control classes="is-flex-grow-1">
-                    <Field>
-                        <label class="label"><Text path="dlc4_comm_npc" /></label>
-                        <Control>
-                            <Selector<Npc>
-                                state={npc.clone()}
-                                values={&*data.game().dlc.community.npcs}
-                                sort_key={data.lang().dlc.community.npc_sort.clone()}
-                            />
-                        </Control>
-                    </Field>
                 </Control>
                 <Control>
                     <Button onclick={order_change(true).reform(|_: MouseEvent| ())}>
@@ -68,79 +60,72 @@ pub fn CommunityPage() -> Html {
                     </Button>
                 </Control>
             </Field>
-            <Table classes={classes!("is-fullwidth")}>
-                <thead>
-                    <tr>
-                        <th><Text path="dlc4_comm_status" /></th>
-                        <th><Text path="dlc4_comm_type" /></th>
-                        <th><Text path="dlc4_comm_desc" /></th>
-                        <th><Text path="dlc4_comm_progress" /></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {for (0..comm_npc.tasks.len()).map(|task| html!(<TaskView npc_id={npc_id} task={task} />))}
-                </tbody>
-            </Table>
+            <Tile classes="mb-2">
+                {for page_organizer.bounds().map(|(s, e)| html! {
+                    <Tile classes="is-align-items-start">
+                        <Table classes={classes!("is-fullwidth")}>
+                            <thead>
+                                <tr>
+                                    <th><Text path="dlc4_comm_npc" /></th>
+                                    <th><Text path="dlc4_comm_status" /></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {for (s..=e).map(|index| {
+                                    html!(<NpcRow npc={sorted[index]}/>)
+                                })}
+                            </tbody>
+                        </Table>
+                    </Tile>
+                })}
+            </Tile>
+            <PageControls<PAGES_PER_VIEW> organizer={page_organizer} state={page} />
         </>
     }
 }
 
 #[function_component]
-fn TaskView(props: &TaskProps) -> Html {
+fn NpcRow(props: &NpcProps) -> Html {
     let data = use_context::<Data>().unwrap();
-    let challenges = &data.game().dlc.community.challenge(props.npc_id);
-    let task = &challenges.tasks[props.task];
+    let challenges = &data.game().dlc.community.challenge(props.npc.id);
     let editor = StatusEditor {
         progress: FlagEditor::from(challenges.progress_flag),
         order: FlagEditor::from(challenges.order_flag),
-        target: props.task as u32,
     };
-    let type_fmt = format!(
-        "dlc4_comm_task_{}",
-        match task {
-            CommunityTask::Talk { .. } => "talk",
-            CommunityTask::Quest { .. } => "quest",
-            CommunityTask::Condition { .. } => "condition",
-        }
-    );
     html! {
         <tr>
-            <td><CheckboxInput<StatusEditor> editor={editor} /></td>
-            <td><Text path={type_fmt}/></td>
-            <td>{task.get_desc(data.game(), data.lang()).unwrap_or("")}</td>
-            <td></td>
+            <td>{props.npc.get_name_str(data.lang())}</td>
+            <td><EnumInput<StatusEditor> editor={editor} /></td>
         </tr>
     }
 }
 
 impl Editor for StatusEditor {
-    type Target = bool;
+    type Target = CommunityStatus;
 
     fn get(&self, save: &SaveData) -> Self::Target {
-        if self.order.get(save) == 0 {
-            // Progress flag = 0 means the first task is complete, while
-            // order flag = 0 means the community entry is absent (i.e. first task not complete)
-            return false;
-        }
-        self.progress.get(save) >= self.target
+        CommunityStatus::from_repr(self.progress.get(save)).expect("unknown status")
     }
 
     fn set(&self, save: &mut SaveData, new: Self::Target) {
         let mut chrono_editor = CommunityChrono::new(save);
-        if new {
-            chrono_editor.insert(self.order.flag_index);
-            let old_val = self.progress.get(save);
-            if old_val < self.target {
-                self.progress.set(save, self.target);
-            }
+        if new == CommunityStatus::Unregistered {
+            chrono_editor.delete(self.order.flag_index);
         } else {
-            if self.target == 0 {
-                // Delete order entry if no task is completed
-                chrono_editor.delete(self.order.flag_index);
-            }
-            // Undo progress thus far
-            let new_val = self.target.saturating_sub(1);
-            self.progress.set(save, new_val);
+            chrono_editor.insert(self.order.flag_index);
         }
+        self.progress.set(save, new as u32);
+    }
+}
+
+impl ToHtml for CommunityStatus {
+    fn to_html(&self) -> Html {
+        let lang = match self {
+            CommunityStatus::Unregistered => "none",
+            CommunityStatus::Registered => "regist",
+            CommunityStatus::ChallengeComplete => "complete_task",
+            CommunityStatus::Complete => "complete",
+        };
+        html!(<Text path ={format!("dlc4_comm_status_{lang}")} />)
     }
 }

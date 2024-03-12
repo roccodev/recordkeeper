@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
+use strum::{EnumIter, FromRepr};
 
 use crate::{
     lang::{FilterEntry, SortKey, TextEntry, TextTable},
@@ -21,7 +22,7 @@ pub struct DlcCommunityLang {
     pub npc_sort: SortKey,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
 pub enum CommunityTask {
     Talk {
         npc_id: u32,
@@ -42,6 +43,23 @@ pub struct NpcCommunity {
     pub progress_flag: Flag,
     pub order_flag: Flag,
     pub tasks: Box<[CommunityTask]>,
+}
+
+#[derive(
+    Serialize, Deserialize, FromRepr, EnumIter, Clone, Copy, PartialEq, Eq, PartialOrd, Ord,
+)]
+#[repr(u32)]
+pub enum CommunityStatus {
+    /// Unregistered NPC
+    Unregistered = 0,
+    /// Registered in the community circle, but tasks
+    /// not yet completed
+    Registered = 1,
+    /// Community tasks completed, but final event
+    /// not seen yet
+    ChallengeComplete = 2,
+    /// Community tasks completed and final event seen
+    Complete = 3,
 }
 
 impl DlcCommunity {

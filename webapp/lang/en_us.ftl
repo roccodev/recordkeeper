@@ -512,18 +512,12 @@ dlc4_pedia_bulk_off = Reset all
 # DLC4 community menu
 
 dlc4_comm_npc = NPC
-dlc4_comm_status = Completed
-dlc4_comm_type = Task Type
-dlc4_comm_desc = Task Description
+dlc4_comm_status = Status
+dlc4_comm_status_none = Unregistered
+dlc4_comm_status_regist = Registered
+# Completed tasks, but hasn't seen final cutscene
+dlc4_comm_status_complete_task = Completed (No Event)
+dlc4_comm_status_complete = Completed
 # Allows users to change the order in which NPCs
 # are displayed in the community chart
 dlc4_comm_order = Change order
-# Some condition tasks also show progress. Read only.
-dlc4_comm_progress = Task Progress
-# This task requires talking to an NPC multiple times
-dlc4_comm_task_talk = Talk
-# This task requires completing a quest
-dlc4_comm_task_quest = Finish Quest
-# This task requires satisfying some conditions. Can be translated
-# as "miscellaneous"
-dlc4_comm_task_condition = Misc

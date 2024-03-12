@@ -1,4 +1,5 @@
 use game_data::{
+    dlc::community::CommunityTask,
     lang::{Nameable, TextEntry},
     manual::Flag,
 };
@@ -8,7 +9,7 @@ use yew::prelude::*;
 use yew_feather::{ArrowDown, ArrowUp};
 
 use crate::{
-    components::edit::{Editor, FlagEditor},
+    components::edit::{Editor, FlagEditor, NumberInput},
     data::Data,
     lang::Text,
     save::SaveContext,
@@ -19,6 +20,11 @@ pub struct OrderModalProps {
     pub open: bool,
     #[prop_or_default]
     pub close_callback: Callback<()>,
+}
+
+#[derive(Properties, PartialEq)]
+pub struct TaskProgressProps {
+    pub task: CommunityTask,
 }
 
 #[derive(Properties, PartialEq)]
@@ -87,6 +93,22 @@ pub fn CommunityOrderModal(props: &OrderModalProps) -> Html {
                 </section>
             </div>
         </Modal>
+    }
+}
+
+#[function_component]
+pub fn TaskProgress(props: &TaskProgressProps) -> Html {
+    match props.task {
+        CommunityTask::Talk { flag, max, .. } => html! {
+            <NumberInput<FlagEditor> editor={FlagEditor::from(flag)} max={max} />
+        },
+        CommunityTask::Condition {
+            progress_flag: Some(flag),
+            ..
+        } => html! {
+            <NumberInput<FlagEditor> editor={FlagEditor::from(flag)} />
+        },
+        _ => html!(),
     }
 }
 
