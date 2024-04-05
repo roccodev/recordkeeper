@@ -146,7 +146,15 @@ pub fn AccessoryInput(props: &AccessorySlotProps) -> Html {
     let current = props
         .save_slot(save.get_save())
         .get()
-        .map(|acc| acc.slot_index() as usize);
+        .map(|acc| acc.slot_index() as usize)
+        .and_then(|idx| {
+            // Option index might be different than save slot index
+            // due to the filter
+            inventory
+                .as_slice()
+                .binary_search_by_key(&idx, |a| a.slot_index.into())
+                .ok()
+        });
 
     let on_select = {
         let save_context = save_context.clone();

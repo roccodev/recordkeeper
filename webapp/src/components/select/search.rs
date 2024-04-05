@@ -187,11 +187,11 @@ impl<O: 'static> Options<O> {
         self.as_slice().iter()
     }
 
-    fn id(&self) -> usize {
-        self.as_slice().as_ptr() as usize
+    fn id(&self) -> (usize, usize) {
+        (self.as_slice().as_ptr() as usize, self.len())
     }
 
-    fn as_slice(&self) -> &[O] {
+    pub fn as_slice(&self) -> &[O] {
         match self {
             Self::Owned(v) => v,
             Self::Borrowed(s) => s,
