@@ -1,4 +1,4 @@
-use bdat::{label_hash, Label, TableAccessor};
+use bdat::{label_hash, Label};
 use game_data::{
     dlc::{
         pedia::{Dlc4Collepedia, Enemypedia},
@@ -21,7 +21,7 @@ pub fn read_collepedia(bdat: &BdatRegistry) -> Regional<Dlc4Collepedia> {
                 max: row.get(label_hash!("ReqNum")).get_as(),
                 flag: Flag {
                     bits: 2,
-                    index: row.get(label_hash!("Flag")).get_as::<u16>() as usize,
+                    index: row.get(label_hash!("Flag")).get_as::<u16>().into(),
                 },
                 sort_id: row.get(label_hash!("SortID")).get_as(),
             };
@@ -35,13 +35,13 @@ pub fn read_collepedia(bdat: &BdatRegistry) -> Regional<Dlc4Collepedia> {
 pub fn read_enemypedia(bdat: &BdatRegistry) -> Regional<Enemypedia> {
     let table = bdat.table(Label::Hash(0xB4158056));
     let locations = bdat.table(label_hash!("ma40a_GMK_Location"));
-    let first_flag = table.row(1).get(Label::Hash(0x32F9A6F1)).get_as::<u16>() as usize;
+    let first_flag = u32::from(table.row(1).get(Label::Hash(0x32F9A6F1)).get_as::<u16>());
     let mut entries = table
         .rows()
         .map(|row| {
             let region: u32 = row.get(Label::Hash(0x7A94A94B)).get_as();
             let region = locations.row_by_hash(region).id(); // why Monolith?
-            let flag = row.get(Label::Hash(0x32F9A6F1)).get_as::<u16>() as usize;
+            let flag = row.get(Label::Hash(0x32F9A6F1)).get_as::<u16>().into();
             let row = Enemypedia {
                 enemy: row
                     .get(label_hash!("EnemyID1"))
@@ -60,5 +60,8 @@ pub fn read_enemypedia(bdat: &BdatRegistry) -> Regional<Enemypedia> {
         })
         .collect::<Vec<_>>();
     entries.sort_by_key(|&(region, e)| (region, e.sort_id));
-    entries.into_iter().collect()
+    entries
+        .into_iter()
+        .map(|(r, e)| (usize::try_from(r).unwrap(), e))
+        .collect()
 }

@@ -1,9 +1,10 @@
 use std::collections::HashMap;
 
-use bdat::{label_hash, Label, TableAccessor};
+use bdat::{label_hash, Label};
 use game_data::{
     dlc::community::{CommunityTask, DlcCommunity, DlcCommunityLang, NpcCommunity},
     manual::Flag,
+    IdInt,
 };
 
 use crate::{
@@ -23,8 +24,7 @@ pub fn read_game(bdat: &BdatRegistry) -> DlcCommunity {
             if flag == 0 {
                 return None;
             }
-            let challenge =
-                challenges.row(npc.get(label_hash!("HitonowaChallenge")).to_integer() as usize);
+            let challenge = challenges.row(npc.get(label_hash!("HitonowaChallenge")).to_integer());
             let tasks = (1..=4)
                 .map(|i| {
                     let ty = challenge
@@ -32,20 +32,20 @@ pub fn read_game(bdat: &BdatRegistry) -> DlcCommunity {
                         .to_integer();
                     let task = challenge
                         .get(label_hash!(format!("ChallengeTask{i}")))
-                        .to_integer() as usize;
+                        .to_integer();
                     (ty, task)
                 })
                 .take_while(|(_, id)| *id != 0)
                 .map(|(ty, task)| read_task(bdat, ty, task, npc.id() as u32))
                 .collect();
-            let order_flag = npc.get(Label::Hash(0xE7AB0B6E)).to_integer() as usize;
+            let order_flag = npc.get(Label::Hash(0xE7AB0B6E)).to_integer();
             let npc = read_npc(bdat, npc.id() as u32);
             Some((
                 npc,
                 NpcCommunity {
                     progress_flag: Flag {
                         bits: 2,
-                        index: flag as usize,
+                        index: flag,
                     },
                     order_flag: Flag {
                         bits: 8,
@@ -82,7 +82,7 @@ pub fn read_lang(bdat: &LangBdatRegistry) -> DlcCommunityLang {
             if flag == 0 {
                 return None;
             }
-            let res = resources.row(npc.get(Label::Hash(0x7F0A3296)).get_as::<u16>() as usize);
+            let res = resources.row(npc.get(Label::Hash(0x7F0A3296)).get_as::<u16>().into());
             let name_id_hash = res.get(label_hash!("Name")).to_integer();
             Some((npc.id(), names.row_by_hash(name_id_hash).id()))
         });
@@ -93,7 +93,7 @@ pub fn read_lang(bdat: &LangBdatRegistry) -> DlcCommunityLang {
     }
 }
 
-fn read_task(bdat: &BdatRegistry, ty: u32, id: usize, npc_id: u32) -> CommunityTask {
+fn read_task(bdat: &BdatRegistry, ty: u32, id: IdInt, npc_id: u32) -> CommunityTask {
     match ty {
         0 => {
             let talk_task = bdat.table(Label::Hash(0x8A6DA2C6)).row(id);
@@ -101,7 +101,7 @@ fn read_task(bdat: &BdatRegistry, ty: u32, id: usize, npc_id: u32) -> CommunityT
                 npc_id,
                 flag: Flag {
                     bits: 4,
-                    index: talk_task.get(Label::Hash(0x44C70F2F)).to_integer() as usize,
+                    index: talk_task.get(Label::Hash(0x44C70F2F)).to_integer(),
                 },
                 max: talk_task.get(Label::Hash(0xB1DDC202)).to_integer(),
             }
@@ -114,7 +114,7 @@ fn read_task(bdat: &BdatRegistry, ty: u32, id: usize, npc_id: u32) -> CommunityT
         }
         2 => {
             let condition_task = bdat.table(Label::Hash(0x2C1E4B90)).row(id);
-            let progress_flag = condition_task.get(Label::Hash(0x982C82A8)).to_integer() as usize;
+            let progress_flag = condition_task.get(Label::Hash(0x982C82A8)).to_integer();
             CommunityTask::Condition {
                 msg_id: condition_task.get(Label::Hash(0xE853AC27)).to_integer(),
                 progress_flag: (progress_flag != 0).then_some(Flag {

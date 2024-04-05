@@ -1,11 +1,15 @@
-use bdat::{label_hash, Label, ModernTable, TableAccessor};
+use bdat::{
+    label_hash,
+    modern::{ModernRowRef, ModernTable},
+    Label,
+};
 use game_data::dlc::challenge::{
     ChallengeData, ChallengeGame, ChallengeLang, Emblem, GauntletMap, Whimsy,
 };
 
 use crate::{
     lang::{filter_table_from_bdat, text_table_from_bdat},
-    BdatRegistry, LangBdatRegistry, ModernRow,
+    BdatRegistry, LangBdatRegistry,
 };
 
 pub fn read_game(bdat: &BdatRegistry) -> ChallengeGame {
@@ -27,7 +31,7 @@ pub fn read_game(bdat: &BdatRegistry) -> ChallengeGame {
             next == 0
         })
         .fold((0, Vec::<Emblem>::new()), |(id, mut vec), row| {
-            let name_id = row.get(label_hash!("Name")).to_integer() as usize;
+            let name_id = row.get(label_hash!("Name")).to_integer();
             let levels = row.id() - id;
             vec.push(Emblem {
                 id: row.id() - levels + 1,
@@ -68,18 +72,22 @@ pub fn read_lang(lang: &LangBdatRegistry) -> ChallengeLang {
     }
 }
 
-fn read_challenge(row: ModernRow) -> ChallengeData {
-    let name_id = row.get(label_hash!("Name")).to_integer() as usize;
+fn read_challenge(row: ModernRowRef) -> ChallengeData {
+    let name_id = row.get(label_hash!("Name")).to_integer();
     ChallengeData {
         id: row.id(),
         name_id,
     }
 }
 
-fn read_gauntlet_map(maps: &ModernTable, resources: &ModernTable, jump: ModernRow) -> GauntletMap {
+fn read_gauntlet_map(
+    maps: &ModernTable,
+    resources: &ModernTable,
+    jump: ModernRowRef,
+) -> GauntletMap {
     let map = jump.get(label_hash!("Map")).to_integer();
     let map = maps.row_by_hash(map);
-    let resource = resources.row(map.get(label_hash!("ResourceId")).to_integer() as usize);
+    let resource = resources.row(map.get(label_hash!("ResourceId")).to_integer());
     let default_resource = resource.get(label_hash!("DefaultResource")).as_str();
     let original_resource = resources
         .rows()
@@ -87,16 +95,16 @@ fn read_gauntlet_map(maps: &ModernTable, resources: &ModernTable, jump: ModernRo
         .expect("no matching map resource");
     let original_map = maps
         .rows()
-        .find(|r| original_resource.id() == r.get(label_hash!("ResourceId")).to_integer() as usize)
+        .find(|r| original_resource.id() == r.get(label_hash!("ResourceId")).to_integer())
         .expect("no map for resource");
     GauntletMap {
         id: map.id(),
-        based_on_lang_id: original_map.get(label_hash!("Name")).to_integer() as usize,
+        based_on_lang_id: original_map.get(label_hash!("Name")).to_integer(),
     }
 }
 
-fn read_whimsy(row: ModernRow) -> Whimsy {
-    let caption = row.get(label_hash!("Caption")).to_integer() as usize;
+fn read_whimsy(row: ModernRowRef) -> Whimsy {
+    let caption = row.get(label_hash!("Caption")).to_integer();
     Whimsy {
         id: row.id(),
         caption,

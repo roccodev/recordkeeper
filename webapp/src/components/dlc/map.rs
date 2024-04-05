@@ -113,7 +113,7 @@ fn achievement_lang(lang: &LanguageData, achievement: &AchievementSearch) -> Htm
         AchievementName::Enemy { name_id } => lang
             .enemies
             .enemies
-            .get(*name_id as usize)
+            .get(*name_id)
             .map(TextEntry::text)
             .map(Into::into),
         AchievementName::Npc { name_id } => lang
@@ -124,13 +124,13 @@ fn achievement_lang(lang: &LanguageData, achievement: &AchievementSearch) -> Htm
         AchievementName::Location { name_id } => lang
             .field
             .locations
-            .get(*name_id as usize)
+            .get(*name_id)
             .map(FilterEntry::text)
             .map(Into::into),
         AchievementName::ComSpot { name_id } => lang
             .field
             .com_spots
-            .get(*name_id as usize)
+            .get(*name_id)
             .map(TextEntry::text)
             .map(Into::into),
         AchievementName::Architecture { ty, x, y, z } => {

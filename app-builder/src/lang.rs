@@ -1,7 +1,10 @@
 use std::cmp::Reverse;
 
-use bdat::{label_hash, ModernTable, TableAccessor};
-use game_data::lang::{FilterEntry, FilterTable, SortKey, TextEntry, TextTable};
+use bdat::{label_hash, modern::ModernTable};
+use game_data::{
+    lang::{FilterEntry, FilterTable, SortKey, TextEntry, TextTable},
+    IdInt,
+};
 
 pub fn text_table_from_bdat(table: &ModernTable) -> TextTable {
     TextTable::new(table.rows().filter_map(|row| {
@@ -21,7 +24,7 @@ pub fn filter_table_from_bdat(table: &ModernTable) -> FilterTable {
 /// are ordered last.
 pub fn sort_key_from_bdat(
     lang_table: &ModernTable,
-    id_name_pairs: impl IntoIterator<Item = (usize, usize)>,
+    id_name_pairs: impl IntoIterator<Item = (IdInt, IdInt)>,
 ) -> SortKey {
     let mut id_strs: Vec<_> = id_name_pairs
         .into_iter()

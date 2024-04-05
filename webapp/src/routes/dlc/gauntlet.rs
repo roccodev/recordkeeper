@@ -1,3 +1,4 @@
+use game_data::IdInt;
 use recordkeeper::dlc::ChallengeDifficulty;
 use strum::{EnumIter, IntoEnumIterator};
 use ybc::{Control, Field, Table, Tabs, Tile};
@@ -29,9 +30,9 @@ pub enum GauntletTab {
 
 #[derive(Properties, PartialEq)]
 struct EmblemProps {
-    pub start: usize,
-    pub end: usize,
-    pub max_level: usize,
+    pub start: IdInt,
+    pub end: IdInt,
+    pub max_level: u32,
 }
 
 #[rustfmt::skip]
@@ -133,7 +134,7 @@ pub fn Emblems() -> Html {
             <Tile classes="mb-2">
                 {for page_organizer.current_bounds.into_iter().map(|(s, e)| html! {
                     <Tile>
-                        <EmblemPage start={1 + s} end={1 + e} max_level={max_level} />
+                        <EmblemPage start={1 + s as u32} end={1 + e as u32} max_level={max_level} />
                     </Tile>
                 })}
             </Tile>

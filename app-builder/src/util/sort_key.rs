@@ -3,7 +3,7 @@
 
 use bdat::{BdatVersion, Label};
 use binrw::BinRead;
-use game_data::lang::SortKey;
+use game_data::{lang::SortKey, IdInt};
 
 #[derive(BinRead, Debug)]
 #[br(little)]
@@ -49,10 +49,10 @@ impl BdatKey {
     ///
     /// This function takes an ID->name ID mapping and returns the order
     /// in which the (former) IDs should appear.
-    pub fn to_id_key(&self, id_name_map: impl IntoIterator<Item = (usize, usize)>) -> SortKey {
+    pub fn to_id_key(&self, id_name_map: impl IntoIterator<Item = (IdInt, IdInt)>) -> SortKey {
         let base_id = 1; // Common to all lang tables
         let mut id_name_map: Vec<_> = id_name_map.into_iter().collect();
-        id_name_map.sort_unstable_by_key(|(_, name_id)| self.get(name_id - base_id));
+        id_name_map.sort_unstable_by_key(|(_, name_id)| self.get((name_id - base_id) as usize));
         id_name_map.into_iter().map(|(id, _)| id).collect()
     }
 }

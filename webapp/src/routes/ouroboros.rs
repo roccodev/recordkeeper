@@ -15,9 +15,9 @@ use crate::{
 
 #[function_component]
 pub fn OuroborosPage() -> Html {
-    let char_id_state = use_state(|| 1usize);
+    let char_id_state = use_state(|| 1u32);
     let char_id = *char_id_state;
-    let char_idx = char_id.checked_sub(1).unwrap();
+    let char_idx = char_id.checked_sub(1).unwrap() as usize;
 
     let data = use_context::<Data>().unwrap();
 

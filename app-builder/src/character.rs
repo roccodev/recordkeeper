@@ -1,12 +1,19 @@
-use std::num::NonZeroUsize;
+use std::num::{NonZeroU32, NonZeroUsize};
 
-use bdat::{label_hash, Label, ModernTable, TableAccessor};
-use game_data::character::{
-    Art, Attachment, Character, CharacterData, CharacterLang, Class, Costume, Skill, SoulHack,
+use bdat::{
+    label_hash,
+    modern::{ModernRowRef, ModernTable},
+    Label,
+};
+use game_data::{
+    character::{
+        Art, Attachment, Character, CharacterData, CharacterLang, Class, Costume, Skill, SoulHack,
+    },
+    IdInt,
 };
 
 use crate::lang::filter_table_from_bdat;
-use crate::{dlc, BdatRegistry, LangBdatRegistry, ModernRow};
+use crate::{dlc, BdatRegistry, LangBdatRegistry};
 
 const UI_NAME_HASHES: [Label; 6] = [
     label_hash!("UIName1"),
@@ -84,9 +91,9 @@ pub fn read_lang(bdat: &LangBdatRegistry) -> CharacterLang {
     }
 }
 
-fn read_id_name_pairs<'a>(table: &'a ModernTable) -> impl Iterator<Item = (usize, usize)> + 'a {
+fn read_id_name_pairs<'a>(table: &'a ModernTable) -> impl Iterator<Item = (IdInt, IdInt)> + 'a {
     table.rows().map(|row| {
-        let name = row.get(label_hash!("Name")).to_integer() as usize;
+        let name = row.get(label_hash!("Name")).to_integer();
         (row.id(), name)
     })
 }
@@ -94,21 +101,21 @@ fn read_id_name_pairs<'a>(table: &'a ModernTable) -> impl Iterator<Item = (usize
 fn read_costume(table: &ModernTable, char_id: usize, out: &mut Vec<Costume>) {
     for row in table.rows() {
         let id = row.id();
-        let name_id = row.get(&UI_NAME_HASHES[char_id]).to_integer() as usize;
+        let name_id = row.get(&UI_NAME_HASHES[char_id]).to_integer();
         out.push(Costume { id, name_id })
     }
 }
 
 fn read_soul_hack(
-    row: &ModernRow,
+    row: &ModernRowRef,
     status_hash: Label,
     achievement_hash: Label,
 ) -> Option<SoulHack> {
-    let status = row.get(status_hash).to_integer() as usize;
-    let status = NonZeroUsize::new(status)?;
+    let status = row.get(status_hash).to_integer();
+    let status = NonZeroU32::new(status)?;
 
-    let achievement = row.get(achievement_hash).to_integer() as usize;
-    let achievement = NonZeroUsize::new(achievement)?;
+    let achievement = row.get(achievement_hash).to_integer();
+    let achievement = NonZeroU32::new(achievement)?;
 
     Some(SoulHack {
         status_flag: status,

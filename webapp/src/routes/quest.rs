@@ -3,13 +3,14 @@ use crate::components::quest::QuestRow;
 use crate::data::Data;
 use crate::lang::Text;
 use crate::save::SaveContext;
+use game_data::IdInt;
 use ybc::{Table, Tile};
 use yew::prelude::*;
 
 #[derive(Properties, PartialEq)]
 struct TableProps {
-    pub start: usize,
-    pub end: usize,
+    pub start: IdInt,
+    pub end: IdInt,
 }
 
 const PAGES_PER_VIEW: usize = 2;
@@ -27,14 +28,14 @@ pub fn Quests() -> Html {
 
     let page = use_state(|| 0);
     let page_organizer =
-        PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, end + 1 - start);
+        PageOrganizer::<PAGES_PER_VIEW>::new(ROWS_PER_PAGE, *page, (end + 1 - start) as usize);
 
     html! {
         <>
             <Tile classes="mb-2">
                 {for page_organizer.current_bounds.into_iter().map(|(s, e)| html! {
                     <Tile>
-                        <TablePage start={start + s} end={start + e} />
+                        <TablePage start={start + s as u32} end={start + e as u32} />
                     </Tile>
                 })}
             </Tile>

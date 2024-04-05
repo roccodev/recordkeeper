@@ -3,6 +3,7 @@ use std::borrow::Cow;
 use game_data::{
     lang::Nameable,
     quest::{PurposeTask, QuestPurpose},
+    IdInt,
 };
 use recordkeeper::flags::FlagType;
 use ybc::{Button, Buttons, Table};
@@ -21,7 +22,7 @@ use crate::{
 
 #[derive(Properties, PartialEq)]
 pub struct PurposeModalProps {
-    pub quest_id: Option<usize>,
+    pub quest_id: Option<IdInt>,
     #[prop_or_default]
     pub close_callback: Callback<()>,
 }

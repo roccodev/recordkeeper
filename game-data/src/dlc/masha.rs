@@ -33,7 +33,7 @@ impl LangCraftItems {
             .into_iter()
             .map(|(id, lang_id)| CraftTypeText {
                 id,
-                text: table.get(lang_id as usize).cloned(),
+                text: table.get(lang_id).cloned(),
             })
             .collect();
         Self { type_names }

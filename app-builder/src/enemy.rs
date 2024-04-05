@@ -1,4 +1,4 @@
-use bdat::{label_hash, TableAccessor};
+use bdat::label_hash;
 use game_data::enemy::{Enemy, EnemyLang, EnemyRegistry, UniqueMonster};
 
 use crate::{lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry};
@@ -10,11 +10,11 @@ pub fn read_data(bdat: &BdatRegistry) -> EnemyRegistry {
     let uniques = uniques
         .rows()
         .map(|row| {
-            let enemy = row.get(label_hash!("EnemyID1")).to_integer() as usize;
-            let map = row.get(label_hash!("Zone")).to_integer() as usize;
-            let group = row.get(label_hash!("GroupName")).to_integer() as usize;
+            let enemy = row.get(label_hash!("EnemyID1")).to_integer();
+            let map = row.get(label_hash!("Zone")).to_integer();
+            let group = row.get(label_hash!("GroupName")).to_integer();
 
-            let enemy_name = enemies.row(enemy).get(label_hash!("MsgName")).to_integer() as usize;
+            let enemy_name = enemies.row(enemy).get(label_hash!("MsgName")).to_integer();
 
             UniqueMonster {
                 id: row.id(),
@@ -29,7 +29,7 @@ pub fn read_data(bdat: &BdatRegistry) -> EnemyRegistry {
         .rows()
         .map(|row| Enemy {
             id: row.id(),
-            name_id: row.get(label_hash!("MsgName")).to_integer() as usize,
+            name_id: row.get(label_hash!("MsgName")).to_integer(),
         })
         .collect();
 

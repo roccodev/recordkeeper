@@ -1,4 +1,4 @@
-use bdat::{label_hash, ModernTable};
+use bdat::{label_hash, modern::ModernTable};
 use game_data::dlc::pow_augment::{AugmentNode, PowAugment};
 
 pub fn read_for_character(table: &ModernTable) -> PowAugment {

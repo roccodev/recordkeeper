@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::IdInt;
+
 #[derive(Serialize, Deserialize)]
 pub struct ManualData {
     pub flags: Flags,
@@ -33,7 +35,7 @@ pub struct Flags {
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Flag {
     pub bits: usize,
-    pub index: usize,
+    pub index: IdInt,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]

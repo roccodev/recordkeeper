@@ -1,3 +1,5 @@
+use std::num::NonZeroU32;
+
 use recordkeeper_macros::SaveBin;
 
 use crate::flags::BitFlags;
@@ -86,12 +88,12 @@ pub struct OuroborosTree {
 }
 
 impl Character {
-    pub fn class_data(&self, class_id: usize) -> &CharacterClass {
-        &self.class_inventory[class_id.checked_sub(1).expect("class ID must be >= 1")]
+    pub fn class_data(&self, class_id: NonZeroU32) -> &CharacterClass {
+        &self.class_inventory[usize::try_from(u32::from(class_id) - 1).unwrap()]
     }
 
-    pub fn class_data_mut(&mut self, class_id: usize) -> &mut CharacterClass {
-        &mut self.class_inventory[class_id.checked_sub(1).expect("class ID must be >= 1")]
+    pub fn class_data_mut(&mut self, class_id: NonZeroU32) -> &mut CharacterClass {
+        &mut self.class_inventory[usize::try_from(u32::from(class_id) - 1).unwrap()]
     }
 
     pub fn is_flag_set(&self, flag: CharacterFlag) -> bool {

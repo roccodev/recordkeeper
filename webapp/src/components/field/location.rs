@@ -1,7 +1,7 @@
 use game_data::{
     field::{Location, LocationType, Map},
     lang::Nameable,
-    GameData,
+    GameData, IdInt,
 };
 use recordkeeper::SaveData;
 use ybc::{Button, Buttons, Control, Field, Table};
@@ -21,7 +21,7 @@ use crate::{
 #[derive(Properties, PartialEq)]
 struct LocationProps {
     location: Location,
-    map_id: usize,
+    map_id: IdInt,
     landmark_count: FlagEditor,
     secret_count: FlagEditor,
 }
@@ -40,7 +40,7 @@ pub fn LocationsPage() -> Html {
     let save_context = use_context::<SaveContext>().unwrap();
 
     // Use save map as default
-    let map_state = use_state(|| MapIdEditor {}.get(save_context.get().get_save()) as usize);
+    let map_state = use_state(|| MapIdEditor {}.get(save_context.get().get_save()));
 
     let map_id = *map_state;
     let map = data

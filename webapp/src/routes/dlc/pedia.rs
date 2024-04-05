@@ -65,8 +65,8 @@ fn PediaPage<T: PartialEq + PediaItem + 'static>(props: &PediaProps<T>) -> Html 
     let data = use_context::<Data>().unwrap();
 
     let page = use_state(|| 0);
-    let region_state = use_state(|| 1);
-    let region = *region_state - 1;
+    let region_state = use_state(|| 1u32);
+    let region = *region_state as usize - 1;
 
     let items = props.items.get(region);
 
@@ -126,7 +126,9 @@ fn PediaRow<T: PartialEq + PediaItem + 'static>(props: &PediaRowProps<T>) -> Htm
 
     let type_display = match props.item.item() {
         PediaValue::Number { max, slot_id } => {
-            let count_editor = EnemypediaEditor { index: slot_id };
+            let count_editor = EnemypediaEditor {
+                index: slot_id as usize,
+            };
             html! {
                 <td class={classes!("is-flex", "is-align-items-center")}>
                     <NumberInput<EnemypediaEditor> editor={count_editor} max={max} />
@@ -164,9 +166,12 @@ fn PediaBulkEdit<T: PartialEq + PediaItem + 'static>(props: &PediaBulkProps<T>) 
                 PediaStatus::Unknown as u32
             };
             let count_editor = match item.item() {
-                PediaValue::Number { max, slot_id } => {
-                    Some((EnemypediaEditor { index: slot_id }, max))
-                }
+                PediaValue::Number { max, slot_id } => Some((
+                    EnemypediaEditor {
+                        index: slot_id as usize,
+                    },
+                    max,
+                )),
                 _ => None,
             };
             save.edit(move |save| {

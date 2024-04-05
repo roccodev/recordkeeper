@@ -1,11 +1,11 @@
 use std::{collections::HashMap, num::NonZeroU16};
 
-use bdat::{hash::murmur3_str, label_hash, Label, TableAccessor};
+use bdat::{hash::murmur3_str, label_hash, modern::ModernRowRef, Label};
 use game_data::field::{FieldLang, FieldRegistry, Location, LocationType, Map, MapId, MapPoint};
 
 use crate::{
     lang::{filter_table_from_bdat, text_table_from_bdat},
-    BdatRegistry, LangBdatRegistry, ModernRow,
+    BdatRegistry, LangBdatRegistry,
 };
 
 type GimmickTable = HashMap<u32, MapPoint>;
@@ -19,8 +19,7 @@ pub fn read_data(bdat: &BdatRegistry) -> FieldRegistry {
     let jumps = read_jumps(bdat, &gimmicks);
 
     let maps = maps.rows().filter_map(|row| {
-        let resource =
-            resources.get_row(row.get(label_hash!("ResourceId")).to_integer() as usize)?;
+        let resource = resources.get_row(row.get(label_hash!("ResourceId")).to_integer())?;
         read_map(bdat, row, resource, &gimmicks, &jumps)
     });
 
@@ -39,12 +38,12 @@ pub fn read_lang(bdat: &LangBdatRegistry) -> FieldLang {
 
 fn read_map(
     bdat: &BdatRegistry,
-    map: ModernRow,
-    resource: ModernRow,
+    map: ModernRowRef,
+    resource: ModernRowRef,
     gimmicks: &GimmickTable,
     jumps: &JumpTable,
 ) -> Option<Map> {
-    let name_id = map.get(label_hash!("Name")).to_integer() as usize;
+    let name_id = map.get(label_hash!("Name")).to_integer();
     let id = MapId {
         id: map.id(),
         name_id,
@@ -66,10 +65,10 @@ fn read_map(
     Some(Map { id, locations })
 }
 
-fn read_location(row: ModernRow, gimmicks: &GimmickTable, jumps: &JumpTable) -> Location {
+fn read_location(row: ModernRowRef, gimmicks: &GimmickTable, jumps: &JumpTable) -> Location {
     let hash_id = row.get(label_hash!("ID")).to_integer();
-    let name_id = row.get(label_hash!("LocationName")).to_integer() as usize;
-    let category = row.get(label_hash!("CategoryPriority")).to_integer() as usize;
+    let name_id = row.get(label_hash!("LocationName")).to_integer();
+    let category = row.get(label_hash!("CategoryPriority")).to_integer();
     let map_jump: u16 = row
         .get(label_hash!("MapJumpID"))
         .to_integer()

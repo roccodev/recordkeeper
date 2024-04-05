@@ -1,8 +1,11 @@
 //! Item types, names, max amounts, etc.
 
-use std::num::NonZeroUsize;
+use std::num::NonZeroU32;
 
-use crate::lang::{FilterTable, Filterable, Id};
+use crate::{
+    lang::{FilterTable, Filterable, Id},
+    IdInt,
+};
 use enum_map::{Enum, EnumArray, EnumMap};
 use recordkeeper::item::ItemType;
 use serde::{Deserialize, Serialize};
@@ -18,7 +21,7 @@ pub struct ItemRegistry {
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy)]
 pub struct Item {
     pub id: u32,
-    pub name_id: Option<NonZeroUsize>,
+    pub name_id: Option<NonZeroU32>,
     pub item_type: Type,
     pub amount_max: u32,
     pub rarity: Rarity,
@@ -28,7 +31,7 @@ pub struct Item {
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy)]
 pub struct GemCategory {
     pub id: u32,
-    pub name_id: usize,
+    pub name_id: IdInt,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
@@ -169,7 +172,7 @@ impl Filterable for GemCategory {
 }
 
 impl Id for GemCategory {
-    fn id(&self) -> usize {
-        self.id as usize
+    fn id(&self) -> IdInt {
+        self.id
     }
 }

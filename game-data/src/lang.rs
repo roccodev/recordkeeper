@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::LanguageData;
+use crate::{IdInt, LanguageData};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -14,7 +14,7 @@ pub type FilterTable = Table<FilterEntry>;
 #[derive(Serialize, Deserialize, Clone)]
 pub struct TextEntry {
     text: Box<str>,
-    id: usize,
+    id: IdInt,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -26,7 +26,7 @@ pub struct FilterEntry {
 /// A key to sort entries based on their translated name
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone)]
 pub struct SortKey {
-    ids: Rc<[usize]>,
+    ids: Rc<[IdInt]>,
 }
 
 pub trait Nameable {
@@ -42,7 +42,7 @@ pub trait Filterable {
 }
 
 pub trait Id {
-    fn id(&self) -> usize;
+    fn id(&self) -> IdInt;
 }
 
 impl<T> Table<T>
@@ -55,7 +55,7 @@ where
         Self { entries }
     }
 
-    pub fn get(&self, id: usize) -> Option<&T> {
+    pub fn get(&self, id: IdInt) -> Option<&T> {
         self.entries
             .binary_search_by_key(&id, |e| e.id())
             .ok()
@@ -74,7 +74,7 @@ impl<T> Table<T> {
 }
 
 impl TextEntry {
-    pub fn new(text: &str, id: usize) -> Self {
+    pub fn new(text: &str, id: IdInt) -> Self {
         Self {
             text: Box::from(text),
             id,
@@ -87,7 +87,7 @@ impl TextEntry {
 }
 
 impl FilterEntry {
-    pub fn new(text: &str, id: usize) -> Self {
+    pub fn new(text: &str, id: IdInt) -> Self {
         TextEntry::new(text, id).into()
     }
 
@@ -126,13 +126,13 @@ where
 }
 
 impl Id for TextEntry {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id
     }
 }
 
 impl Id for FilterEntry {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.text.id
     }
 }
@@ -152,8 +152,8 @@ impl<'a> From<&'a FilterEntry> for &'a TextEntry {
     }
 }
 
-impl FromIterator<usize> for SortKey {
-    fn from_iter<T: IntoIterator<Item = usize>>(iter: T) -> Self {
+impl FromIterator<IdInt> for SortKey {
+    fn from_iter<T: IntoIterator<Item = IdInt>>(iter: T) -> Self {
         Self {
             ids: iter.into_iter().collect(),
         }

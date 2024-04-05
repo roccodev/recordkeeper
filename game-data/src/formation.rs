@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     lang::{FilterEntry, FilterTable, Filterable, Id},
-    LanguageData,
+    IdInt, LanguageData,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -24,8 +24,8 @@ pub struct FormationNameProfile {
 
 #[derive(Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum ProfileName {
-    Literal(usize),
-    Challenge(usize),
+    Literal(IdInt),
+    Challenge(IdInt),
 }
 
 impl FormationNameProfile {
@@ -44,7 +44,7 @@ impl Filterable for FormationNameProfile {
 }
 
 impl Id for FormationNameProfile {
-    fn id(&self) -> usize {
-        self.save_id as usize
+    fn id(&self) -> IdInt {
+        self.save_id.into()
     }
 }

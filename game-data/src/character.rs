@@ -1,10 +1,10 @@
-use std::num::NonZeroUsize;
+use std::num::NonZeroU32;
 
 use crate::{
     dlc::pow_augment::PowAugment,
     enemy::SoulLearnable,
     lang::{FilterEntry, FilterTable, Filterable, Id},
-    LanguageData,
+    IdInt, LanguageData,
 };
 use serde::{Deserialize, Serialize};
 
@@ -31,47 +31,47 @@ pub struct CharacterLang {
 
 #[derive(Serialize, Deserialize, Clone, PartialEq)]
 pub struct Character {
-    pub id: usize,
-    pub name_id: usize,
+    pub id: IdInt,
+    pub name_id: IdInt,
     pub pow_augment: Option<PowAugment>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct Art {
-    pub id: usize,
-    pub name_id: usize,
+    pub id: IdInt,
+    pub name_id: IdInt,
     pub soul_hack: Option<SoulHack>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct Skill {
-    pub id: usize,
-    pub name_id: usize,
+    pub id: IdInt,
+    pub name_id: IdInt,
     pub soul_hack: Option<SoulHack>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct SoulHack {
-    pub status_flag: NonZeroUsize,
-    pub achievement_flag: NonZeroUsize,
+    pub status_flag: NonZeroU32,
+    pub achievement_flag: NonZeroU32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct Class {
-    pub id: usize,
-    pub name_id: usize,
+    pub id: IdInt,
+    pub name_id: IdInt,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct Attachment {
-    pub id: usize,
-    pub name_id: usize,
+    pub id: IdInt,
+    pub name_id: IdInt,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct Costume {
-    pub id: usize,
-    pub name_id: usize,
+    pub id: IdInt,
+    pub name_id: IdInt,
 }
 
 impl CharacterData {
@@ -100,20 +100,23 @@ impl CharacterData {
         }
     }
 
-    pub fn get_character(&self, id: usize) -> Option<&Character> {
-        id.checked_sub(1).and_then(|id| self.characters.get(id))
+    pub fn get_character(&self, id: IdInt) -> Option<&Character> {
+        id.checked_sub(1)
+            .and_then(|id| self.characters.get(id as usize))
     }
 
-    pub fn get_art(&self, id: usize) -> Option<&Art> {
-        id.checked_sub(1).and_then(|id| self.arts.get(id))
+    pub fn get_art(&self, id: IdInt) -> Option<&Art> {
+        id.checked_sub(1).and_then(|id| self.arts.get(id as usize))
     }
 
-    pub fn get_skill(&self, id: usize) -> Option<&Skill> {
-        id.checked_sub(1).and_then(|id| self.skills.get(id))
+    pub fn get_skill(&self, id: IdInt) -> Option<&Skill> {
+        id.checked_sub(1)
+            .and_then(|id| self.skills.get(id as usize))
     }
 
-    pub fn get_class(&self, id: usize) -> Option<&Class> {
-        id.checked_sub(1).and_then(|id| self.classes.get(id))
+    pub fn get_class(&self, id: IdInt) -> Option<&Class> {
+        id.checked_sub(1)
+            .and_then(|id| self.classes.get(id as usize))
     }
 
     pub fn characters(&self) -> &[Character] {
@@ -136,10 +139,10 @@ impl CharacterData {
         &self.attachments
     }
 
-    pub fn costumes(&self, char_id: usize) -> &[Costume] {
+    pub fn costumes(&self, char_id: IdInt) -> &[Costume] {
         char_id
             .checked_sub(1)
-            .and_then(|i| self.costumes.get(i))
+            .and_then(|i| self.costumes.get(i as usize))
             .unwrap_or_else(|| &self.costumes[0])
     }
 }
@@ -187,37 +190,37 @@ impl Filterable for Costume {
 }
 
 impl Id for Art {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id
     }
 }
 
 impl Id for Skill {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id
     }
 }
 
 impl Id for Class {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id
     }
 }
 
 impl Id for Character {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id
     }
 }
 
 impl Id for Attachment {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id
     }
 }
 
 impl Id for Costume {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id
     }
 }

@@ -1,3 +1,5 @@
+use std::num::NonZeroU32;
+
 use recordkeeper_macros::SaveBin;
 use thiserror::Error;
 
@@ -136,11 +138,8 @@ impl ChallengeBattle {
     /// Returns a view of an emblem shop item.
     ///
     /// The ID starts at 1.
-    ///
-    /// ## Panics
-    /// Panics if the ID is out of bounds.
-    pub fn emblem(&self, id: usize) -> &EmblemItem {
-        &self.emblem_shop[id.checked_sub(1).expect("id > 0")]
+    pub fn emblem(&self, id: NonZeroU32) -> &EmblemItem {
+        &self.emblem_shop[usize::try_from(u32::from(id) - 1).unwrap()]
     }
 
     /// Returns a mutable view of an emblem shop item.
@@ -149,8 +148,8 @@ impl ChallengeBattle {
     ///
     /// ## Panics
     /// Panics if the ID is out of bounds.
-    pub fn emblem_mut(&mut self, id: usize) -> &mut EmblemItem {
-        &mut self.emblem_shop[id.checked_sub(1).expect("id > 0")]
+    pub fn emblem_mut(&mut self, id: NonZeroU32) -> &mut EmblemItem {
+        &mut self.emblem_shop[usize::try_from(u32::from(id) - 1).unwrap()]
     }
 
     /// Returns an iterator over the challenge records.

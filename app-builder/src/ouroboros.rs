@@ -18,14 +18,14 @@ pub fn read_ouroboros(bdat: &BdatRegistry) -> OuroborosRegistry {
     let ouro_table = bdat.table(label_hash!("CHR_UroBody"));
 
     OuroborosRegistry::new(ouro_table.rows().take(TABLES.len()).map(|row| {
-        let name_id = row.get(label_hash!("Name")).to_integer() as usize;
-        let share_slot_flag = row.get(label_hash!("Flag_ShareSlot")).to_integer() as usize;
+        let name_id = row.get(label_hash!("Name")).to_integer();
+        let share_slot_flag = row.get(label_hash!("Flag_ShareSlot")).to_integer();
 
         Ouroboros {
             id: row.id(),
             name_id,
             share_slot_flag,
-            tree_nodes: read_ouro_tree(bdat, row.id().checked_sub(1).unwrap()),
+            tree_nodes: read_ouro_tree(bdat, row.id().checked_sub(1).unwrap() as usize),
         }
     }))
 }
@@ -36,7 +36,7 @@ fn read_ouro_tree(bdat: &BdatRegistry, i: usize) -> Box<[OuroTreeNode]> {
         .rows()
         .map(|row| {
             let ty = row.get(label_hash!("Type")).to_integer();
-            let param = row.get(label_hash!("Param")).to_integer() as usize;
+            let param = row.get(label_hash!("Param")).to_integer();
 
             (match ty {
                 1 => OuroTreeNode::UnlockArt,

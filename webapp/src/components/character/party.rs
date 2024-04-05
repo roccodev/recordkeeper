@@ -69,7 +69,7 @@ where
                     let update = {
                         let save_context = save_context.clone();
                         let editor = props.editor.clone();
-                        Callback::from(move |new: usize| {
+                        Callback::from(move |new: u32| {
                             let editor = editor.clone();
                             save_context.edit(move |save| editor.get_mut(save).set(i, new.try_into().unwrap()))
                         })
@@ -77,7 +77,7 @@ where
                     html! {
                         <Control classes={classes!("recordkeeper-party-select")}>
                             <UpdateSelector<Character>
-                                current={*party.get(i).unwrap() as usize}
+                                current={u32::from(*party.get(i).unwrap())}
                                 update={update}
                                 values={characters}
                             />

@@ -41,11 +41,11 @@ pub fn MapPage() -> Html {
     let data = use_context::<Data>().unwrap();
     let save_context = use_context::<SaveContext>().unwrap();
 
-    let region_state = use_state(|| 1);
+    let region_state = use_state(|| 1u32);
     let category = use_state(|| 1);
     let bulk_edit = use_state(|| BulkEditState::Category);
 
-    let region = *region_state - 1;
+    let region = *region_state as usize - 1;
 
     let categories: Vec<_> = data
         .game()

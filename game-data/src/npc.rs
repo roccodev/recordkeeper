@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     lang::{FilterEntry, FilterTable, Filterable, Id},
-    LanguageData,
+    IdInt, LanguageData,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -28,14 +28,14 @@ impl NpcRegistry {
         }
     }
 
-    pub fn get(&self, id: u32) -> &Npc {
+    pub fn get(&self, id: IdInt) -> &Npc {
         &self.npcs[self.npcs.binary_search_by_key(&id, |npc| npc.id).unwrap()]
     }
 }
 
 impl NpcLang {
-    pub fn get_npc_name(&self, name_id_hash: u32) -> Option<&FilterEntry> {
-        self.npc_names.get(name_id_hash as usize)
+    pub fn get_npc_name(&self, name_id_hash: IdInt) -> Option<&FilterEntry> {
+        self.npc_names.get(name_id_hash)
     }
 }
 
@@ -46,7 +46,7 @@ impl Filterable for Npc {
 }
 
 impl Id for Npc {
-    fn id(&self) -> usize {
-        self.id as usize
+    fn id(&self) -> IdInt {
+        self.id
     }
 }

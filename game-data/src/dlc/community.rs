@@ -90,14 +90,14 @@ impl CommunityTask {
                 lang.npcs.get_npc_name(name_id).map(FilterEntry::text)
             }
             CommunityTask::Quest { quest_id } => {
-                let name_id = game.quests.get(*quest_id as usize)?.name_id?;
+                let name_id = game.quests.get(*quest_id)?.name_id?;
                 lang.quests.text.get(name_id).map(TextEntry::text)
             }
             CommunityTask::Condition { msg_id, .. } => lang
                 .dlc
                 .community
                 .condition_lang
-                .get(*msg_id as usize)
+                .get(*msg_id)
                 .map(TextEntry::text),
         }
     }

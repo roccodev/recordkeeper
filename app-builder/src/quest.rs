@@ -1,7 +1,10 @@
-use bdat::{label_hash, ModernTable, TableAccessor};
+use bdat::{
+    label_hash,
+    modern::{ModernRowRef, ModernTable},
+};
 use game_data::quest::{PurposeTask, Quest, QuestLang, QuestPurpose, QuestRegistry, TaskType};
 
-use crate::{lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry, ModernRow};
+use crate::{lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry};
 
 pub fn read_quests(bdat: &BdatRegistry) -> QuestRegistry {
     let quests = bdat.table(label_hash!("QST_List"));
@@ -30,9 +33,9 @@ pub fn read_quest_lang(bdat: &LangBdatRegistry) -> QuestLang {
     ))
 }
 
-fn read_quest(row: ModernRow) -> Quest {
-    let flag = row.get(label_hash!("FlagPrt")).to_integer() as usize;
-    let name_id = row.get(label_hash!("QuestTitle")).to_integer() as usize;
+fn read_quest(row: ModernRowRef) -> Quest {
+    let flag = row.get(label_hash!("FlagPrt")).to_integer();
+    let name_id = row.get(label_hash!("QuestTitle")).to_integer();
 
     Quest {
         id: row.id(),
@@ -42,12 +45,12 @@ fn read_quest(row: ModernRow) -> Quest {
     }
 }
 
-fn read_purpose(row: &ModernRow, task_table: &ModernTable, quests: &mut Vec<Quest>) {
-    let quest_id = row.get(label_hash!("QuestID")).to_integer() as usize;
+fn read_purpose(row: &ModernRowRef, task_table: &ModernTable, quests: &mut Vec<Quest>) {
+    let quest_id = row.get(label_hash!("QuestID")).to_integer();
     // FlagLd???
-    let flag = row.get(label_hash!("Flagld")).to_integer() as usize;
+    let flag = row.get(label_hash!("Flagld")).to_integer();
 
-    let task_row = row.get(label_hash!("TaskID")).to_integer() as usize;
+    let task_row = row.get(label_hash!("TaskID")).to_integer();
     let task_row = task_table.row(task_row);
 
     let Ok(tasks) = (1..=4)
@@ -58,7 +61,7 @@ fn read_purpose(row: &ModernRow, task_table: &ModernTable, quests: &mut Vec<Ques
         unreachable!()
     };
 
-    quests[quest_id.checked_sub(1).expect("quest ID out of bounds")]
+    quests[quest_id.checked_sub(1).expect("quest ID out of bounds") as usize]
         .purposes
         .push(QuestPurpose {
             id: row.id(),
@@ -67,20 +70,20 @@ fn read_purpose(row: &ModernRow, task_table: &ModernTable, quests: &mut Vec<Ques
         });
 }
 
-fn read_task(row: &ModernRow, id: usize) -> Option<PurposeTask> {
-    let task_id = row.get(label_hash!(format!("TaskID{id}"))).to_integer() as usize;
+fn read_task(row: &ModernRowRef, id: usize) -> Option<PurposeTask> {
+    let task_id = row.get(label_hash!(format!("TaskID{id}"))).to_integer();
     if task_id == 0 {
         return None;
     }
-    let ty = row.get(label_hash!(format!("TaskType{id}"))).to_integer() as usize;
+    let ty = row.get(label_hash!(format!("TaskType{id}"))).to_integer();
     let branch = row.get(label_hash!(format!("Branch{id}"))).to_integer();
-    let name = row.get(label_hash!(format!("TaskLog{id}"))).to_integer() as usize;
-    let flag = row.get(label_hash!(format!("TaskFlag{id}"))).to_integer() as usize;
+    let name = row.get(label_hash!(format!("TaskLog{id}"))).to_integer();
+    let flag = row.get(label_hash!(format!("TaskFlag{id}"))).to_integer();
 
     Some(PurposeTask {
         id: task_id,
         name_id: (name != 0).then_some(name),
-        task_type: TaskType::from_repr(ty).expect("unknown type"),
+        task_type: TaskType::from_repr(ty as usize).expect("unknown type"),
         branch: branch.try_into().unwrap(),
         flag,
     })

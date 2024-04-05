@@ -21,11 +21,11 @@ impl AugmentNode {
         match self {
             Self::UnlockArt(id) | Self::UpgradeArt(id) => game
                 .characters
-                .get_art(*id as usize)
+                .get_art(*id)
                 .and_then(|a| a.get_filter(lang)),
             Self::UnlockSkill(id) | Self::UpgradeSkill(id) => game
                 .characters
-                .get_skill(*id as usize)
+                .get_skill(*id)
                 .and_then(|s| s.get_filter(lang)),
         }
         .map(|t| t.text())

@@ -1,7 +1,4 @@
-use bdat::{
-    hash::PreHashedMap, label_hash, BdatFile, Label, ModernCell, ModernTable, RowRef, SwitchEndian,
-    TableAccessor,
-};
+use bdat::{hash::PreHashedMap, label_hash, modern::ModernTable, BdatFile, Label, SwitchEndian};
 use binrw::BinReaderExt;
 use game_data::{GameData, LanguageData};
 use gimmick::GimmickData;
@@ -24,16 +21,14 @@ mod quest;
 mod scenario;
 mod util;
 
-pub type ModernRow<'a, 'b> = RowRef<'a, 'b, ModernCell<'a, 'b>>;
-
 pub struct BdatRegistry<'b> {
-    game_tables: HashMap<Label, ModernTable<'b>>,
+    game_tables: HashMap<Label<'b>, ModernTable<'b>>,
     gimmicks: PreHashedMap<u32, GimmickData>,
 }
 
 pub struct LangBdatRegistry<'b> {
     game: BdatRegistry<'b>,
-    tables: HashMap<Label, ModernTable<'b>>,
+    tables: HashMap<Label<'b>, ModernTable<'b>>,
     sort_keys: SortKeys,
 }
 
@@ -109,7 +104,7 @@ impl<'b> BdatRegistry<'b> {
                 .get_tables()
                 .unwrap();
             for table in tables {
-                game_tables.insert(table.name().clone(), table);
+                game_tables.insert(table.name().clone().into_owned(), table);
             }
         }
 
@@ -126,11 +121,11 @@ impl<'b> BdatRegistry<'b> {
         }
     }
 
-    pub fn get_table(&self, label: impl Borrow<Label>) -> Option<&ModernTable<'b>> {
+    pub fn get_table(&self, label: impl Borrow<Label<'b>>) -> Option<&ModernTable<'b>> {
         self.game_tables.get(label.borrow())
     }
 
-    pub fn table(&self, label: impl Borrow<Label>) -> &ModernTable<'b> {
+    pub fn table(&self, label: impl Borrow<Label<'b>>) -> &ModernTable<'b> {
         self.get_table(label).expect("table not found")
     }
 }
@@ -149,7 +144,7 @@ impl<'b> LangBdatRegistry<'b> {
                 .get_tables()
                 .unwrap();
             for table in tables {
-                all_tables.insert(table.name().clone(), table);
+                all_tables.insert(table.name().clone().into_owned(), table);
             }
         }
 
@@ -164,7 +159,7 @@ impl<'b> LangBdatRegistry<'b> {
         }
     }
 
-    pub fn table(&self, label: impl Borrow<Label>) -> &ModernTable<'b> {
+    pub fn table(&self, label: impl Borrow<Label<'b>>) -> &ModernTable<'b> {
         let label = label.borrow();
         self.tables
             .get(label)

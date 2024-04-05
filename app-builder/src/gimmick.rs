@@ -1,6 +1,4 @@
-use bdat::{label_hash, Label};
-
-use crate::ModernRow;
+use bdat::{label_hash, modern::ModernRowRef, Label};
 
 pub struct GimmickData {
     pub row_id: u32,
@@ -14,7 +12,7 @@ pub struct GimmickData {
 }
 
 impl GimmickData {
-    pub fn new(row: ModernRow) -> Self {
+    pub fn new(row: ModernRowRef) -> Self {
         Self {
             row_id: row.id() as u32,
             type_hash: row.get(label_hash!("GimmickType")).get_as(),

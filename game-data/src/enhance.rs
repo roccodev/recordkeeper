@@ -107,6 +107,6 @@ impl Enhance {
 
 impl Nameable for Enhance {
     fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l TextEntry> {
-        language.enhance.captions.get(self.caption_id as usize)
+        language.enhance.captions.get(self.caption_id)
     }
 }

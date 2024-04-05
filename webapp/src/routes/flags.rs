@@ -105,7 +105,7 @@ fn TablePage(props: &TableProps) -> Html {
                 {for (props.start..=props.end).map(|index| {
                     let editor = FlagEditor {
                         flag_type,
-                        flag_index: index
+                        flag_index: index.try_into().unwrap()
                     };
 
                     html! {

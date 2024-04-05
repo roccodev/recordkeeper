@@ -1,5 +1,5 @@
-use crate::{lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry, ModernRow};
-use bdat::label_hash;
+use crate::{lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry};
+use bdat::{label_hash, modern::ModernRowRef};
 use game_data::enhance::{Enhance, EnhanceEffect, EnhanceLang, EnhanceRegistry};
 
 pub fn load_enhance(bdat: &BdatRegistry) -> EnhanceRegistry {
@@ -25,7 +25,7 @@ pub fn load_enhance_lang(bdat: &LangBdatRegistry) -> EnhanceLang {
     EnhanceLang::new(text_table_from_bdat(captions))
 }
 
-fn read_enhance(row: ModernRow) -> Enhance {
+fn read_enhance(row: ModernRowRef) -> Enhance {
     let effect_id = row.get(label_hash!("EnhanceEffect")).to_integer();
     let caption_id = row.get(label_hash!("Caption")).to_integer();
 
@@ -41,7 +41,7 @@ fn read_enhance(row: ModernRow) -> Enhance {
     }
 }
 
-fn read_enhance_effect(row: ModernRow) -> EnhanceEffect {
+fn read_enhance_effect(row: ModernRowRef) -> EnhanceEffect {
     let param = row.get(label_hash!("Param")).to_integer();
     EnhanceEffect {
         id: row.id() as u32,

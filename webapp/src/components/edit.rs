@@ -47,10 +47,10 @@ pub trait Editor: Copy + 'static {
 editor!(
     pub FlagEditor,
     u32,
-    get |editor, save| { save.flags.get(editor.flag_type, editor.flag_index).unwrap() },
-    set |editor, save, new_value| { save.flags.set(editor.flag_type, editor.flag_index, new_value) },
+    get |editor, save| { save.flags.get(editor.flag_type, editor.flag_index as usize).unwrap() },
+    set |editor, save, new_value| { save.flags.set(editor.flag_type, editor.flag_index as usize, new_value) },
     assert |editor, value| { editor.flag_type.is_valid(*value).then_some(()).ok_or_else(|| String::from("value too big")) },
-    capture flag_type: recordkeeper::flags::FlagType, flag_index: usize
+    capture flag_type: recordkeeper::flags::FlagType, flag_index: u32
 );
 
 macro_rules! editor {

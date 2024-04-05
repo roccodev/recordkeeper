@@ -83,7 +83,7 @@ pub struct FormationStateProps {
 
 #[function_component]
 pub fn FormationCharacters(props: &FormationProps) -> Html {
-    let char_id_state = use_state(|| 1usize);
+    let char_id_state = use_state(|| 1u32);
     let char_id = *char_id_state;
 
     let data = use_context::<Data>().unwrap();
@@ -98,7 +98,7 @@ pub fn FormationCharacters(props: &FormationProps) -> Html {
     let class_callback = {
         let save_context = save_context.clone();
         let id = props.id;
-        move |class_id: usize, import: bool| {
+        move |class_id: u32, import: bool| {
             let save_context = save_context.clone();
             Callback::from(move |_| {
                 save_context.edit(move |save| {
@@ -107,7 +107,8 @@ pub fn FormationCharacters(props: &FormationProps) -> Html {
                     char.current_class = class_id as u16;
                     if import {
                         char.copy_class_from_save(
-                            save.characters[char_id.checked_sub(1).unwrap()].class_data(class_id),
+                            save.characters[char_id.checked_sub(1).unwrap() as usize]
+                                .class_data(class_id.try_into().unwrap()),
                         );
                     }
                 })
@@ -116,7 +117,7 @@ pub fn FormationCharacters(props: &FormationProps) -> Html {
     };
 
     let open_dialog = {
-        Callback::from(move |class_id: usize| {
+        Callback::from(move |class_id: u32| {
             dialog_context.dispatch(Some(
                 DialogLayout::YesNo {
                     title: None,
@@ -155,7 +156,7 @@ pub fn FormationCharacters(props: &FormationProps) -> Html {
                                     <UpdateSelector<Class>
                                         values={data.game().characters.classes()}
                                         update={open_dialog}
-                                        current={accessor.get_selected_class(save_context.get().get_save()) as usize}
+                                        current={u32::from(accessor.get_selected_class(save_context.get().get_save()))}
                                     />
                                 </Control>
                             </Field>
@@ -241,7 +242,7 @@ pub fn FormationCardPresent(props: &FormationStateProps) -> Html {
     };
     let name_callback = {
         let save_context = save_context.clone();
-        Callback::from(move |id: usize| {
+        Callback::from(move |id: u32| {
             save_context.edit(move |save| name_editor.set(save, id.try_into().unwrap()))
         })
     };
@@ -268,7 +269,7 @@ pub fn FormationCardPresent(props: &FormationStateProps) -> Html {
                         <UpdateSelector<FormationNameProfile>
                             values={data.game().formation.names.as_ref()}
                             update={name_callback}
-                            current={name_editor.get(save_context.get().get_save()) as usize}
+                            current={u32::from(name_editor.get(save_context.get().get_save()))}
                         />
                     </Control>
                 </Field>

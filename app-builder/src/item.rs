@@ -1,5 +1,6 @@
-use std::num::NonZeroUsize;
+use std::num::NonZeroU32;
 
+use bdat::modern::ModernRowRef;
 use bdat::{label_hash, Label};
 use enum_map::enum_map;
 use game_data::item::{GemCategory, Item, ItemDetails, ItemLanguageRegistry, Rarity};
@@ -7,8 +8,8 @@ use game_data::item::{ItemRegistry, Type};
 use recordkeeper::item::ItemType;
 
 use crate::lang::filter_table_from_bdat;
+use crate::BdatRegistry;
 use crate::LangBdatRegistry;
-use crate::{BdatRegistry, ModernRow};
 
 pub fn load_items(bdat: &BdatRegistry) -> ItemRegistry {
     let categories = [
@@ -40,7 +41,7 @@ pub fn load_items(bdat: &BdatRegistry) -> ItemRegistry {
         if registered & (1 << category) == 0 {
             registered |= 1 << category;
 
-            let name_id = row.get(label_hash!("Name")).to_integer() as usize;
+            let name_id = row.get(label_hash!("Name")).to_integer();
 
             registry.register_gem_category(GemCategory {
                 id: category,
@@ -68,7 +69,7 @@ pub fn load_item_lang(bdat: &LangBdatRegistry) -> ItemLanguageRegistry {
     ItemLanguageRegistry::new(categories.map(|_, label| filter_table_from_bdat(bdat.table(&label))))
 }
 
-fn read_item(item_type: ItemType, row: ModernRow) -> Option<Item> {
+fn read_item(item_type: ItemType, row: ModernRowRef) -> Option<Item> {
     let rarity = row
         .get_if_present(label_hash!("Rarity"))
         .map(|cell| Rarity::try_from(cell.to_integer()).unwrap())
@@ -102,7 +103,7 @@ fn read_item(item_type: ItemType, row: ModernRow) -> Option<Item> {
 
     Some(Item {
         id: row.id().try_into().unwrap(),
-        name_id: NonZeroUsize::new(row.get(label_hash!("Name")).to_integer() as usize),
+        name_id: NonZeroU32::new(row.get(label_hash!("Name")).to_integer()),
         item_type: Type(item_type),
         amount_max,
         rarity,

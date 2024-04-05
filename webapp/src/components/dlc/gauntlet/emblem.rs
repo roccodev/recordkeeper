@@ -1,4 +1,6 @@
-use game_data::lang::Nameable;
+use std::num::NonZeroU32;
+
+use game_data::{lang::Nameable, IdInt};
 use yew::prelude::*;
 
 use crate::{
@@ -11,12 +13,12 @@ editor!(
     bool,
     get |editor, save| save.challenge_battle.emblem(editor.id).unlocked,
     set |editor, save, new| save.challenge_battle.emblem_mut(editor.id).unlocked = new,
-    capture id: usize
+    capture id: NonZeroU32
 );
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct EmblemProps {
-    pub id: usize,
+    pub id: IdInt,
 }
 
 #[function_component]
@@ -37,7 +39,7 @@ pub fn EmblemRow(props: &EmblemProps) -> Html {
                 <th>{emblem.id.to_string()}</th>
                 <td>{emblem.get_name_str(data.lang())}</td>
                 {for (0..emblem.levels).map(|offset| html! {
-                    <td><CheckboxInput<PurchaseEditor> editor={PurchaseEditor { id: emblem.id + offset }} /></td>
+                    <td><CheckboxInput<PurchaseEditor> editor={PurchaseEditor { id: (emblem.id + offset).try_into().unwrap() }} /></td>
                 })}
             </tr>
         </>

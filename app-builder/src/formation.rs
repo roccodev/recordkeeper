@@ -11,7 +11,7 @@ pub fn read_data(bdat: &BdatRegistry) -> FormationData {
         .rows()
         .map(|row| {
             (
-                row.get(label_hash!("Name")).to_integer() as usize,
+                row.get(label_hash!("Name")).to_integer(),
                 row.get(label_hash!("ListNum")).to_integer(),
             )
         })
@@ -26,11 +26,11 @@ pub fn read_data(bdat: &BdatRegistry) -> FormationData {
 
             let name = match ty {
                 0 => return None,
-                1 => ProfileName::Literal(row.get(label_hash!("Name")).to_integer() as usize),
+                1 => ProfileName::Literal(row.get(label_hash!("Name")).to_integer()),
                 2 => {
-                    let sort_id = row.get(label_hash!("SortNo")).to_integer() as usize;
+                    let sort_id = row.get(label_hash!("SortNo")).to_integer();
                     ProfileName::Challenge(
-                        challenges_by_list_num[sort_id.checked_sub(1).unwrap()].0,
+                        challenges_by_list_num[sort_id.checked_sub(1).unwrap() as usize].0,
                     )
                 }
                 n => panic!("unknown type {n}"),

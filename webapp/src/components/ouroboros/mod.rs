@@ -1,7 +1,7 @@
 use game_data::{
     character::{Art, Skill},
     ouroboros::Ouroboros,
-    GameData,
+    GameData, IdInt,
 };
 use recordkeeper::{
     character::{OUROBOROS_ART_MAX, OUROBOROS_SKILL_MAX},
@@ -85,7 +85,7 @@ pub struct OuroEditorConfig {
 
 #[derive(PartialEq, Properties)]
 pub struct OuroborosProps {
-    pub char_id: usize,
+    pub char_id: IdInt,
     pub config: OuroEditorConfig,
 }
 
@@ -99,7 +99,7 @@ pub fn OuroborosEditor(props: &OuroborosProps) -> Html {
     let art_mapper = Callback::from(art_to_id);
     let skill_mapper = Callback::from(skill_to_id);
 
-    let char_idx = props.char_id.checked_sub(1).unwrap();
+    let char_idx = props.char_id.checked_sub(1).unwrap() as usize;
     let share_slot_flag = ToBool(FlagEditor {
         flag_type: FlagType::Bit,
         flag_index: ouroboros.share_slot_flag,

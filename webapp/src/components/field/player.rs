@@ -17,8 +17,8 @@ use crate::{
 #[rustfmt::skip]
 editor!(
     pub MapIdEditor,
-    usize,
-    get |_, save| save.map_id as usize,
+    u32,
+    get |_, save| save.map_id.into(),
     set |_, save, new| save.map_id = new.try_into().unwrap()
 );
 

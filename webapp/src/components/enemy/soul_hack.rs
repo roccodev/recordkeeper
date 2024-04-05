@@ -80,7 +80,7 @@ where
     });
 
     let progress_editor = AchievementEditor {
-        id: props.soul_hack.achievement_flag,
+        id: props.soul_hack.achievement_flag.try_into().unwrap(),
     };
 
     let is_upgraded =

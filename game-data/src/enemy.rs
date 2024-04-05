@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     character::SoulHack,
     lang::{Nameable, TextEntry, TextTable},
-    LanguageData,
+    IdInt, LanguageData,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -22,16 +22,16 @@ pub struct EnemyLang {
 
 #[derive(Serialize, Deserialize)]
 pub struct Enemy {
-    pub id: usize,
-    pub name_id: usize,
+    pub id: IdInt,
+    pub name_id: IdInt,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct UniqueMonster {
-    pub id: usize,
-    pub map_id: usize,
-    pub name_id: usize,
-    pub group_name: Option<usize>,
+    pub id: IdInt,
+    pub map_id: IdInt,
+    pub name_id: IdInt,
+    pub group_name: Option<IdInt>,
 }
 
 pub trait SoulLearnable {

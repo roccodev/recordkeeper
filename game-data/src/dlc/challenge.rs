@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     lang::{FilterEntry, FilterTable, Filterable, Id, Nameable, TextEntry, TextTable},
-    LanguageData,
+    IdInt, LanguageData,
 };
 
 #[derive(Serialize, Deserialize)]
@@ -23,27 +23,27 @@ pub struct ChallengeLang {
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct ChallengeData {
-    pub id: usize,
-    pub name_id: usize,
+    pub id: u32,
+    pub name_id: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct Emblem {
-    pub id: usize,
-    pub name_id: usize,
-    pub levels: usize,
+    pub id: u32,
+    pub name_id: u32,
+    pub levels: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct GauntletMap {
-    pub id: usize,
-    pub based_on_lang_id: usize,
+    pub id: u32,
+    pub based_on_lang_id: u32,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct Whimsy {
-    pub id: usize,
-    pub caption: usize,
+    pub id: u32,
+    pub caption: u32,
 }
 
 impl ChallengeGame {
@@ -55,8 +55,9 @@ impl ChallengeGame {
         id.checked_sub(1).and_then(|idx| self.gauntlets.get(idx))
     }
 
-    pub fn get_emblem(&self, id: usize) -> Option<&Emblem> {
-        id.checked_sub(1).and_then(|idx| self.emblems.get(idx))
+    pub fn get_emblem(&self, id: IdInt) -> Option<&Emblem> {
+        id.checked_sub(1)
+            .and_then(|idx| self.emblems.get(idx as usize))
     }
 }
 
@@ -85,19 +86,19 @@ impl Nameable for Emblem {
 }
 
 impl Id for ChallengeData {
-    fn id(&self) -> usize {
+    fn id(&self) -> u32 {
         self.id
     }
 }
 
 impl Id for GauntletMap {
-    fn id(&self) -> usize {
+    fn id(&self) -> u32 {
         self.id
     }
 }
 
 impl Id for Whimsy {
-    fn id(&self) -> usize {
+    fn id(&self) -> u32 {
         self.id
     }
 }

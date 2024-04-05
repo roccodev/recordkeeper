@@ -41,7 +41,7 @@ macro_rules! edit_num {
     };
 }
 
-edit_num!(IdEditor, gauntlet_id, usize);
+edit_num!(IdEditor, gauntlet_id);
 
 edit_num!(WeatherEditor, game_weather);
 edit_num!(StageEditor, last_stage);
@@ -61,25 +61,25 @@ edit_num!(WatchGaugeEditor, nopwatch_gauge, FF32);
 #[rustfmt::skip]
 editor!(
     LeadEditor,
-    usize,
-    get |_, save| save.challenge_battle.gauntlet_save().get_lead_character() as usize,
-    set |_, save, new| save.challenge_battle.gauntlet_save_mut().set_lead_character(new.try_into().unwrap())
+    u32,
+    get |_, save| save.challenge_battle.gauntlet_save().get_lead_character(),
+    set |_, save, new| save.challenge_battle.gauntlet_save_mut().set_lead_character(new)
 );
 
 #[rustfmt::skip]
 editor!(
     MapIdEditor,
-    usize,
-    get |_, save| save.challenge_battle.gauntlet_save().map_id.checked_add(75).unwrap() as usize,
-    set |_, save, new| save.challenge_battle.gauntlet_save_mut().map_id = new.checked_sub(75).unwrap().try_into().unwrap()
+    u32,
+    get |_, save| save.challenge_battle.gauntlet_save().map_id.checked_add(75).unwrap(),
+    set |_, save, new| save.challenge_battle.gauntlet_save_mut().map_id = new.checked_sub(75).unwrap()
 );
 
 #[rustfmt::skip]
 editor!(
     WhimsyEditor,
-    usize,
-    get |editor, save| save.challenge_battle.gauntlet_save().whimsy[editor.index] as usize,
-    set |editor, save, new| save.challenge_battle.gauntlet_save_mut().whimsy[editor.index] = new.try_into().unwrap(),
+    u32,
+    get |editor, save| save.challenge_battle.gauntlet_save().whimsy[editor.index],
+    set |editor, save, new| save.challenge_battle.gauntlet_save_mut().whimsy[editor.index] = new,
     capture index: usize
 );
 
@@ -214,7 +214,8 @@ fn WhimsySelect() -> Html {
         let save_context = save_context.clone();
         Callback::from(move |whimsy: usize| {
             let editor = WhimsyEditor { index: i };
-            save_context.edit(move |save| editor.set(save, whimsy.wrapping_add(1)))
+            save_context
+                .edit(move |save| editor.set(save, whimsy.wrapping_add(1).try_into().unwrap()))
         })
     };
 
@@ -229,7 +230,7 @@ fn WhimsySelect() -> Html {
                             <Control>
                                 <Field classes={classes!("has-addons")}>
                                     <SearchSelect<Whimsy>
-                                        current={value.checked_sub(1)}
+                                        current={value.checked_sub(1).map(|i| i as usize)}
                                         options={whimsy.clone()}
                                         on_select={update_whimsy(i)}
                                         lang={lang.clone()}

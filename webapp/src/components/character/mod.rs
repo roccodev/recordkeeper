@@ -1,3 +1,4 @@
+use game_data::IdInt;
 use recordkeeper::{flags::BitFlags, SaveData};
 use strum::{EnumIter, IntoEnumIterator};
 use ybc::{Control, Field, Notification, Tile};
@@ -32,7 +33,7 @@ editor!(
 
 #[derive(Properties, PartialEq, Clone, Copy)]
 pub struct CharacterProps {
-    pub char_id: usize,
+    pub char_id: IdInt,
 }
 
 #[derive(EnumIter, Clone, Copy, PartialEq)]
@@ -52,7 +53,7 @@ pub enum CharacterAccessor {
 pub fn CharacterEditor(props: &CharacterProps) -> Html {
     let save = use_context::<SaveContext>().unwrap();
 
-    let char_idx = props.char_id.checked_sub(1).unwrap();
+    let char_idx = props.char_id.checked_sub(1).unwrap() as usize;
     let class_id = save.get().get_save().characters[char_idx].selected_class;
 
     let accessor = CharacterAccessor::Save { idx: char_idx };
@@ -75,7 +76,7 @@ pub fn CharacterEditor(props: &CharacterProps) -> Html {
                 </Tile>
             </Notification>
             <Notification>
-                <ClassEditor accessor={accessor.into_class(class_id as usize)} stats={true} />
+                <ClassEditor accessor={accessor.into_class(class_id.into())} stats={true} />
             </Notification>
         </>
     }
@@ -167,11 +168,11 @@ impl CharacterAccessor {
         }
     }
 
-    pub fn into_class(self, class_id: usize) -> ClassAccessor {
+    pub fn into_class(self, class_id: u32) -> ClassAccessor {
         match self {
             CharacterAccessor::Save { idx } => ClassAccessor::Character {
                 char: idx,
-                class: class_id,
+                class: class_id.try_into().unwrap(),
             },
             CharacterAccessor::Formation { formation, id } => ClassAccessor::Formation {
                 formation,

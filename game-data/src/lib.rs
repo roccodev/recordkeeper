@@ -29,6 +29,8 @@ pub mod ouroboros;
 pub mod quest;
 pub mod scenario;
 
+pub type IdInt = u32;
+
 #[derive(Serialize, Deserialize)]
 pub struct GameData {
     pub items: ItemRegistry,

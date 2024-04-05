@@ -61,16 +61,18 @@ editor!(
 
 #[function_component]
 pub fn CharacterStats(props: &CharacterProps) -> Html {
-    let char_idx = props.char_id.checked_sub(1).unwrap();
+    let char_idx = props.char_id.checked_sub(1).unwrap() as usize;
 
     let data = use_context::<Data>().unwrap();
     let save_context = use_context::<SaveContext>().unwrap();
     let selected_class_editor = SelectedClassEditor { char_idx };
-    let selected_class = selected_class_editor.get(save_context.get().get_save()) as usize;
+    let selected_class: u32 = selected_class_editor
+        .get(save_context.get().get_save())
+        .into();
 
     let update_selected_class = {
         let save_context = save_context.clone();
-        Callback::from(move |class_id: usize| {
+        Callback::from(move |class_id: u32| {
             save_context
                 .edit(move |save| selected_class_editor.set(save, class_id.try_into().unwrap()))
         })

@@ -1,38 +1,37 @@
-use bdat::{hash::murmur3_str, label_hash, Label, TableAccessor};
+use bdat::{hash::murmur3_str, label_hash, modern::ModernRowRef, Label};
 use game_data::{
     dlc::map::{
         AchievementName, AchievementSearch, ArchitectureType, Dlc4Map, Dlc4MapLang, Dlc4Region,
         MapAchievement,
     },
     manual::Flag,
+    IdInt,
 };
 
-use crate::{
-    gimmick::GimmickData, lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry, ModernRow,
-};
+use crate::{gimmick::GimmickData, lang::text_table_from_bdat, BdatRegistry, LangBdatRegistry};
 
 const FLAG_BASE_NAMED: u16 = 5419;
-const FLAG_BASE_ENEMY: usize = 12158;
-const FLAG_BASE_LOCATION: usize = 6850;
-const FLAG_BASE_RESCUE: usize = 12516;
+const FLAG_BASE_ENEMY: IdInt = 12158;
+const FLAG_BASE_LOCATION: IdInt = 6850;
+const FLAG_BASE_RESCUE: IdInt = 12516;
 
-const FLAG_BASE_ARCH_LADDER: usize = 14118;
-const FLAG_BASE_ARCH_ELEVATOR: usize = 15119;
-const FLAG_BASE_ARCH_COM_SPOT: usize = 16120;
+const FLAG_BASE_ARCH_LADDER: IdInt = 14118;
+const FLAG_BASE_ARCH_ELEVATOR: IdInt = 15119;
+const FLAG_BASE_ARCH_COM_SPOT: IdInt = 16120;
 // Ether masts ("towers")
-const FLAG_BASE_ARCH_TOWER: usize = 17121;
-const FLAG_BASE_ARCH_SLIDE: usize = 17222;
-const FLAG_BASE_ARCH_LIFT: usize = 17323;
+const FLAG_BASE_ARCH_TOWER: IdInt = 17121;
+const FLAG_BASE_ARCH_SLIDE: IdInt = 17222;
+const FLAG_BASE_ARCH_LIFT: IdInt = 17323;
 
-const ACHIEVEMENT_BASE_FLAGS: &[usize] = &[
-    usize::MAX,              // 0: ignored
+const ACHIEVEMENT_BASE_FLAGS: &[IdInt] = &[
+    IdInt::MAX,              // 0: ignored
     10055,                   // 1: containers
     11056,                   // 2: relics
     11157,                   // 3: ether channels
     FLAG_BASE_LOCATION,      // 4: locations and rest spots
     7851,                    // 5: landmarks
     8852,                    // 6: secret areas
-    usize::MAX,              // 7: architecture (see above)
+    IdInt::MAX,              // 7: architecture (see above)
     FLAG_BASE_RESCUE,        // 8: npc rescue
     9853,                    // 9: kizuna events
     FLAG_BASE_ARCH_COM_SPOT, // 10: rest spots
@@ -75,13 +74,14 @@ pub fn read_game(bdat: &BdatRegistry) -> Dlc4Map {
         name: locations
             .row(id)
             .get(label_hash!("LocationName"))
-            .get_as::<u16>() as usize,
+            .get_as::<u16>()
+            .into(),
     });
 
     for row in achievements.rows() {
         let achievement = read_achievement(bdat, row);
         if !achievement.searches.is_empty() {
-            maps[achievement.region as usize - 1].push(achievement);
+            maps[(achievement.region - 1) as usize].push(achievement);
         }
     }
 
@@ -102,7 +102,7 @@ pub fn read_lang(lang: &LangBdatRegistry) -> Dlc4MapLang {
     }
 }
 
-fn read_achievement(bdat: &BdatRegistry, row: ModernRow) -> MapAchievement {
+fn read_achievement(bdat: &BdatRegistry, row: ModernRowRef) -> MapAchievement {
     let ty = row.get(label_hash!("Type")).get_as::<u8>() as u32;
     let region = row.get(Label::Hash(0x09F6EF1A)).get_as::<u16>() as u32;
     MapAchievement {
@@ -112,7 +112,7 @@ fn read_achievement(bdat: &BdatRegistry, row: ModernRow) -> MapAchievement {
     }
 }
 
-fn read_searches(bdat: &BdatRegistry, row: ModernRow, ty: u32) -> Box<[AchievementSearch]> {
+fn read_searches(bdat: &BdatRegistry, row: ModernRowRef, ty: u32) -> Box<[AchievementSearch]> {
     let enemies = bdat.table(label_hash!("FLD_EnemyData"));
     let npc_rescues = bdat.table(Label::Hash(0x46B9A047));
     let npcs = bdat.table(label_hash!("FLD_NpcList"));
@@ -142,7 +142,7 @@ fn read_searches(bdat: &BdatRegistry, row: ModernRow, ty: u32) -> Box<[Achieveme
                 AchievementSearch {
                     flag: Flag {
                         bits: 2,
-                        index: flag_offset as usize + FLAG_BASE_ENEMY,
+                        index: u32::from(flag_offset) + FLAG_BASE_ENEMY,
                     },
                     name: AchievementName::Enemy {
                         name_id: enemy.get(label_hash!("MsgName")).get_as::<u16>() as u32,
@@ -152,13 +152,13 @@ fn read_searches(bdat: &BdatRegistry, row: ModernRow, ty: u32) -> Box<[Achieveme
             8 => {
                 // NPC
                 let rescue = npc_rescues.row_by_hash(gmk);
-                let npc = npcs.row(rescue.get(label_hash!("NpcID")).get_as::<u16>() as usize);
+                let npc = npcs.row(rescue.get(label_hash!("NpcID")).get_as::<u16>().into());
                 let res =
-                    npc_resources.row(npc.get(Label::Hash(0x7F0A3296)).get_as::<u16>() as usize);
+                    npc_resources.row(npc.get(Label::Hash(0x7F0A3296)).get_as::<u16>().into());
                 AchievementSearch {
                     flag: Flag {
                         bits: 2,
-                        index: rescue.get(Label::Hash(0x0DEC588C)).get_as::<u16>() as usize,
+                        index: rescue.get(Label::Hash(0x0DEC588C)).get_as::<u16>().into(),
                     },
                     name: AchievementName::Npc {
                         name_id: res.get(label_hash!("Name")).get_as(),
@@ -217,16 +217,16 @@ fn gimmick_search<'a>(
                 0 | 2 | 3 => unreachable!(),
                 d => panic!("unknown architecture type {d}"),
             };
-            flag = base_flag + gmk.sequential_id as usize;
+            flag = base_flag + gmk.sequential_id;
         }
         h if h == murmur3_str("Elevator") => {
-            flag = FLAG_BASE_ARCH_ELEVATOR + gmk.sequential_id as usize;
+            flag = FLAG_BASE_ARCH_ELEVATOR + gmk.sequential_id;
         }
         h if h == murmur3_str("KizunaEvent") => {
             let event = bdat
                 .table(label_hash!("ma40a_GMK_KizunaEvent"))
                 .row_by_hash(gmk.external_id);
-            flag = event.get(label_hash!("Flag")).get_as::<u16>() as usize;
+            flag = event.get(label_hash!("Flag")).get_as::<u16>().into();
         }
         h if h == murmur3_str("EtherSlide") => {
             let slide = bdat
@@ -237,10 +237,10 @@ fn gimmick_search<'a>(
             } else {
                 FLAG_BASE_ARCH_SLIDE
             };
-            flag = base_flag + gmk.sequential_id as usize;
+            flag = base_flag + gmk.sequential_id;
         }
         _ => {
-            flag = ACHIEVEMENT_BASE_FLAGS[ty as usize] + gmk.sequential_id as usize;
+            flag = ACHIEVEMENT_BASE_FLAGS[ty as usize] + gmk.sequential_id;
         }
     }
 

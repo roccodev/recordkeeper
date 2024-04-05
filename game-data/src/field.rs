@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     lang::{FilterEntry, FilterTable, Filterable, Id, TextTable},
-    LanguageData,
+    IdInt, LanguageData,
 };
 
 #[derive(Serialize, Deserialize, PartialEq)]
@@ -26,14 +26,14 @@ pub struct Map {
 
 #[derive(Serialize, Deserialize, Copy, Clone, PartialEq)]
 pub struct MapId {
-    pub id: usize,
-    pub name_id: usize,
+    pub id: IdInt,
+    pub name_id: IdInt,
 }
 
 #[derive(Serialize, Deserialize, Copy, Clone, PartialEq)]
 pub struct Location {
-    pub id: usize,
-    pub name_id: usize,
+    pub id: IdInt,
+    pub name_id: IdInt,
     pub location_type: LocationType,
     pub map_jump: Option<NonZeroU16>,
     pub map_point: Option<MapPoint>,
@@ -66,8 +66,8 @@ impl FieldRegistry {
         }
     }
 
-    pub fn get_map_by_id(&self, id: usize) -> Option<&Map> {
-        id.checked_sub(1).and_then(|i| self.maps.get(i))
+    pub fn get_map_by_id(&self, id: IdInt) -> Option<&Map> {
+        id.checked_sub(1).and_then(|i| self.maps.get(i as usize))
     }
 
     pub fn maps(&self) -> &[Map] {
@@ -82,7 +82,7 @@ impl Filterable for MapId {
 }
 
 impl Id for MapId {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id
     }
 }
@@ -94,7 +94,7 @@ impl Filterable for Map {
 }
 
 impl Id for Map {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id.id()
     }
 }
@@ -106,7 +106,7 @@ impl Filterable for Location {
 }
 
 impl Id for Location {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id
     }
 }

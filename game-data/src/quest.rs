@@ -3,12 +3,15 @@
 use serde::{Deserialize, Serialize};
 use strum::{EnumIter, FromRepr};
 
-use crate::lang::{Nameable, TextTable};
+use crate::{
+    lang::{Nameable, TextTable},
+    IdInt,
+};
 
 #[derive(Serialize, Deserialize)]
 pub struct QuestRegistry {
     quests: Vec<Quest>,
-    dlc4_spacer: usize,
+    dlc4_spacer: IdInt,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -18,25 +21,25 @@ pub struct QuestLang {
 
 #[derive(Serialize, Deserialize)]
 pub struct Quest {
-    pub id: usize,
-    pub name_id: Option<usize>,
-    pub flag: usize,
+    pub id: IdInt,
+    pub name_id: Option<IdInt>,
+    pub flag: IdInt,
     pub purposes: Vec<QuestPurpose>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct QuestPurpose {
-    pub id: usize,
-    pub flag: usize,
+    pub id: IdInt,
+    pub flag: IdInt,
     pub tasks: [Option<PurposeTask>; 4],
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, PartialEq)]
 pub struct PurposeTask {
-    pub id: usize,
-    pub name_id: Option<usize>,
+    pub id: IdInt,
+    pub name_id: Option<IdInt>,
     pub task_type: TaskType,
-    pub flag: usize,
+    pub flag: IdInt,
     pub branch: u8,
 }
 
@@ -65,18 +68,19 @@ pub enum TaskType {
 }
 
 impl QuestRegistry {
-    pub fn new(quests: Vec<Quest>, dlc4_spacer: usize) -> Self {
+    pub fn new(quests: Vec<Quest>, dlc4_spacer: IdInt) -> Self {
         Self {
             quests,
             dlc4_spacer,
         }
     }
 
-    pub fn get(&self, id: usize) -> Option<&Quest> {
-        id.checked_sub(1).and_then(|id| self.quests.get(id))
+    pub fn get(&self, id: IdInt) -> Option<&Quest> {
+        id.checked_sub(1)
+            .and_then(|id| self.quests.get(id as usize))
     }
 
-    pub fn start(&self, dlc4: bool) -> usize {
+    pub fn start(&self, dlc4: bool) -> IdInt {
         if dlc4 {
             self.dlc4_spacer.checked_add(1).unwrap()
         } else {
@@ -84,9 +88,9 @@ impl QuestRegistry {
         }
     }
 
-    pub fn end(&self, dlc4: bool) -> usize {
+    pub fn end(&self, dlc4: bool) -> IdInt {
         if dlc4 {
-            self.quests.len()
+            self.quests.len().try_into().unwrap()
         } else {
             self.dlc4_spacer.checked_sub(1).unwrap()
         }

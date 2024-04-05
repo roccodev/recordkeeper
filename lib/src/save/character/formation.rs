@@ -154,7 +154,7 @@ impl CharacterFormation {
         let current_class = save_char.selected_class;
         Self {
             class: if current_class != 0 {
-                *save_char.class_data(current_class as usize)
+                *save_char.class_data(u32::from(current_class).try_into().unwrap())
             } else {
                 Default::default()
             },

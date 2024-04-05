@@ -6,7 +6,7 @@ use strum::{EnumIter, FromRepr};
 use crate::{
     lang::{FilterEntry, Filterable, Id, Nameable, TextEntry, TextTable},
     manual::{Flag, FlagRange},
-    LanguageData,
+    IdInt, LanguageData,
 };
 
 #[derive(Deserialize, Serialize)]
@@ -23,8 +23,8 @@ pub struct Dlc4MapLang {
 
 #[derive(Deserialize, Serialize, PartialEq)]
 pub struct Dlc4Region {
-    pub id: usize,
-    pub name: usize,
+    pub id: IdInt,
+    pub name: IdInt,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -166,18 +166,18 @@ impl ArchitectureType {
 impl Nameable for MapAchievement {
     fn get_name<'l>(&self, language: &'l LanguageData) -> Option<&'l TextEntry> {
         let name_id = language.dlc.map.achievement_type_map.get(&self.ty)?;
-        language.dlc.map.map.get(*name_id as usize)
+        language.dlc.map.map.get(*name_id)
     }
 }
 
 impl Filterable for Dlc4Region {
     fn get_filter<'l>(&self, language: &'l LanguageData) -> Option<&'l FilterEntry> {
-        language.field.locations.get(self.name as usize)
+        language.field.locations.get(self.name)
     }
 }
 
 impl Id for Dlc4Region {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id
     }
 }

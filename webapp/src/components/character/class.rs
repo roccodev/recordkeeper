@@ -1,3 +1,5 @@
+use std::num::NonZeroU32;
+
 use game_data::{
     character::{Art, Skill},
     item::GemCategory,
@@ -91,7 +93,7 @@ editor!(
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum ClassAccessor {
-    Character { char: usize, class: usize },
+    Character { char: usize, class: NonZeroU32 },
     Formation { formation: usize, char: u16 },
 }
 

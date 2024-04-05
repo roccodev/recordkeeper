@@ -110,9 +110,9 @@ impl Editor for StatusEditor {
     fn set(&self, save: &mut SaveData, new: Self::Target) {
         let mut chrono_editor = CommunityChrono::new(save);
         if new == CommunityStatus::Unregistered {
-            chrono_editor.delete(self.order.flag_index);
+            chrono_editor.delete(self.order.flag_index as usize);
         } else {
-            chrono_editor.insert(self.order.flag_index);
+            chrono_editor.insert(self.order.flag_index as usize);
         }
         self.progress.set(save, new as u32);
     }

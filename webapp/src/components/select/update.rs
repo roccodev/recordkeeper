@@ -1,6 +1,9 @@
 use std::slice;
 
-use game_data::lang::{Filterable, Id, SortKey};
+use game_data::{
+    lang::{Filterable, Id, SortKey},
+    IdInt,
+};
 use yew::prelude::*;
 
 use crate::{
@@ -13,8 +16,8 @@ use crate::{
 #[derive(Properties, PartialEq)]
 pub struct UpdateSelectorProps<F: Filterable + PartialEq + Id + 'static> {
     pub values: &'static [F],
-    pub current: usize,
-    pub update: Callback<usize>,
+    pub current: IdInt,
+    pub update: Callback<IdInt>,
     #[prop_or_default]
     pub sort_key: Option<SortKey>,
 }
@@ -22,7 +25,7 @@ pub struct UpdateSelectorProps<F: Filterable + PartialEq + Id + 'static> {
 #[derive(Properties, PartialEq)]
 pub struct StateSelectorProps<F: Filterable + PartialEq + Id + 'static> {
     /// State to update. Value is the object's ID (e.g. character ID, class ID...)
-    pub state: UseStateHandle<usize>,
+    pub state: UseStateHandle<IdInt>,
     pub values: &'static [F],
     #[prop_or_default]
     pub sort_key: Option<SortKey>,
@@ -61,7 +64,7 @@ pub fn UpdateSelector<F: Filterable + PartialEq + Id + 'static>(
     let update = {
         let update = props.update.clone();
         Callback::from(move |s: String| {
-            update.emit(s.parse::<usize>().unwrap());
+            update.emit(s.parse::<IdInt>().unwrap());
         })
     };
 
@@ -96,7 +99,7 @@ pub fn UpdateSelector<F: Filterable + PartialEq + Id + 'static>(
 #[function_component]
 pub fn EditorSelector<E, F>(props: &EditorSelectorProps<E, F>) -> Html
 where
-    E: PartialEq + Editor<Target = usize>,
+    E: PartialEq + Editor<Target = IdInt>,
     F: Filterable + PartialEq + Id + 'static,
 {
     let save_context = use_context::<SaveContext>().unwrap();

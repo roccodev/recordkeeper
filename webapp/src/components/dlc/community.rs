@@ -122,7 +122,9 @@ fn NpcEntry(props: &NpcEntryProps) -> Html {
         let save = save.clone();
         match flag {
             Some(flag) => Callback::from(move |_: MouseEvent| {
-                save.edit(move |save| CommunityChrono::new(save).swap(self_flag, flag.index))
+                save.edit(move |save| {
+                    CommunityChrono::new(save).swap(self_flag as usize, flag.index as usize)
+                })
             }),
             None => Callback::noop(),
         }

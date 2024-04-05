@@ -24,7 +24,7 @@ editor!(
 #[function_component]
 pub fn OuroTree(props: &OuroTreeProps) -> Html {
     let data = use_context::<Data>().unwrap();
-    let char_idx = props.ouroboros.id.checked_sub(1).unwrap();
+    let char_idx = props.ouroboros.id.checked_sub(1).unwrap() as usize;
 
     html! {
         <Field classes={classes!("is-grouped", "is-grouped-multiline")}>

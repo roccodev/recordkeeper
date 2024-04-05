@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     lang::{Filterable, Id},
-    GameData, LanguageData,
+    GameData, IdInt, LanguageData,
 };
 
 #[derive(Serialize, Deserialize, Clone, PartialEq)]
@@ -12,19 +12,19 @@ pub struct OuroborosRegistry {
 
 #[derive(Serialize, Deserialize, Clone, PartialEq)]
 pub struct Ouroboros {
-    pub id: usize,
-    pub name_id: usize,
-    pub share_slot_flag: usize,
+    pub id: IdInt,
+    pub name_id: IdInt,
+    pub share_slot_flag: IdInt,
 
     pub tree_nodes: Box<[OuroTreeNode]>,
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, Copy, PartialOrd, Eq, Ord)]
 pub enum OuroTreeNode {
-    UnlockArt(usize),
-    UnlockSkill(usize),
-    UpgradeArt(usize),
-    UpgradeSkill(usize),
+    UnlockArt(IdInt),
+    UnlockSkill(IdInt),
+    UpgradeArt(IdInt),
+    UpgradeSkill(IdInt),
 }
 
 impl OuroborosRegistry {
@@ -34,8 +34,9 @@ impl OuroborosRegistry {
         }
     }
 
-    pub fn get(&self, id: usize) -> Option<&Ouroboros> {
-        id.checked_sub(1).and_then(|i| self.characters.get(i))
+    pub fn get(&self, id: u32) -> Option<&Ouroboros> {
+        id.checked_sub(1)
+            .and_then(|i| self.characters.get(i as usize))
     }
 
     pub fn as_slice(&self) -> &[Ouroboros] {
@@ -75,7 +76,7 @@ impl Filterable for Ouroboros {
 }
 
 impl Id for Ouroboros {
-    fn id(&self) -> usize {
+    fn id(&self) -> IdInt {
         self.id
     }
 }

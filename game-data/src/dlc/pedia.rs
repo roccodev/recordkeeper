@@ -4,7 +4,7 @@ use recordkeeper::item::ItemType;
 use serde::{Deserialize, Serialize};
 use strum::{EnumIter, FromRepr};
 
-use crate::{lang::Nameable, manual::Flag, GameData, LanguageData};
+use crate::{lang::Nameable, manual::Flag, GameData, IdInt, LanguageData};
 
 #[derive(Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
 pub struct Dlc4Collepedia {
@@ -22,7 +22,7 @@ pub struct Enemypedia {
     pub flag: Flag,
     pub sort_id: u16,
     pub max: u8,
-    pub slot_id: usize,
+    pub slot_id: IdInt,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, EnumIter, FromRepr)]
@@ -36,7 +36,7 @@ pub enum PediaStatus {
 }
 
 pub enum PediaValue {
-    Number { max: u8, slot_id: usize },
+    Number { max: u8, slot_id: IdInt },
     TriState,
 }
 

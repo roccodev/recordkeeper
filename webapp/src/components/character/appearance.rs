@@ -1,4 +1,7 @@
-use game_data::character::{Attachment, Costume};
+use game_data::{
+    character::{Attachment, Costume},
+    IdInt,
+};
 use recordkeeper::character::CharacterFlag;
 use strum::IntoEnumIterator;
 use ybc::{Control, Field, Tile};
@@ -54,7 +57,7 @@ editor!(
 #[derive(Properties, PartialEq)]
 pub struct AppearanceProps {
     pub accessor: CharacterAccessor,
-    pub char_id: usize,
+    pub char_id: IdInt,
 }
 
 trait FlagBox {

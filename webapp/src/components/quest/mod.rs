@@ -1,4 +1,4 @@
-use game_data::{lang::Nameable, quest::QuestStatus};
+use game_data::{lang::Nameable, quest::QuestStatus, IdInt};
 use recordkeeper::flags::FlagType;
 use ybc::{Button, Control, Icon};
 use yew::prelude::*;
@@ -20,7 +20,7 @@ mod purpose;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct QuestEditorProps {
-    pub id: usize,
+    pub id: IdInt,
 }
 
 #[derive(Clone, Copy, PartialEq)]
