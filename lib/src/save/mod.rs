@@ -20,6 +20,7 @@ use self::chrono::ChronologicalData;
 use self::enemy::SoulHackAchievements;
 use self::field::FieldConfig;
 use self::flags::BitFlags;
+use self::item::GemLevels;
 use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
 
 pub mod character;
@@ -115,6 +116,7 @@ pub struct SaveData {
     #[loc(0xe3a0)]
     pub characters: Box<[Character; CHARACTER_MAX]>,
     pub ouroboros: Box<[Ouroboros; OUROBOROS_MAX]>,
+    gem_levels: GemLevels,
 
     /// ID for `BTL_Pair`
     #[loc(0x53c38)]

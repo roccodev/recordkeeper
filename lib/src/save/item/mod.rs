@@ -1,3 +1,5 @@
+use std::num::NonZeroUsize;
+
 use recordkeeper_macros::SaveBin;
 use thiserror::Error;
 
@@ -7,6 +9,7 @@ use crate::{
 };
 
 pub const ITEM_ACCESSORY_MAX: usize = 1500;
+pub const GEM_CATEGORY_MAX: usize = 20;
 
 pub mod edit;
 
@@ -64,6 +67,16 @@ pub struct DlcManualSlot {
     item_id: u16,
     inventory_slot_index: u16,
     item_type: u16,
+}
+
+/// Highest levels the player has unlocked for each gem category (in the form of item IDs).
+///
+/// Unfortunately, the library cannot automatically update this when items are changed, as it
+/// requires knowledge of game data. (in particular, the ID ranges of each gem category)
+#[derive(SaveBin, Debug)]
+pub struct GemLevels {
+    /// Gem Item IDs (12000+) for each category
+    item_ids: [u16; GEM_CATEGORY_MAX],
 }
 
 #[derive(PartialEq, Clone, Copy, Debug)]
@@ -221,6 +234,27 @@ impl ItemType {
             Self::Exchange => "exchange",
             Self::Extra => "extra",
         }
+    }
+}
+
+impl GemLevels {
+    /// Returns the item ID that represents the gem category (`ITM_Gem.Category`).
+    ///
+    /// The ID points to a row in `ITM_Gem`.
+    pub fn get_item(&self, category: usize) -> Option<u16> {
+        self.item_ids
+            .get(category.checked_sub(1)?)
+            .copied()
+            .and_then(|n| (n != 0).then_some(n))
+    }
+
+    /// Updates the item ID that represents a gem category (`ITM_Gem.Category`).
+    ///
+    /// The ID should point to a row in `ITM_Gem`, and should represent the highest level the
+    /// player has unlocked for the gem. It is possible to use the ID of a gem with
+    /// a different category, which results in the game showing a duplicate entry.
+    pub fn set_item(&mut self, category: NonZeroUsize, item_id: u16) {
+        self.item_ids[category.get() - 1] = item_id;
     }
 }
 

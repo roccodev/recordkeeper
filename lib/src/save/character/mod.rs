@@ -89,11 +89,11 @@ pub struct OuroborosTree {
 
 impl Character {
     pub fn class_data(&self, class_id: NonZeroU32) -> &CharacterClass {
-        &self.class_inventory[usize::try_from(u32::from(class_id) - 1).unwrap()]
+        &self.class_inventory[usize::try_from(class_id.get() - 1).unwrap()]
     }
 
     pub fn class_data_mut(&mut self, class_id: NonZeroU32) -> &mut CharacterClass {
-        &mut self.class_inventory[usize::try_from(u32::from(class_id) - 1).unwrap()]
+        &mut self.class_inventory[usize::try_from(class_id.get() - 1).unwrap()]
     }
 
     pub fn is_flag_set(&self, flag: CharacterFlag) -> bool {

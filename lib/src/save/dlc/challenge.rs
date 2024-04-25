@@ -139,7 +139,7 @@ impl ChallengeBattle {
     ///
     /// The ID starts at 1.
     pub fn emblem(&self, id: NonZeroU32) -> &EmblemItem {
-        &self.emblem_shop[usize::try_from(u32::from(id) - 1).unwrap()]
+        &self.emblem_shop[usize::try_from(id.get() - 1).unwrap()]
     }
 
     /// Returns a mutable view of an emblem shop item.
@@ -149,7 +149,7 @@ impl ChallengeBattle {
     /// ## Panics
     /// Panics if the ID is out of bounds.
     pub fn emblem_mut(&mut self, id: NonZeroU32) -> &mut EmblemItem {
-        &mut self.emblem_shop[usize::try_from(u32::from(id) - 1).unwrap()]
+        &mut self.emblem_shop[usize::try_from(id.get() - 1).unwrap()]
     }
 
     /// Returns an iterator over the challenge records.
