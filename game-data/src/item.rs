@@ -37,6 +37,7 @@ pub struct GemCategory {
 #[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Copy)]
 pub enum ItemDetails {
     Accessory { is_manual: bool },
+    Gem { category: u16 },
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy)]

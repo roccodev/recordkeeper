@@ -98,6 +98,11 @@ fn read_item(item_type: ItemType, row: ModernRowRef) -> Option<Item> {
                     is_manual: cell.to_integer() != 0,
                 })
         }
+        ItemType::Gem => row
+            .get_if_present(label_hash!("Category"))
+            .map(|cell| ItemDetails::Gem {
+                category: cell.get_as(),
+            }),
         _ => None,
     };
 

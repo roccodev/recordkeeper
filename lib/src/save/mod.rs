@@ -116,7 +116,7 @@ pub struct SaveData {
     #[loc(0xe3a0)]
     pub characters: Box<[Character; CHARACTER_MAX]>,
     pub ouroboros: Box<[Ouroboros; OUROBOROS_MAX]>,
-    gem_levels: GemLevels,
+    pub gem_levels: GemLevels,
 
     /// ID for `BTL_Pair`
     #[loc(0x53c38)]

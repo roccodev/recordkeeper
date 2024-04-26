@@ -1,9 +1,9 @@
 use game_data::{GameData, LanguageData};
 use gloo_net::http::Request;
 use log::{info, warn};
-use std::error::Error;
 use std::io::Cursor;
 use std::rc::Rc;
+use std::{error::Error, ops::Deref};
 use yew::{Reducible, UseReducerHandle};
 
 pub static DEFAULT_GAME_LANG: &str = "gb";
@@ -17,7 +17,7 @@ static RES_DEFAULT_LANG: &[u8] = include_bytes!(concat!(
 ));
 
 pub struct DataManager {
-    game_data: &'static GameData,
+    game_data: Singleton<GameData>,
     current_language_data: Rc<LanguageData>,
     lang_id: String,
 }
@@ -26,6 +26,11 @@ pub type Data = UseReducerHandle<DataManager>;
 
 pub enum DataAction {
     ChangeLanguage(LanguageData, String),
+}
+
+#[derive(Debug)]
+pub struct Singleton<T: 'static> {
+    ptr: &'static T,
 }
 
 impl DataManager {
@@ -37,14 +42,20 @@ impl DataManager {
         info!("Loaded game data.");
 
         Self {
-            game_data: Box::leak(Box::new(game_data)),
+            game_data: Singleton {
+                ptr: Box::leak(Box::new(game_data)),
+            },
             current_language_data: Rc::new(lang_data),
             lang_id: DEFAULT_GAME_LANG.to_string(),
         }
     }
 
     pub fn game(&self) -> &'static GameData {
-        self.game_data
+        self.game_data.ptr
+    }
+
+    pub fn game_ref(&self) -> &Singleton<GameData> {
+        &self.game_data
     }
 
     pub fn lang(&self) -> &LanguageData {
@@ -87,9 +98,23 @@ fn load_default_lang() -> Result<LanguageData, Box<dyn Error>> {
     game_data::load_lang_data(Cursor::new(RES_DEFAULT_LANG))
 }
 
+impl<T: 'static> Clone for Singleton<T> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl<T: 'static> Copy for Singleton<T> {}
+
+impl<T: 'static> PartialEq for Singleton<T> {
+    fn eq(&self, other: &Self) -> bool {
+        std::ptr::eq(self.ptr, other.ptr)
+    }
+}
+
 impl PartialEq for DataManager {
     fn eq(&self, other: &Self) -> bool {
-        std::ptr::eq(self.game_data, other.game_data) && self.lang_id.eq(&other.lang_id)
+        self.game_data == other.game_data && self.lang_id.eq(&other.lang_id)
     }
 }
 
@@ -106,5 +131,13 @@ impl Reducible for DataManager {
             current_language_data: Rc::new(new_lang),
             lang_id,
         })
+    }
+}
+
+impl<T: 'static> Deref for Singleton<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        self.ptr
     }
 }
