@@ -60,7 +60,7 @@ editor!(
     u8,
     get |editor, save| editor.class.class_data(save).level,
     set |editor, save, new| editor.class.class_data_mut(save).level = new,
-    assert |_, v| (1..=20).contains(v).then_some(()).ok_or_else(String::new),
+    assert |_, v| (0..=20).contains(v).then_some(()).ok_or_else(String::new),
     capture class: ClassAccessor
 );
 
