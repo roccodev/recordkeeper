@@ -1,0 +1,9 @@
+[package]
+name = "pattern-exporter"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+recordkeeper = { path = "../lib" }
+recordkeeper-data-model = { path = "../data-model" }
+clap = { version = "4.5", features = ["derive"] }

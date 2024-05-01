@@ -1,0 +1,12 @@
+[package]
+name = "recordkeeper-data-model"
+version = "0.1.0"
+description = "Abstract data model for recordkeeper"
+authors = ["RoccoDev <hey@rocco.dev>"]
+license = "LGPL-3.0-only"
+edition = "2021"
+categories = ["parsing", "parser-implementations"]
+keywords = ["xenoblade", "save-edit", "monolithsoft"]
+repository = "https://github.com/RoccoDev/recordkeeper/tree/master/data-model"
+
+[dependencies]

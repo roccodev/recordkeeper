@@ -13,6 +13,7 @@ use crate::{
 
 use crate::menu::MenuData;
 use crate::util::FixVec;
+use recordkeeper_data_model::Model;
 use recordkeeper_macros::SaveBin;
 
 use self::character::CharacterSets;
@@ -182,7 +183,7 @@ pub struct Pos {
 #[derive(SaveBin, Debug)]
 pub struct MapTime<N = u16>
 where
-    N: SaveBin,
+    N: SaveBin + Model,
     SaveError: From<<N as SaveBin>::ReadError>,
     SaveError: From<<N as SaveBin>::WriteError>,
 {

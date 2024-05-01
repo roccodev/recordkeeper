@@ -1,5 +1,6 @@
 use crate::error::SaveError;
 use byteorder::{ByteOrder, LittleEndian, ReadBytesExt};
+use recordkeeper_data_model::{Model, TypeModel};
 use std::convert::Infallible;
 use std::io::Cursor;
 use std::marker::PhantomData;

@@ -1,5 +1,6 @@
 use crate::error::SaveError;
 use crate::io::SaveBin;
+use recordkeeper_data_model::Model;
 use recordkeeper_macros::SaveBin;
 use std::marker::PhantomData;
 
@@ -40,7 +41,7 @@ pub struct BitFlags<const BITS: usize, const WORDS: usize> {
 }
 
 #[derive(SaveBin, Debug)]
-struct ByteFlags<B: SaveBin, const N: usize>
+struct ByteFlags<B: SaveBin + Model, const N: usize>
 where
     SaveError: From<<B as SaveBin>::ReadError>,
     SaveError: From<<B as SaveBin>::WriteError>,
@@ -146,11 +147,11 @@ impl<const BITS: usize, const WORDS: usize> BitFlags<BITS, WORDS> {
     }
 }
 
-impl<B: SaveBin, const N: usize> ByteFlags<B, N>
+impl<B, const N: usize> ByteFlags<B, N>
 where
     SaveError: From<<B as SaveBin>::ReadError>,
     SaveError: From<<B as SaveBin>::WriteError>,
-    B: Copy,
+    B: SaveBin + Copy + Model,
 {
     pub fn get(&self, index: usize) -> Option<B> {
         self.flags.get(index).copied()

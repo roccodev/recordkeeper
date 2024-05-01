@@ -1,6 +1,6 @@
 [package]
 name = "recordkeeper-macros"
-version = "0.1.0"
+version = "0.2.0"
 description = "Derive macros for recordkeeper. (For internal use)"
 authors = ["RoccoDev <hey@rocco.dev>"]
 license = "LGPL-3.0-only"

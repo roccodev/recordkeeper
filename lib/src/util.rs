@@ -1,3 +1,4 @@
+use recordkeeper_data_model::Model;
 use recordkeeper_macros::SaveBin;
 use thiserror::Error;
 
@@ -20,7 +21,7 @@ pub struct FixStr<const MAX: usize> {
 #[derive(SaveBin, Debug, Clone)]
 pub struct FixVec<T, const MAX: usize>
 where
-    T: SaveBin,
+    T: SaveBin + Model,
     SaveError: From<<T as SaveBin>::ReadError>,
     SaveError: From<<T as SaveBin>::WriteError>,
 {
@@ -30,7 +31,7 @@ where
 
 impl<T, const MAX: usize> FixVec<T, MAX>
 where
-    T: SaveBin,
+    T: SaveBin + Model,
     SaveError: From<<T as SaveBin>::ReadError>,
     SaveError: From<<T as SaveBin>::WriteError>,
 {
@@ -80,7 +81,7 @@ where
 
 impl<T, const MAX: usize> FixVec<T, MAX>
 where
-    T: Default + SaveBin,
+    T: Default + SaveBin + Model,
     SaveError: From<<T as SaveBin>::ReadError>,
     SaveError: From<<T as SaveBin>::WriteError>,
 {

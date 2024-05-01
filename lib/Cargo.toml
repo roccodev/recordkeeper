@@ -18,7 +18,8 @@ strum = ["dep:strum"]
 map-bitmaps = []
 
 [dependencies]
-recordkeeper-macros = { version = "=0.1.0", path = "../macros" }
+recordkeeper-macros = { version = "=0.2.0", path = "../macros" }
+recordkeeper-data-model = { version = "=0.1.0", path = "../data-model" }
 byteorder = "1.4.3"
 thiserror = "1.0.44"
 paste = "1.0.14"
