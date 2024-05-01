@@ -17,33 +17,33 @@ pub fn export_imhex(root: &StructModel) {
     while let Some(str) = structs.pop_back() {
         let name = UniqueTypeName::from((str.name, str.type_id));
         if written.insert(name.clone()) {
-            write_struct(&mut out, &str, &name, &mut structs).unwrap();
+            write_struct(&mut out, str, &name, &mut structs).unwrap();
         }
     }
 
+    // Default limit is too low
+    // TODO: calculate this
     println!("#pragma pattern_limit 0x80000");
 
+    // Compatibility types: turn i8, i16, etc. into s8, s16, ...
     for b in [8, 16, 32, 64] {
         println!("using i{b} = s{b};");
     }
-
     println!("using f32 = float;");
     println!("using f64 = double;");
 
-    println!(
-        r#"
-struct Array<T, auto Size> {{
-    T data[Size];
-}};
-        "#
-    );
+    // For simpler multi-dim array support
+    println!(r#"struct Array<T, auto size> {{ T data[size]; }};"#);
 
+    // Forward declaration for all defined structs
     for str in written {
         println!("using {str};");
     }
 
+    // Write all converted structs
     std::io::stdout().write_all(&out).unwrap();
 
+    // Add an instance of the root struct
     println!(
         "{} root @ 0x0;",
         UniqueTypeName::from((root.name, root.type_id))
