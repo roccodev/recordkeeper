@@ -22,6 +22,7 @@ use self::enemy::SoulHackAchievements;
 use self::field::FieldConfig;
 use self::flags::BitFlags;
 use self::item::GemLevels;
+use self::npc::talk::NpcTalkFlags;
 use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
 
 pub mod character;
@@ -32,6 +33,7 @@ pub mod field;
 pub mod flags;
 pub mod item;
 pub mod menu;
+pub mod npc;
 
 pub(crate) const SAVE_VERSION: u8 = 10;
 pub(crate) const SAVE_MAGIC: [u8; 4] = [0x6a, 0xfa, 0x68, 0xb3];
@@ -60,10 +62,25 @@ pub struct SaveData {
 
     /// ID for `SYS_MapJumpList`
     pub respawn_point: u16,
+    #[loc(0x30)]
+    pub respawn_point_pos: Pos,
+    pub respawn_point_hash_id: u32,
+
+    /// Base count of discovered landmarks.
+    ///
+    /// This is 0 for New Game files, it is set when a New Game Plus file is created,
+    /// with the discovered landmark count (16-bit flag) of the previous
+    /// playthrough, plus the value of this field.
+    pub base_landmark_count: u16,
+    /// Base count of discovered secret areas.
+    ///
+    /// This is 0 for New Game files, it is set when a New Game Plus file is created,
+    /// with the discovered secret area count (16-bit flag) of the previous
+    /// playthrough, plus the value of this field.
+    pub base_secret_area_count: u16,
 
     /// Updated by the game on load (only adding new entries, removing none).  
     /// Also recomputed from colony IconFlags when creating a NG+ file.
-    #[loc(0x4c)]
     pub liberated_colonies: BitFlags<1, 1>,
 
     /// For Ino's DX cylinders. (DLC2)
@@ -77,6 +94,9 @@ pub struct SaveData {
     /// incremented by one.
     #[loc(0x54)]
     pub(crate) dlc4_community_order_max: u16,
+
+    #[loc(0x84)]
+    pub npc_talk: NpcTalkFlags,
 
     #[loc(0x664)]
     save_flags: BitFlags<1, 1>,
@@ -177,6 +197,7 @@ pub struct Pos {
     pub x: f32,
     pub y: f32,
     pub z: f32,
+    #[loc(0x10)]
     pub rotation: f32,
 }
 

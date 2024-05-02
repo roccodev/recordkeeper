@@ -33,7 +33,7 @@ pub fn export_imhex(root: &StructModel) {
     println!("using f64 = double;");
 
     // For simpler multi-dim array support
-    println!(r#"struct Array<T, auto size> {{ T data[size]; }};"#);
+    println!(r#"struct Array<T, auto size> {{ T data[size] [[inline]]; }};"#);
 
     // Forward declaration for all defined structs
     for str in written {
@@ -89,7 +89,7 @@ fn write_struct<'a>(
         writeln!(&mut writer, "    padding[{}];", model.total_len - offset)?;
     }
 
-    writeln!(&mut writer, "}};")?;
+    writeln!(&mut writer, "}} [[static]];")?;
     Ok(())
 }
 
