@@ -5,6 +5,8 @@ use crate::{error::SaveError, flags::BitFlags};
 pub(crate) const SYSTEM_VERSION: u32 = 2;
 pub(crate) const SYSTEM_MAGIC: [u8; 4] = [0x74, 0x60, 0xab, 0xe6];
 
+pub const SAVE_SLOT_COUNT: usize = 5;
+
 #[derive(SaveBin, Debug)]
 pub struct SystemData {
     #[assert(SYSTEM_MAGIC)]
@@ -35,9 +37,9 @@ pub struct SystemData {
     #[loc(0x6a0)]
     _unk: u64, // new game count?
     /// One for each slot
-    save_counter: [u64; 5],
+    save_counter: [u64; SAVE_SLOT_COUNT],
     /// One for each slot
-    load_counter: [u64; 5],
+    load_counter: [u64; SAVE_SLOT_COUNT],
     pub continue_counter: u64,
     pub settings_save_counter: u64,
 }

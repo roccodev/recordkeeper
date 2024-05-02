@@ -13,8 +13,15 @@ pub struct CapacityError;
 ///
 /// Extra bytes are not guaranteed to be nulls.
 #[derive(SaveBin, Debug)]
+pub struct FixNullStr<const MAX: usize> {
+    buf: [u8; MAX],
+}
+
+/// Bounded string with fixed storage and maximum length.
+#[derive(SaveBin, Debug)]
 pub struct FixStr<const MAX: usize> {
     buf: [u8; MAX],
+    len: u32,
 }
 
 /// Dynamic array with fixed capacity.

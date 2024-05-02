@@ -19,10 +19,12 @@ use recordkeeper_macros::SaveBin;
 use self::character::CharacterSets;
 use self::chrono::ChronologicalData;
 use self::enemy::SoulHackAchievements;
-use self::field::FieldConfig;
+use self::field::colony::ColonyFlameClocks;
+use self::field::{ActiveMeal, CameraSettings, FieldConfig};
 use self::flags::BitFlags;
 use self::item::GemLevels;
 use self::npc::talk::NpcTalkFlags;
+use self::stats::PlayReportStats;
 use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
 
 pub mod character;
@@ -34,6 +36,7 @@ pub mod flags;
 pub mod item;
 pub mod menu;
 pub mod npc;
+pub mod stats;
 
 pub(crate) const SAVE_VERSION: u8 = 10;
 pub(crate) const SAVE_MAGIC: [u8; 4] = [0x6a, 0xfa, 0x68, 0xb3];
@@ -119,7 +122,10 @@ pub struct SaveData {
     pub ship_pos: Pos,
 
     /// Starts at 0, index for `party_characters`
-    pub controlled_character_idx: u32,
+    pub controlled_character_idx: u16,
+    pub active_meal: ActiveMeal,
+
+    pub camera_settings: CameraSettings,
 
     #[loc(0x710)]
     pub flags: AllFlags,
@@ -161,6 +167,10 @@ pub struct SaveData {
 
     #[loc(0x183000)]
     pub enemy_tombstones: [EnemyTombstone; ENEMY_TOMBSTONE_MAX],
+
+    pub colony_flame_clocks: ColonyFlameClocks,
+
+    pub play_report_stats: PlayReportStats,
 
     #[loc(0x184648)]
     pub chronological_data: ChronologicalData,

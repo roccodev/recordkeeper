@@ -1,4 +1,4 @@
-use crate::util::FixStr;
+use crate::util::FixNullStr;
 use recordkeeper_macros::SaveBin;
 
 /// aka `nn::time::PeriodicBenefitClaimContext`
@@ -37,7 +37,7 @@ struct ClockSnapshot {
     #[loc(0x90)]
     steady_clock_time: SteadyClockTime,
 
-    timezone_name: FixStr<36>,
+    timezone_name: FixNullStr<36>,
     #[loc(0xcc)]
     enable_automatic_correction: bool,
     // != 0 => has last benefit received info
@@ -81,7 +81,7 @@ struct CalendarAdditionalInfo {
     day_of_week: u32,
     /// 0-based day of year
     day_of_year: u32,
-    timezone_short_id: FixStr<8>,
+    timezone_short_id: FixNullStr<8>,
     /// Whether daylight savings are currently in effect
     is_dst: bool,
     #[loc(0x14)]
