@@ -1,5 +1,7 @@
 use recordkeeper_macros::SaveBin;
 
+const COLLECTION_CACHE_MAX: usize = 3000;
+
 #[cfg(feature = "map-bitmaps")]
 pub mod map;
 
@@ -24,6 +26,10 @@ pub struct FieldConfig {
     pub pinned_recipe: u16,
     /// Pinned gem recipe (for the Pinned Items list)
     pub pinned_gem: u16,
+
+    /// Hashed ID for `msg_mnu_sort`
+    #[loc(0x10)]
+    sort_modes: [u32; 29],
 }
 
 #[derive(SaveBin, Debug)]
@@ -63,6 +69,27 @@ pub struct CameraProfile {
     /// In practice, this is `false` when the camera is reset (ZL+RStick), and it is set to
     /// `true` whenever the user moves the camera.
     pub detached: bool,
+}
+
+/// History of last collected items and their locations
+#[derive(SaveBin, Debug)]
+pub struct CollectionCache {
+    pub history: Box<[CollectionCacheEntry; COLLECTION_CACHE_MAX]>,
+}
+
+#[derive(SaveBin, Debug)]
+#[size(32)]
+pub struct CollectionCacheEntry {
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
+    /// Collection gimmick hash ID
+    #[loc(0x10)]
+    pub gimmick_id: u32,
+    /// The collected item's ID
+    pub item_id: u16,
+    /// Timestamp (seconds since save load) of last collection
+    pub collected_at: u16,
 }
 
 impl ActiveMeal {

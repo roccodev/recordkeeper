@@ -4,10 +4,18 @@ use crate::{character::CHARACTER_MAX, util::FixStr, SAVE_SLOT_COUNT};
 
 const ORIGIN_SHARD_MAX: usize = 7;
 
+/// Telemetry collected by the game.
+///
+/// ## Online play warning
+/// It is safe to assume that data from this section is sent to Nintendo's servers.
+/// This includes the console's "pseudo device ID".
 #[derive(SaveBin, Debug)]
 pub struct PlayReportStats {
+    /// A randomly generated string
     pub data_sequence_key: [u8; 8],
+    /// This is probably a playthrough count, but it doesn't quite seem to work
     pub repeat_play_count: u32,
+    /// Currently known values: "product", "test"
     pub product_mode: FixStr<16>,
     /// Monotonic Silver Nopon Coin count
     pub silver_coin_total: u64,
@@ -31,6 +39,7 @@ pub struct PlayReportStats {
     /// Times this playthrough was saved in each slot
     pub save_count: [u64; SAVE_SLOT_COUNT],
 
+    /// Monotonic Interlink SP count
     pub sp_total: u64,
     /// Total number of battles (from initial enemy to full deaggro)
     pub battles_total: u64,
@@ -51,13 +60,14 @@ pub struct PlayReportStats {
     pub collection_total: u64,
     /// Monotonic DX Ether Cylinder (DLC2) count
     pub dx_ether_cylinder_total: u64,
+    /// Completed ether sphere challenges (max 1 each)
     pub ether_sphere_total: u64,
     /// Monotonic crafted accessory count (DLC3)
     pub accessory_craft_total: u64,
-    // Not sure: times crafted accessories were upgraded
-    accessory_craft_enhance_total: u64,
-    // Not sure: times crafted accessories were dismantled
-    accessory_craft_dismantle_total: u64,
+    /// Times crafted accessories were upgraded
+    pub accessory_craft_enhance_total: u64,
+    /// Times crafted accessories were dismantled
+    pub accessory_craft_dismantle_total: u64,
     /// Monotonic DLC4 Affinity Point count
     pub dlc4_ap_total: u64,
 

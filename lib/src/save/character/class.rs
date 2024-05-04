@@ -15,9 +15,10 @@ pub struct CharacterClass {
     pub cp: u32,
     pub unlock_points: u16,
     pub level: u8,
+    flags: u8,
 
     /// The raw value is `ITM_Gem.Category - 1`.
-    /// Level can't be controlled.
+    /// For gem levels, see [`SaveData::gem_levels`](crate::SaveData::gem_levels)
     #[loc(0x8)]
     gems: [u8; CHARACTER_CLASS_GEM_MAX],
     arts: [u16; CHARACTER_CLASS_ART_MAX],
@@ -35,6 +36,14 @@ pub struct ClassAccessory {
     bdat_id: u16,
     slot_index: u16,
     item_type: u16,
+}
+
+pub enum ClassFlags {
+    /// Level cap unlocked
+    Ascended = 0,
+    /// `D9D339FE` type = 13 (unused)
+    Grow13 = 1,
+    Unk = 2,
 }
 
 impl CharacterClass {
@@ -109,7 +118,7 @@ impl ClassAccessory {
     }
 
     pub fn item_type(&self) -> ItemType {
-        todo!()
+        ItemType::try_from(u32::from(self.item_type)).expect("invalid item type")
     }
 
     pub fn slot_index(&self) -> u16 {

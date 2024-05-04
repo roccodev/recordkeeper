@@ -20,9 +20,9 @@ use self::character::CharacterSets;
 use self::chrono::ChronologicalData;
 use self::enemy::SoulHackAchievements;
 use self::field::colony::ColonyFlameClocks;
-use self::field::{ActiveMeal, CameraSettings, FieldConfig};
+use self::field::{ActiveMeal, CameraSettings, CollectionCache, FieldConfig};
 use self::flags::BitFlags;
-use self::item::GemLevels;
+use self::item::{GemLevels, LegacyForge};
 use self::npc::talk::NpcTalkFlags;
 use self::stats::PlayReportStats;
 use dlc::{AccessoryCrafting, ChallengeBattle, Dlc4, PowAugment, POW_AUGMENT_NUM};
@@ -151,6 +151,13 @@ pub struct SaveData {
 
     #[loc(0x53c78)]
     pub inventory: Inventory,
+
+    // This is a removed feature that has no effect on the latest save version, not sure whether
+    // it should be exposed. I'll leave it here for documentation's sake
+    #[loc(0x64f60)]
+    legacy_forge: LegacyForge,
+
+    pub collection_cache: CollectionCache,
 
     #[loc(0x7c760)]
     pub soul_hack_achievements: SoulHackAchievements,

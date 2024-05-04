@@ -4,6 +4,7 @@ use recordkeeper_macros::SaveBin;
 use thiserror::Error;
 
 use crate::{
+    character::CHARACTER_MAX,
     dlc::{CraftItemData, CRAFTED_ITEM_ID},
     SaveData,
 };
@@ -77,6 +78,29 @@ pub struct DlcManualSlot {
 pub struct GemLevels {
     /// Gem Item IDs (12000+) for each category
     item_ids: [u16; GEM_CATEGORY_MAX],
+}
+
+/// Forged accessory data (unused/removed feature)
+///
+/// This is a removed feature, but its data still lingers in the latest version. The mechanic
+/// would allegedly make some character-exclusive accessories forgeable, allowing their effect
+/// to be changed and their stats upgraded.
+///
+/// **This is not to be confused with Masha accessory crafting**. This is, however, not a
+/// coincidence: the code responsible for updating this section now updates the Masha section instead.
+#[derive(SaveBin, Debug)]
+pub struct LegacyForge {
+    /// One entry per character (ID - 1). The single accessory associated to an entry is the
+    /// one with the respective `UseChr` in `ITM_Accessory`.
+    pub data: [LegacyForgeData; CHARACTER_MAX],
+}
+
+/// See [`LegacyForge`]
+#[derive(SaveBin, Debug)]
+#[size(4)]
+pub struct LegacyForgeData {
+    pub enhance_id: u16,
+    pub valid: bool,
 }
 
 #[derive(PartialEq, Clone, Copy, Debug)]
