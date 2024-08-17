@@ -1,1 +1,16 @@
- 
+menu_base_quests = Quêtes
+save = Sauvegarder
+download = Sauvegarder et Télécharger
+yes = Oui
+no = Non
+nav_source = Source
+nav_license = License
+menu_category_dlc = Fichier du DLC
+menu_base_items = Objets
+menu_base_ums = Monstre Unique
+lang_game = Jeu
+open = Ouvrir
+ok = OK
+nav_about = A propos
+home_upload = Pour commencer, ouvrez un fichier de sauvegarde avec ce bouton.
+menu_category_base = Fichier de jeu
