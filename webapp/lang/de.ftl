@@ -140,3 +140,7 @@ flag_bits = Flaggenbits
 # Allows the user to jump to the page that contains the flag
 flag_jump_page = Gehe zu Flagge...
 menu_base_ouroboros = Ouroboros
+menu_dlc4_community = Gemeinschaft
+unnamed = #{ $id } (Kein Name)
+menu_base_chrono = Chronologische Daten
+menu_dlc4_map_completion = Kartenvervollständigung
